@@ -9,9 +9,8 @@
     {
       "name": "cc-plugins",
       "source": {
-        "type": "github",
-        "owner": "ccheney",
-        "repo": "cc-plugins"
+        "source": "github",
+        "repo": "ccheney/cc-plugins"
       },
       "description": "Mermaid diagram generation and more",
       "version": "1.0.0",
