@@ -16,9 +16,6 @@
       "version": "1.0.0",
       "author": {
         "name": "ccheney"
-      },
-      "components": {
-        "skills": ["mermaid-diagrams"]
       }
     }
   ]
