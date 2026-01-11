@@ -1,7 +1,7 @@
 {
   "name": "cc-plugins",
   "version": "1.0.0",
-  "description": "Custom Claude Code plugins including diagram generation and more",
+  "description": "Generate Mermaid diagrams in markdown - flowcharts, sequence diagrams, ER diagrams, state machines, Gantt charts, and more",
   "author": {
     "name": "ccheney",
     "url": "https://github.com/ccheney"

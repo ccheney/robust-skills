@@ -12,10 +12,13 @@
         "source": "github",
         "repo": "ccheney/cc-plugins"
       },
-      "description": "Mermaid diagram generation and more",
+      "description": "Generate Mermaid diagrams in markdown - flowcharts, sequence diagrams, ER diagrams, state machines, Gantt charts, and more",
       "version": "1.0.0",
       "author": {
         "name": "ccheney"
+      },
+      "components": {
+        "skills": ["mermaid-diagrams"]
       }
     }
   ]
