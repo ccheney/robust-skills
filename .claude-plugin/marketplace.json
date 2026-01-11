@@ -8,10 +8,16 @@
   "plugins": [
     {
       "name": "cc-plugins",
-      "source": "ccheney/cc-plugins",
+      "source": {
+        "type": "github",
+        "owner": "ccheney",
+        "repo": "cc-plugins"
+      },
       "description": "Mermaid diagram generation and more",
       "version": "1.0.0",
-      "author": "ccheney"
+      "author": {
+        "name": "ccheney"
+      }
     }
   ]
 }
