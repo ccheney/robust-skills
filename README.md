@@ -2,15 +2,18 @@
 
 Custom Claude Code plugins for enhanced development workflows.
 
-## Installation
+## Skills
 
-### Using add-skill (Recommended)
+| Skill | Description |
+|-------|-------------|
+| [mermaid-diagrams](skills/mermaid-diagrams/) | Generate Mermaid diagrams in markdown |
+| [postgres-drizzle](skills/postgres-drizzle/) | PostgreSQL 18 + Drizzle ORM best practices |
+
+## Installation
 
 ```bash
 npx add-skill ccheney/cc-plugins
 ```
-
-This installs skills to your project's `.claude/skills/` directory. Use `-g` for global installation.
 
 ### Using Claude Code Plugin Marketplace
 
@@ -23,10 +26,3 @@ This installs skills to your project's `.claude/skills/` directory. Use `-g` for
 ```bash
 claude plugin install ccheney/cc-plugins
 ```
-
-## Skills
-
-| Skill | Description |
-|-------|-------------|
-| [mermaid-diagrams](skills/mermaid-diagrams/) | Generate Mermaid diagrams in markdown |
-| [postgres-drizzle](skills/postgres-drizzle/) | PostgreSQL 18 + Drizzle ORM best practices |
