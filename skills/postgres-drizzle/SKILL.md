@@ -1,6 +1,6 @@
 ---
 name: postgres-drizzle
-description: PostgreSQL 18 and Drizzle ORM 0.45 best practices for schema design, queries, migrations, performance optimization, and TypeScript type safety. Use when writing database code, schemas, queries, migrations, or optimizing PostgreSQL performance with Drizzle ORM.
+description: PostgreSQL 18 and Drizzle ORM best practices. Use when writing database schemas, queries, or migrations.
 ---
 
 # PostgreSQL 18 + Drizzle ORM Best Practices

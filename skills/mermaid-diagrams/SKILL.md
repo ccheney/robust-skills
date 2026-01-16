@@ -1,6 +1,6 @@
 ---
 name: mermaid-diagrams
-description: Generate Mermaid diagrams in markdown including flowcharts, sequence diagrams, class diagrams, ER diagrams, state diagrams, Gantt charts, pie charts, mindmaps, and timelines. Use when the user asks for diagrams, charts, visualizations, architecture drawings, or system documentation in markdown.
+description: Generate Mermaid diagrams in markdown. Use when the user asks for diagrams, charts, or visualizations.
 ---
 
 # Mermaid Diagram Generation
