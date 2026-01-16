@@ -8,6 +8,6 @@
   },
   "repository": "https://github.com/ccheney/cc-plugins",
   "license": "MIT",
-  "keywords": ["mermaid", "diagrams", "visualization"],
+  "keywords": ["mermaid", "diagrams", "postgres", "drizzle", "database"],
   "skills": "./skills/"
 }
