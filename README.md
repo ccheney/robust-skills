@@ -31,6 +31,9 @@ npx add-skill ccheney/robust-skills
 
 ```bash
 npx add-skill ccheney/robust-skills/clean-ddd-hexagonal
+npx add-skill ccheney/robust-skills/feature-slicing
+npx add-skill ccheney/robust-skills/mermaid-diagrams
+npx add-skill ccheney/robust-skills/postgres-drizzle
 ```
 
 ## Usage
