@@ -451,45 +451,6 @@ When embedding in HTML:
 
 ---
 
-# Integration Tips
-
-## GitHub/GitLab
-
-Native support - just use fenced code blocks:
-
-````markdown
-```mermaid
-flowchart LR
-    A --> B
-```
-````
-
-## VS Code
-
-Install "Markdown Preview Mermaid Support" extension.
-
-## Docusaurus
-
-```javascript
-// docusaurus.config.js
-module.exports = {
-  markdown: {
-    mermaid: true,
-  },
-  themes: ['@docusaurus/theme-mermaid'],
-};
-```
-
-## Notion
-
-Paste directly - native support.
-
-## Confluence
-
-Use Mermaid plugin or paste as image.
-
----
-
 # Export Options
 
 ## From Live Editor

@@ -310,64 +310,6 @@ export function ProductDetailPage() {
 
 ---
 
-## Phase 6: Enforce Rules
-
-### Install Steiger
-
-```bash
-npm install -D @feature-sliced/steiger
-```
-
-### Configure Steiger
-
-```javascript
-// steiger.config.js
-module.exports = {
-  root: './src',
-  rules: {
-    'no-public-api-sidestep': 'error',
-    'no-layer-public-api': ['error', { severity: 'error' }],
-    'no-cross-imports': 'error',
-    'no-ui-in-app': 'error',
-  },
-};
-```
-
-### Run Linting
-
-```bash
-npx steiger ./src
-```
-
-### ESLint Rules
-
-```javascript
-// .eslintrc.js
-module.exports = {
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          // Forbid deep imports into slices
-          'entities/*/*',
-          'features/*/*',
-          'widgets/*/*',
-          'pages/*/*',
-          // Forbid upward imports
-          {
-            group: ['app/*'],
-            message: 'Cannot import from app layer in lower layers',
-          },
-        ],
-      },
-    ],
-  },
-};
-```
-
----
-
 ## Common Migration Patterns
 
 ### Handling Circular Dependencies
@@ -473,8 +415,6 @@ export function AddToCartButton({ product }) {
 - [ ] Migrate pages to page slices
 - [ ] Extract reusable widgets
 - [ ] Setup `app/` layer with providers
-- [ ] Install and configure Steiger
-- [ ] Add ESLint rules for import restrictions
 - [ ] Remove old directory structure
 - [ ] Update documentation
 

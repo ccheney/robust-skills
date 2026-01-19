@@ -4,14 +4,6 @@ Comprehensive reference for managing database migrations with drizzle-kit.
 
 ---
 
-## Installation
-
-```bash
-npm install -D drizzle-kit
-```
-
----
-
 ## Configuration
 
 ### drizzle.config.ts

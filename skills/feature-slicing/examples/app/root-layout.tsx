@@ -1,6 +1,6 @@
-// app/layout.tsx
-import { Providers } from '@/app/providers';
-import '@/app/styles/globals.css';
+// src/app/layout.tsx
+import { Providers } from './providers';
+import './styles/globals.css';
 
 /**
  * Props for the RootLayout component.

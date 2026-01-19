@@ -200,21 +200,6 @@ import type { ProductId } from '@/entities/product/@x/order';
 
 ---
 
-## Steiger Commands
-
-```bash
-# Install
-npm install -D @feature-sliced/steiger
-
-# Lint
-npx steiger ./src
-
-# Check specific rules
-npx steiger ./src --rule no-cross-imports
-```
-
----
-
 ## Layer Import Matrix
 
 |  | app | pages | widgets | features | entities | shared |
@@ -250,5 +235,4 @@ Add `entities/`, `features/`, `widgets/` as needed.
 - **Official Docs:** https://feature-sliced.design
 - **GitHub:** https://github.com/feature-sliced
 - **Examples:** https://github.com/feature-sliced/examples
-- **Steiger Linter:** https://github.com/feature-sliced/steiger
 - **Discord:** https://discord.gg/S8MzWTUsmp

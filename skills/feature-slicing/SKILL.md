@@ -77,7 +77,7 @@ src/
 1. **Creating a new feature**: Place in `features/` if reused across pages, otherwise keep in `pages/`
 2. **Creating a new entity**: Place in `entities/` with `ui/`, `api/`, `model/` segments
 3. **Creating shared utilities**: Place in `shared/lib/` or `shared/ui/`
-4. **Integrating with Next.js**: Keep Next.js `app/` at root, FSD in `src/`
+4. **Integrating with Next.js**: Place App Router in `src/app/` (no root `app/`), which serves as both routing and FSD app layer
 
 ## Reference Documentation
 

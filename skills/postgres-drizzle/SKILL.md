@@ -7,13 +7,6 @@ description: PostgreSQL and Drizzle ORM best practices. Use when writing databas
 
 Type-safe database applications with PostgreSQL 18 and Drizzle ORM.
 
-## Quick Start
-
-```bash
-npm install drizzle-orm postgres
-npm install -D drizzle-kit
-```
-
 ## Directory Structure
 
 ```

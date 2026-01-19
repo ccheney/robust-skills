@@ -178,8 +178,3 @@ Pages orchestrate widgets, features, and entities for a specific route.
 ### TypeScript Path Aliases
 
 - [tsconfig paths](../examples/config/tsconfig-paths.json) - Path alias setup
-
-### Linting Rules
-
-- [ESLint rules](../examples/config/eslint-rules.js) - Import restriction rules
-- [Steiger config](../examples/config/steiger.config.js) - FSD linter configuration

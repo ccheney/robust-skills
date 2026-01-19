@@ -203,42 +203,6 @@ import { AddToCart } from '@/features/add-to-cart';
 
 ---
 
-## Enforcing Public API Rules
-
-FSD doesn't technically prevent direct file imports. Use **Steiger** to enforce:
-
-```bash
-npm install -D @feature-sliced/steiger
-npx steiger ./src
-```
-
-**ESLint rules:**
-
-```javascript
-// .eslintrc.js
-module.exports = {
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: ['@/entities/*/*', '!@/entities/*/index'],
-            message: 'Import from entity public API only',
-          },
-          {
-            group: ['@/features/*/*', '!@/features/*/index'],
-            message: 'Import from feature public API only',
-          },
-        ],
-      },
-    ],
-  },
-};
-```
-
----
-
 ## Complete Example
 
 ```typescript

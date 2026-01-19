@@ -8,7 +8,9 @@ FSD conflicts with Next.js's built-in `app/` and `pages/` folders, which expect 
 
 ## Solution Overview
 
-Keep Next.js routing folders at project root; place FSD layers in `src/`. Re-export pages from FSD to Next.js route files.
+> **Note:** Next.js ignores `src/app/` if `app/` exists at root. Therefore, we place the entire App Router inside `src/app/` alongside FSD providers, keeping all code in `src/`.
+
+Place the Next.js App Router in `src/app/` (no root `app/` folder). This directory serves double duty: Next.js routing AND the FSD app layer. Re-export page components from FSD `pages/` layer into route files.
 
 ---
 
@@ -18,21 +20,22 @@ Keep Next.js routing folders at project root; place FSD layers in `src/`. Re-exp
 
 ```
 project-root/
-├── app/                      # Next.js App Router (routing only)
-│   ├── layout.tsx            # Root layout
-│   ├── page.tsx              # Home route → re-exports from src/pages
-│   ├── products/
-│   │   ├── page.tsx
-│   │   └── [id]/
-│   │       └── page.tsx
-│   ├── login/
-│   │   └── page.tsx
-│   └── api/                  # API routes
-│       └── ...
-├── src/                      # FSD layers
-│   ├── app/                  # FSD app layer
-│   │   ├── providers/
-│   │   └── styles/
+├── src/
+│   ├── app/                  # Next.js App Router + FSD app layer
+│   │   ├── layout.tsx        # Root layout with providers
+│   │   ├── page.tsx          # Home route → re-exports from pages/
+│   │   ├── products/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── api/              # API routes
+│   │   │   └── ...
+│   │   ├── providers/        # FSD: React context providers
+│   │   │   └── index.tsx
+│   │   └── styles/           # FSD: Global styles
+│   │       └── globals.css
 │   ├── pages/                # FSD pages layer
 │   │   ├── home/
 │   │   ├── products/
@@ -49,13 +52,13 @@ project-root/
 ### Page Re-Export Pattern
 
 ```typescript
-// app/page.tsx (Next.js route)
+// src/app/page.tsx (Next.js route)
 export { HomePage as default } from '@/pages/home';
 
-// app/products/page.tsx
+// src/app/products/page.tsx
 export { ProductsPage as default } from '@/pages/products';
 
-// app/products/[id]/page.tsx
+// src/app/products/[id]/page.tsx
 export { ProductDetailPage as default } from '@/pages/product-detail';
 ```
 
@@ -86,9 +89,9 @@ export { HomePage } from './ui/HomePage';
 ### Root Layout with FSD Providers
 
 ```typescript
-// app/layout.tsx
-import { Providers } from '@/app/providers';
-import '@/app/styles/globals.css';
+// src/app/layout.tsx
+import { Providers } from './providers';
+import './styles/globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -122,7 +125,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ### Server Components with FSD
 
 ```typescript
-// app/products/[id]/page.tsx
+// src/app/products/[id]/page.tsx
 import { ProductDetailPage } from '@/pages/product-detail';
 import { getProductById } from '@/entities/product';
 
@@ -275,10 +278,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 FSD is frontend-focused. For API routes:
 
-### Option 1: Keep in Next.js `app/api/`
+### Option 1: Keep in `src/app/api/`
 
 ```
-app/
+src/app/
 ├── api/
 │   ├── auth/
 │   │   └── route.ts
@@ -292,25 +295,26 @@ app/
 packages/
 ├── frontend/          # Next.js + FSD
 │   └── src/
-│       ├── pages/
+│       ├── app/       # App Router + FSD app layer
+│       ├── pages/     # FSD pages layer
 │       └── ...
 └── backend/           # Express/Fastify
     └── src/
         └── routes/
 ```
 
-### Option 3: API Routes Segment in FSD App Layer
+### Option 3: Re-export API handlers
 
 ```typescript
-// src/app/api-routes/auth.ts
+// src/app/api-handlers/auth.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   // Auth logic
 }
 
-// app/api/auth/route.ts
-export { POST } from '@/app/api-routes/auth';
+// src/app/api/auth/route.ts
+export { POST } from '../api-handlers/auth';
 ```
 
 ---
@@ -400,7 +404,7 @@ export const config = {
 ### Loading States
 
 ```typescript
-// app/products/loading.tsx
+// src/app/products/loading.tsx
 import { ProductListSkeleton } from '@/widgets/product-list';
 
 export default function Loading() {
@@ -422,7 +426,7 @@ export function ProductListSkeleton() {
 ### Error Boundaries
 
 ```typescript
-// app/products/error.tsx
+// src/app/products/error.tsx
 'use client';
 
 import { Button } from '@/shared/ui';
