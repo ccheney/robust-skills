@@ -27,8 +27,6 @@ Production-grade skills that encode battle-tested architectural patterns and bes
 npx skills add ccheney/robust-skills
 ```
 
-For more information about the skills CLI, see the [skills.sh documentation](https://skills.sh).
-
 ## Usage
 
 Once installed, skills activate automatically based on context. You can also invoke them explicitly:
