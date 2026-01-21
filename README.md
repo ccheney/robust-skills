@@ -24,16 +24,16 @@ Production-grade skills that encode battle-tested architectural patterns and bes
 ## Installation
 
 ```bash
-npx skills ccheney/robust-skills
+npx skills add ccheney/robust-skills
 ```
 
 ### Install a Specific Skill
 
 ```bash
-npx skills ccheney/robust-skills/clean-ddd-hexagonal
-npx skills ccheney/robust-skills/feature-slicing
-npx skills ccheney/robust-skills/mermaid-diagrams
-npx skills ccheney/robust-skills/postgres-drizzle
+npx skills add ccheney/robust-skills/clean-ddd-hexagonal
+npx skills add ccheney/robust-skills/feature-slicing
+npx skills add ccheney/robust-skills/mermaid-diagrams
+npx skills add ccheney/robust-skills/postgres-drizzle
 ```
 
 For more information about the skills CLI, see the [skills.sh documentation](https://skills.sh).
