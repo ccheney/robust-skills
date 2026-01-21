@@ -24,16 +24,7 @@ Production-grade skills that encode battle-tested architectural patterns and bes
 ## Installation
 
 ```bash
-npx add-skill ccheney/robust-skills
-```
-
-### Install a Specific Skill
-
-```bash
-npx add-skill ccheney/robust-skills/clean-ddd-hexagonal
-npx add-skill ccheney/robust-skills/feature-slicing
-npx add-skill ccheney/robust-skills/mermaid-diagrams
-npx add-skill ccheney/robust-skills/postgres-drizzle
+npx skills add ccheney/robust-skills
 ```
 
 ## Usage
@@ -42,12 +33,12 @@ Once installed, skills activate automatically based on context. You can also inv
 
 ```
 # Architecture skills trigger on relevant tasks
-"Set up a new Express API with clean architecture"
-"Create a new feature for user authentication using FSD"
+"Set up a new Express API with clean architecture skill"
+"Create a new feature for user authentication using FSD skill"
 
 # Or reference directly
 "Use the postgres-drizzle skill to design my schema"
-"Generate a mermaid diagram showing the data flow"
+"Using the mermaid skill generate a diagram showing the data flow"
 ```
 
 ## Skill Overview
