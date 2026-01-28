@@ -230,11 +230,13 @@ import type { ProductId } from '@/entities/product/@x/order';
 | [references/MIGRATION.md](references/MIGRATION.md) | Incremental migration strategy |
 | [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick reference, import matrix |
 
-## External Resources
+## Resources
 
-| Resource | Description |
-|----------|-------------|
-| [Official Docs](https://feature-sliced.design) | Complete FSD methodology |
-| [Examples](https://github.com/feature-sliced/examples) | Real-world FSD projects |
-| [Awesome FSD](https://github.com/feature-sliced/awesome) | Curated articles, videos, tools |
-| [v2.1 Release Notes](https://github.com/feature-sliced/documentation/releases/tag/v2.1) | "Pages First" approach |
+### Official Sources
+- **Official Documentation**: https://feature-sliced.design
+- **GitHub Organization**: https://github.com/feature-sliced
+- **Official Examples**: https://github.com/feature-sliced/examples
+- **Specification**: https://feature-sliced.design/docs/reference
+
+### Community
+- **Awesome FSD**: https://github.com/feature-sliced/awesome (curated articles, videos, tools)

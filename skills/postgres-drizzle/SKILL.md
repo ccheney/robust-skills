@@ -171,5 +171,15 @@ await db.transaction(async (tx) => {
 
 ## Resources
 
-- **Drizzle Docs**: https://orm.drizzle.team
-- **PostgreSQL 18**: https://www.postgresql.org/docs/18/
+### Drizzle ORM
+- **Official Documentation**: https://orm.drizzle.team
+- **GitHub Repository**: https://github.com/drizzle-team/drizzle-orm
+- **Drizzle Kit (Migrations)**: https://orm.drizzle.team/kit-docs/overview
+
+### PostgreSQL
+- **Official Documentation**: https://www.postgresql.org/docs/
+- **SQL Commands Reference**: https://www.postgresql.org/docs/current/sql-commands.html
+- **Performance Tips**: https://www.postgresql.org/docs/current/performance-tips.html
+- **Index Types**: https://www.postgresql.org/docs/current/indexes-types.html
+- **JSON Functions**: https://www.postgresql.org/docs/current/functions-json.html
+- **Row Level Security**: https://www.postgresql.org/docs/current/ddl-rowsecurity.html

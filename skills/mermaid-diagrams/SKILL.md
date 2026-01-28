@@ -167,5 +167,8 @@ A -->|text| B # Labeled
 
 ## Resources
 
+- **Official Documentation**: https://mermaid.js.org
 - **Live Editor**: https://mermaid.live
-- **Docs**: https://mermaid.js.org
+- **GitHub Repository**: https://github.com/mermaid-js/mermaid
+- **GitHub Markdown Support**: https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams
+- **GitLab Markdown Support**: https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts
