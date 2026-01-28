@@ -1,6 +1,6 @@
 # robust-skills
 
-Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), database design (Postgres/Drizzle), and system visualization (Mermaid).
+Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), database design (Postgres/Drizzle), system visualization (Mermaid), and modern JavaScript (ES6-ES2025).
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
@@ -20,6 +20,14 @@ Apply Feature-Sliced Design (FSD) architecture to frontend projects. Use when cr
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill feature-slicing
+```
+
+### modern-javascript
+
+Modern JavaScript (ES6-ES2025) patterns and best practices. Use when writing new JavaScript, refactoring legacy code, modernizing codebases, or implementing functional patterns. Covers `.at()`, `.toSorted()`, `.toReversed()`, `Object.groupBy()`, optional chaining, nullish coalescing, async/await, and more.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill modern-javascript
 ```
 
 ### mermaid-diagrams
