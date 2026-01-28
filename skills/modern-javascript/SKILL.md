@@ -269,11 +269,6 @@ const { address: { city, country } } = user;
 
 // Rest
 const { id, ...userData } = user;
-
-// Function parameters
-function greet({ name, greeting = 'Hello' }) {
-  return `${greeting}, ${name}!`;
-}
 ```
 
 ### Array Destructuring
