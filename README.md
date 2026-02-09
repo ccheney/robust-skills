@@ -1,6 +1,6 @@
 # robust-skills
 
-Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), and modern JavaScript (ES6-ES2025).
+Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), and Slack rich output (Block Kit, mrkdwn).
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
@@ -36,6 +36,14 @@ Modern CSS features and best practices for building interfaces with pure native 
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill modern-css
+```
+
+### slack-rich-output
+
+Slack Block Kit, mrkdwn syntax, and rich message formatting for building Slack app output. Use when building Slack apps or bots, formatting messages, constructing Block Kit payloads, creating modals or App Home views, implementing link unfurling, or adding interactive elements. Covers all 13 block types, 19 interactive elements, composition objects, surfaces, Work Objects, and the critical mrkdwn vs standard Markdown distinction. Great skill for AI Slack assistants.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill slack-rich-output
 ```
 
 ### mermaid-diagrams
