@@ -73,13 +73,16 @@ The `metadata` parameter (URL-encoded) contains the entity definition:
 
 ### Key Properties
 
-| Property | Purpose |
-|----------|---------|
-| `app_unfurl_url` | The URL the user posted |
-| `url` | Canonical resource URL in external system |
-| `entity_type` | One of the 5 entity types |
-| `external_ref` | Object with `id` (required) and `type` (optional) identifying the entity. Use the same ID your system uses to retrieve the resource |
-| `entity_payload` | Schema defining what's displayed |
+| Property | Required | Purpose |
+|----------|----------|---------|
+| `app_unfurl_url` | Yes | The URL the user posted |
+| `url` | Yes | Canonical resource URL in external system |
+| `entity_type` | Yes | One of the 5 entity types |
+| `external_ref` | Yes | Object with `id` (required) and `type` (optional) identifying the entity |
+| `entity_payload.attributes` | Yes | Header info including `title` |
+| `entity_payload.fields` | Yes | Object of typed field entries (required even if empty `{}`) |
+
+Slack silently drops the entire metadata payload if any required field is missing — no error, no card, just the bare text message.
 
 ### Direct Posting (Without Link Unfurl)
 
