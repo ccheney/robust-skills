@@ -1,6 +1,6 @@
 # robust-skills
 
-Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), Slack Block Kit, and Slack mrkdwn formatting.
+Architectural taste for agentic engineering and agents. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), Slack Block Kit, and Slack mrkdwn formatting.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
