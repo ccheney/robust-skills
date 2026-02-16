@@ -1,6 +1,6 @@
 # robust-skills
 
-Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), and Slack rich output (Block Kit, mrkdwn).
+Architectural taste for AI-assisted development. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), Slack Block Kit, and Slack mrkdwn formatting.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
@@ -38,12 +38,20 @@ Modern CSS features and best practices for building interfaces with pure native 
 npx skills add https://github.com/ccheney/robust-skills --skill modern-css
 ```
 
-### slack-rich-output
+### slack-block-kit
 
-Slack Block Kit, mrkdwn syntax, and rich message formatting for building Slack app output. Use when building Slack apps or bots, formatting messages, constructing Block Kit payloads, creating modals or App Home views, implementing link unfurling, or adding interactive elements. Covers all 13 block types, 19 interactive elements, composition objects, surfaces, Work Objects, and the critical mrkdwn vs standard Markdown distinction. Great skill for AI Slack assistants.
+Slack Block Kit UI framework for building rich message layouts, modals, and App Home views. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, or designing rich message layouts. Covers all 15 block types, 20 interactive elements, composition objects, surfaces, and Work Objects.
 
 ```bash
-npx skills add https://github.com/ccheney/robust-skills --skill slack-rich-output
+npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
+```
+
+### slack-mrkdwn
+
+Slack mrkdwn text formatting syntax for messages, text objects, and attachments. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content, adding mentions or date formatting, or debugging text rendering issues. Covers the critical mrkdwn vs standard Markdown distinction, mentions, date tokens, escaping, and legacy attachments.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
 ```
 
 ### mermaid-diagrams
