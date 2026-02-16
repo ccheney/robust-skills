@@ -38,20 +38,12 @@ Modern CSS features and best practices for building interfaces with pure native 
 npx skills add https://github.com/ccheney/robust-skills --skill modern-css
 ```
 
-### slack-block-kit
+### postgres-drizzle
 
-Slack Block Kit UI framework for building rich message layouts, modals, and App Home views. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, or designing rich message layouts. Covers all 15 block types, 20 interactive elements, composition objects, surfaces, and Work Objects.
-
-```bash
-npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
-```
-
-### slack-mrkdwn
-
-Slack mrkdwn text formatting syntax for messages, text objects, and attachments. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content, adding mentions or date formatting, or debugging text rendering issues. Covers the critical mrkdwn vs standard Markdown distinction, mentions, date tokens, escaping, and legacy attachments.
+PostgreSQL and Drizzle ORM best practices. Use when writing database schemas, queries, migrations, or any database-related code. Proactively apply when creating APIs, backends, or data models.
 
 ```bash
-npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
+npx skills add https://github.com/ccheney/robust-skills --skill postgres-drizzle
 ```
 
 ### mermaid-diagrams
@@ -62,10 +54,18 @@ Generate Mermaid diagrams in markdown. Use when visualizing code, systems, proce
 npx skills add https://github.com/ccheney/robust-skills --skill mermaid-diagrams
 ```
 
-### postgres-drizzle
+### slack-mrkdwn
 
-PostgreSQL and Drizzle ORM best practices. Use when writing database schemas, queries, migrations, or any database-related code. Proactively apply when creating APIs, backends, or data models.
+Slack mrkdwn text formatting syntax for messages, text objects, and attachments. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content, adding mentions or date formatting, or debugging text rendering issues. Covers the critical mrkdwn vs standard Markdown distinction, mentions, date tokens, escaping, and legacy attachments.
 
 ```bash
-npx skills add https://github.com/ccheney/robust-skills --skill postgres-drizzle
+npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
+```
+
+### slack-block-kit
+
+Slack Block Kit UI framework for building rich message layouts, modals, and App Home views. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, or designing rich message layouts. Covers all 15 block types, 20 interactive elements, composition objects, surfaces, and Work Objects.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
 ```
