@@ -1,23 +1,7 @@
-# Slack Rich Output Quick Reference
+# Slack Block Kit Quick Reference
 
 > Sources:
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
-> - [Formatting Message Text](https://docs.slack.dev/messaging/formatting-message-text) — Slack
-
----
-
-## mrkdwn Syntax
-
-```
-*bold*                          _italic_
-~strikethrough~                 `inline code`
-```code block```               > blockquote
-<https://url|display text>      <@U0123ABC> (mention)
-<#C0123ABC> (channel)           :emoji_name:
-<!date^1234567890^{date} at {time}|fallback>
-```
-
-**NOT standard Markdown:** `**bold**`, `[text](url)`, `# heading` all render literally.
 
 ---
 
@@ -37,6 +21,8 @@
 | Context Actions | `context_actions` | Msg only | 5 elements |
 | Input | `input` | Modal, Msg, Home | label required, many element types |
 | Video | `video` | Msg, Modal, Home | links.embed:write scope |
+| Plan | `plan` | Msg only | Sequential task cards for AI agent output |
+| Task Card | `task_card` | Msg only | Single task with status, details, output, sources |
 | File | `file` | Msg only | Read-only, source: "remote" |
 
 ---
@@ -64,6 +50,7 @@
 | Icon Button | `icon_button` | context_actions |
 | Image | `image` | section (accessory), context |
 | Workflow Button | `workflow_button` | section, actions |
+| URL Source | `url` | task_card (sources array) |
 
 ---
 
@@ -78,6 +65,8 @@
 | Conversation Filter | Conversation select menus (via `filter`) |
 | Dispatch Action Config | plain_text_input, rich_text_input |
 | Slack File | Image block/element (via `slack_file`) |
+| Trigger | Workflow button (via `workflow.trigger`) |
+| Workflow | Workflow button (wraps trigger object) |
 
 ---
 
@@ -94,7 +83,7 @@
 
 | Type | Key Properties |
 |------|----------------|
-| `text` | `text`, `style: { bold, italic, strike, code, underline }` |
+| `text` | `text`, `style: { bold, italic, strike, code, underline, highlight, client_highlight, unlink }` |
 | `link` | `url`, `text`, `style` |
 | `emoji` | `name` |
 | `user` | `user_id` |
@@ -113,42 +102,6 @@
 | (default) | Gray | Standard actions |
 | `primary` | Green | Affirmation — use sparingly, one per set |
 | `danger` | Red | Destructive — use with confirmation dialog |
-
----
-
-## Date Tokens
-
-| Token | Example Output |
-|-------|---------------|
-| `{date_num}` | 2014-02-18 |
-| `{date}` | February 18th, 2014 |
-| `{date_short}` | Feb 18, 2014 |
-| `{date_long}` | Tuesday, February 18th, 2014 |
-| `{time}` | 6:39 AM |
-| `{time_secs}` | 6:39:42 AM |
-| `{ago}` | 3 minutes ago |
-| `{date_pretty}` | Yesterday (or date if not recent) |
-| `{date_short_pretty}` | Yesterday (short format) |
-| `{date_long_pretty}` | Yesterday (long format) |
-
----
-
-## Mentions
-
-```
-<@U0123ABC>                  User mention (triggers notification)
-<#C0123ABC>                  Channel link
-<!subteam^SAZ94GDB8>         User group mention
-<!here>                      Active channel members
-<!channel>                   All channel members
-<!everyone>                  All non-guest workspace members
-```
-
----
-
-## Escaping
-
-Only three characters: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`
 
 ---
 
@@ -172,18 +125,7 @@ Only three characters: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`
 | Select options | 100 |
 | Overflow options | 5 |
 | Placeholder text | 150 chars |
-
----
-
-## Work Object Entity Types
-
-| Type | Entity ID |
-|------|-----------|
-| File | `slack#/entities/file` |
-| Task | `slack#/entities/task` |
-| Incident | `slack#/entities/incident` |
-| Content Item | `slack#/entities/content_item` |
-| Item | `slack#/entities/item` |
+| File input max size | 10MB per file |
 
 ---
 
@@ -197,3 +139,15 @@ Only three characters: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`
 | Canvases | No (markdown only) | `canvases.create` |
 | Lists | No | `lists.*` |
 | Split View | Config-based | Agents & AI Apps |
+
+---
+
+## Work Object Entity Types
+
+| Type | Entity ID |
+|------|-----------|
+| File | `slack#/entities/file` |
+| Task | `slack#/entities/task` |
+| Incident | `slack#/entities/incident` |
+| Content Item | `slack#/entities/content_item` |
+| Item | `slack#/entities/item` |

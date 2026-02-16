@@ -124,8 +124,29 @@ Use the `hash` parameter in `views.update` calls. Included in `block_actions` pa
 
 After `view_submission`, input values are in:
 ```
-view.state.values[block_id][action_id].value
+view.state.values[block_id][action_id].value          # text inputs
+view.state.values[block_id][action_id].selected_option # single select
+view.state.values[block_id][action_id].selected_options # multi-select, checkboxes
+view.state.values[block_id][action_id].selected_date   # datepicker
+view.state.values[block_id][action_id].selected_time   # timepicker
+view.state.values[block_id][action_id].selected_date_time # datetimepicker
+view.state.values[block_id][action_id].selected_user   # users_select
+view.state.values[block_id][action_id].selected_users  # multi_users_select
+view.state.values[block_id][action_id].selected_conversation  # conversations_select
+view.state.values[block_id][action_id].selected_conversations # multi_conversations_select
+view.state.values[block_id][action_id].selected_channel       # channels_select
+view.state.values[block_id][action_id].selected_channels      # multi_channels_select
 ```
+
+**Tip:** When updating views, preserve user-entered data by keeping identical `block_id` and `action_id` values in replacement input blocks.
+
+### Payload Types
+
+| Event | When | Key Data |
+|-------|------|----------|
+| `block_actions` | User interacts with non-input elements | `actions[]`, `view.hash` |
+| `view_submission` | User clicks submit button | `view.state.values` |
+| `view_closed` | User dismisses modal (requires `notify_on_close: true`) | `view` |
 
 ### Response URLs from Modals
 
@@ -217,6 +238,14 @@ Text styling (bold, italic, strikethrough, code), lists (bulleted, ordered, chec
 ```markdown
 User: ![](@U123ABCDEFG)
 Channel: ![](#C123ABC456)
+```
+
+### Image References
+
+Images can be referenced using public URLs or Slack-hosted permalinks (obtained via `files.info` after uploading):
+
+```markdown
+![description](https://workspace.slack.com/files/USER/FILE_ID/image.png)
 ```
 
 ### Limitations

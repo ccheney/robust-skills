@@ -30,9 +30,11 @@ The most common composition object. Appears in nearly every block and element.
 | Input label | `plain_text` only |
 | Input hint | `plain_text` only |
 | Modal title / submit / close | `plain_text` only |
-| Confirmation dialog fields | `plain_text` only |
-| Option text | `plain_text` only |
-| Option description | `mrkdwn` or `plain_text` |
+| Confirmation dialog (title/confirm/deny) | `plain_text` only |
+| Confirmation dialog (text) | `plain_text` only |
+| Option text (select/overflow) | `plain_text` only |
+| Option text (checkboxes/radio) | `mrkdwn` or `plain_text` |
+| Option description | `plain_text` (or `mrkdwn` for checkboxes/radio buttons) |
 
 ### Verbatim Behavior
 
@@ -150,7 +152,7 @@ At least one property must be supplied.
 
 **Used in:** conversations_select, multi_conversations_select (via `filter` property).
 
-**Known issues:** iOS shows "0 selected" instead of placeholder text when nothing is selected.
+**Known issues:** iOS shows "0 selected" instead of placeholder text when nothing is selected. iOS also has UI inconsistencies when users interact with multi-select menu items.
 
 ---
 
@@ -160,7 +162,7 @@ Controls when plain_text_input or rich_text_input elements return `block_actions
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
-| `trigger_actions_on` | string[] | Yes | One or both of the values below |
+| `trigger_actions_on` | string[] | No | One or both of the values below |
 
 **Trigger values:**
 

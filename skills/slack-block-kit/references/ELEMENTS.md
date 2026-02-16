@@ -3,7 +3,7 @@
 > Sources:
 > - [Block Kit Elements](https://docs.slack.dev/reference/block-kit/block-elements) — Slack
 
-All 19 interactive element types with properties, constraints, and compatible blocks.
+All 20 interactive element types with properties, constraints, and compatible blocks.
 
 ---
 
@@ -258,10 +258,12 @@ All share: `action_id` (255 chars), `confirm`, `focus_on_load`, `placeholder` (1
 |----------|------|----------|-------------|
 | `type` | string | Yes | `"file_input"` |
 | `action_id` | string | No | Max 255 chars |
-| `filetypes` | string[] | No | Allowed extensions (e.g., `["jpg", "png"]`) |
+| `filetypes` | string[] | No | Allowed extensions (e.g., `["jpg", "png"]`). Client-side only — perform server-side validation too |
 | `max_files` | integer | No | Max uploadable files (1-10, default 10) |
 
 **Blocks:** input. Note: `dispatch_action: true` is incompatible with file_input.
+
+**Requirements:** App must have `files:read` scope. Max 10MB per file.
 
 ---
 
@@ -322,3 +324,19 @@ Both buttons support `accessibility_label` (75 chars).
 | `accessibility_label` | string | No | Max 75 chars |
 
 **Blocks:** section, actions
+
+---
+
+## URL Source Element
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | `"url"` |
+| `url` | string | Yes | Target URL reference |
+| `text` | string | Yes | Display text shown to users |
+
+**Blocks:** task_card (sources array only)
+
+```json
+{ "type": "url", "url": "https://docs.slack.dev/", "text": "Slack API docs" }
+```

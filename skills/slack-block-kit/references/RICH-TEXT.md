@@ -174,7 +174,7 @@ Standard or custom emoji.
 | Property | Type | Required |
 |----------|------|----------|
 | `type` | string | Yes — `"emoji"` |
-| `name` | string | Yes — emoji name without colons |
+| `name` | string | Yes — emoji name without colons (e.g., `"wave"` or `"wave::skin-tone-2"`) |
 | `unicode` | string | No — unicode codepoint |
 
 ### user

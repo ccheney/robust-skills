@@ -4,7 +4,7 @@
 > - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
 
-All 13 block types with full property tables, constraints, and surface compatibility.
+All 15 block types with full property tables, constraints, and surface compatibility.
 
 ---
 
@@ -383,4 +383,80 @@ Cannot be directly added to messages by apps. Shows up when retrieving messages 
 
 ```json
 { "type": "file", "external_id": "ABCD1", "source": "remote" }
+```
+
+---
+
+## 14. Plan Block
+
+Container for displaying sequential tasks or workflow steps, designed for AI agent output.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"plan"` |
+| `title` | string | Yes | Plan title, max 255 chars |
+| `tasks` | task_card[] | No | Array of task card blocks |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages
+
+```json
+{
+  "type": "plan",
+  "title": "Thinking completed",
+  "tasks": [
+    {
+      "task_id": "call_001",
+      "title": "Fetched user profile",
+      "status": "complete"
+    },
+    {
+      "task_id": "call_002",
+      "title": "Generating report",
+      "status": "in_progress",
+      "details": {
+        "type": "rich_text",
+        "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Processing data..." }] }]
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 15. Task Card Block
+
+Displays a single task with title, status, optional details/output, and source URLs. Used standalone or inside a `plan` block.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"task_card"` |
+| `task_id` | string | Yes | Unique task identifier |
+| `title` | string | Yes | Task title, plain text |
+| `status` | string | No | `"pending"`, `"in_progress"`, `"complete"`, or `"error"` |
+| `details` | rich_text object | No | Task details (single rich_text entity) |
+| `output` | rich_text object | No | Task output/results (single rich_text entity) |
+| `sources` | url element[] | No | Array of `url` source elements (references used to generate response) |
+| `block_id` | string | No | Max 255 chars, use unique per message/iteration |
+
+**Surfaces:** Messages
+
+```json
+{
+  "type": "task_card",
+  "task_id": "task_1",
+  "title": "Fetching weather data",
+  "status": "complete",
+  "output": {
+    "type": "rich_text",
+    "elements": [
+      { "type": "rich_text_section", "elements": [{ "type": "text", "text": "Found weather data from 2 sources" }] }
+    ]
+  },
+  "sources": [
+    { "type": "url", "url": "https://weather.com/", "text": "weather.com" },
+    { "type": "url", "url": "https://accuweather.com/", "text": "accuweather.com" }
+  ]
+}
 ```
