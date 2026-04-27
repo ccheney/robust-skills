@@ -16,7 +16,7 @@ rich_text
 └── elements[] (sub-elements)
     ├── rich_text_section → elements[] (inline elements)
     ├── rich_text_list → elements[] (rich_text_section items)
-    ├── rich_text_preformatted → elements[] (inline elements)
+    ├── rich_text_preformatted → elements[] (inline elements), optional language
     └── rich_text_quote → elements[] (inline elements)
 ```
 
@@ -103,20 +103,22 @@ Ordered or unordered list. Each item is a `rich_text_section`.
 
 ### rich_text_preformatted
 
-Code block with monospace font and grey background.
+Code block with monospace font and grey background. Set `language` for syntax highlighting when the language is known.
 
 | Property | Type | Required | Details |
 |----------|------|----------|---------|
 | `type` | string | Yes | `"rich_text_preformatted"` |
 | `elements` | inline element[] | Yes | Text content (styling ignored) |
 | `border` | integer | No | Border thickness in pixels |
+| `language` | string | No | Language hint for syntax highlighting, e.g. `"python"`, `"javascript"`, `"json"` |
 
 ```json
 {
   "type": "rich_text_preformatted",
   "elements": [
     { "type": "text", "text": "const x = 42;\nconsole.log(x);" }
-  ]
+  ],
+  "language": "javascript"
 }
 ```
 

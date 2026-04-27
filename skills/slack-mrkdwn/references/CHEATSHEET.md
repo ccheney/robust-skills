@@ -21,6 +21,8 @@
 
 Inline code disables other formatting within it. Adjacent format markers without spaces (`*bold*_italic_`) are unreliable — add a space between them.
 
+For LLM-generated standard Markdown, use a Block Kit `markdown` block. It supports headings, links, lists, task lists, tables, dividers, and language-tagged code fences; images render as link text.
+
 ---
 
 ## Links

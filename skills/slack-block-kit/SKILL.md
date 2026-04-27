@@ -1,6 +1,6 @@
 ---
 name: slack-block-kit
-description: Proactively apply when generating Slack API payloads with blocks, chat.postMessage calls with structured content, or views.open/views.publish calls. Triggers on Block Kit, Slack blocks, section block, actions block, header block, divider block, context block, table block, markdown block, rich text block, image block, input block, video block, context_actions block, plan block, task_card block, Slack modal, Slack App Home, Slack surfaces, Slack interactive elements, Slack button, Slack select menu, Slack overflow, Slack datepicker, Slack checkboxes, Slack radio buttons, Work Objects, Slack link unfurl, chat.postMessage blocks, views.open, views.update, views.push, views.publish, Slack composition objects. Use when building Block Kit payloads, constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, or designing rich message layouts. Slack Block Kit UI framework for building rich message layouts, modals, and App Home views.
+description: Proactively apply when generating Slack API payloads with blocks, chat.postMessage calls with structured content, streaming AI responses, or views.open/views.publish calls. Triggers on Block Kit, Slack blocks, section block, actions block, header block, divider block, context block, alert block, card block, carousel block, table block, markdown block, rich text block, image block, input block, video block, context_actions block, plan block, task_card block, chat.startStream, chat.appendStream, chat.stopStream, Slack modal, Slack App Home, Slack surfaces, Slack interactive elements, Slack button, Slack select menu, Slack overflow, Slack datepicker, Slack checkboxes, Slack radio buttons, Work Objects, Slack link unfurl, chat.postMessage blocks, views.open, views.update, views.push, views.publish, Slack composition objects. Use when building Block Kit payloads, constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, streaming agent output, or designing rich message layouts. Slack Block Kit UI framework for building rich message layouts, modals, App Home views, and AI agent responses.
 ---
 
 # Slack Block Kit
@@ -35,6 +35,9 @@ What am I rendering?
 ├─ Small metadata or secondary info   → context (images + text, 10 max)
 ├─ Horizontal separator               → divider
 ├─ Buttons, menus, date pickers       → actions (25 elements max)
+├─ Status, warning, success callout    → alert (severity + text)
+├─ Compact entity or summary preview   → card (optional image/actions)
+├─ Multiple comparable cards/options   → carousel (1-10 cards)
 ├─ Standalone image                   → image (image_url or slack_file)
 ├─ Formatted text with lists, quotes  → rich_text (nested sub-elements)
 ├─ Tabular data                       → table (100 rows, 20 cols, 1 per msg)
@@ -53,7 +56,8 @@ What am I rendering?
 Content source?
 ├─ Short formatted text, labels, fields     → mrkdwn in section/context
 ├─ Long-form LLM-generated content          → markdown block (standard MD)
-├─ Need tables inside blocks                → mrkdwn in section (manual layout)
+├─ LLM-generated tables/task lists/code      → markdown block
+├─ Programmatic tabular data                 → table block
 ├─ Need headings                            → markdown block or header blocks
 └─ Mixed: structured layout + prose         → section/header blocks + markdown block
 ```
@@ -138,6 +142,54 @@ Interactive elements: buttons, select menus, overflow menus, date pickers. Max 2
 
 Button styles: `primary` (green), `danger` (red), or omit for default. Use `primary` sparingly — one per set. Action IDs must be unique within the message.
 
+### alert
+
+Callout for status, risk, confirmation, or urgency. Text accepts `plain_text` or `mrkdwn`. `level`: `default`, `info`, `warning`, `error`, or `success` (defaults to `default`).
+
+```json
+{
+  "type": "alert",
+  "text": { "type": "mrkdwn", "text": "*Dependency conflict detected* before deploy." },
+  "level": "warning"
+}
+```
+
+### card
+
+Compact, scannable preview for entities, summaries, records, or agent results. At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute.
+
+```json
+{
+  "type": "card",
+  "title": { "type": "mrkdwn", "text": "Daily Standup Reminder" },
+  "subtitle": { "type": "mrkdwn", "text": "Runs every weekday at *9:00 AM*" },
+  "body": { "type": "mrkdwn", "text": "Last run: Today at 9:00 AM. Status: Success" },
+  "actions": [
+    {
+      "type": "button",
+      "text": { "type": "plain_text", "text": "View Logs" },
+      "action_id": "view_logs"
+    }
+  ]
+}
+```
+
+Fields: `icon` and `hero_image` are image objects; `title`, `subtitle`, and `body` are text objects; `actions` is an array of button elements. Title/subtitle max 150 chars. Body max 200 chars.
+
+### carousel
+
+Horizontal, scrollable group of card blocks for options, recommendations, search results, or next steps. Must contain 1-10 cards.
+
+```json
+{
+  "type": "carousel",
+  "elements": [
+    { "type": "card", "title": { "type": "mrkdwn", "text": "Option A" } },
+    { "type": "card", "title": { "type": "mrkdwn", "text": "Option B" } }
+  ]
+}
+```
+
 ### image
 
 Standalone image with alt text. Provide either `image_url` (public, max 3000 chars) or `slack_file` object. Formats: png, jpg, jpeg, gif.
@@ -218,7 +270,7 @@ Standard Markdown rendering for AI app output. Messages only.
 { "type": "markdown", "text": "**Bold**, *italic*, [link](https://example.com)\n\n## Heading\n\n- List item" }
 ```
 
-Supports: bold, italic, strikethrough, links, headers, ordered/unordered lists, inline code, code blocks, block quotes. Does NOT support: syntax highlighting, horizontal rules, tables, task lists. Cumulative 12,000 char limit per payload. `block_id` is ignored.
+Supports: bold, italic, strikethrough, links, headers, ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, and character escaping. Images render as hyperlink text. Cumulative 12,000 char limit per payload. `block_id` is ignored. A single markdown block may translate into multiple Slack blocks.
 
 ### context_actions
 
@@ -248,6 +300,22 @@ Container for sequential task cards, designed for AI agent output. Messages only
 ```
 
 Task status values: `pending`, `in_progress`, `complete`, `error`. Each task is a `task_card` block with optional `details`, `output` (rich_text), and `sources` (url elements).
+
+### streaming agent output
+
+Use `chat.startStream`, `chat.appendStream`, and `chat.stopStream` for live AI responses. Streamed messages should be replies to a user request (`thread_ts` required on start) and require `chat:write`.
+
+`chunks` can include:
+- `markdown_text` chunks for standard Markdown text
+- `task_update` chunks for timeline-style task progress
+- `plan_update` chunks for updating a plan title
+- `blocks` chunks for arrays of Block Kit blocks
+
+Set `task_display_mode` on `chat.startStream`:
+- `timeline` (default): tasks appear individually in sequence
+- `plan`: tasks appear grouped in one plan, with the first task placement determining the plan placement
+
+`chat.stopStream` can add final `blocks` rendered after streamed `chunks` or `markdown_text`. It has a separate 50-block limit from streamed `blocks` chunks, allowing up to 100 total finalized blocks.
 
 ### file
 
@@ -303,6 +371,10 @@ See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tab
 | Context elements | 10 |
 | Actions elements | 25 |
 | Context actions elements | 5 |
+| Alert levels | `default`, `info`, `warning`, `error`, `success` |
+| Card title/subtitle | 150 chars |
+| Card body | 200 chars |
+| Carousel cards | 1-10 |
 | Table rows | 100 |
 | Table columns | 20 |
 | Tables per message | 1 |
@@ -328,6 +400,7 @@ See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tab
 | `text` and `blocks` diverge | Confusing: notification says one thing, chat shows another | Keep semantically aligned |
 | Blocks for simple replies | Visual noise for short responses | Use `text` only for simple replies |
 | 2+ tables in one message | `invalid_attachments` error | One table per message |
+| Using blog-nested `card`/`alert` payloads | Invalid against current reference docs | Put `title`, `body`, `text`, and `level` directly on the block |
 | `mrkdwn` in header text | Ignored — headers only accept `plain_text` | Use `plain_text` type |
 | Long header text | Silently truncated at 150 chars | Keep under 150 |
 | Missing `alt_text` on images | Accessibility failure, API may reject | Always include alt_text |
@@ -387,7 +460,7 @@ Work Objects use `chat.unfurl` with a `metadata` parameter containing entity typ
 | File | Purpose |
 |------|---------|
 | [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick reference: all blocks, elements, limits at a glance |
-| [references/BLOCKS.md](references/BLOCKS.md) | All 15 block types with full property tables and constraints |
+| [references/BLOCKS.md](references/BLOCKS.md) | All 18 block types with full property tables and constraints |
 | [references/ELEMENTS.md](references/ELEMENTS.md) | All 20 interactive elements with properties and constraints |
 | [references/COMPOSITION.md](references/COMPOSITION.md) | Composition objects: text, option, confirmation, filters |
 | [references/RICH-TEXT.md](references/RICH-TEXT.md) | Rich text block deep dive: sub-elements, inline types, styles |
@@ -398,8 +471,12 @@ Work Objects use `chat.unfurl` with a `metadata` parameter containing entity typ
 
 - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
 - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
+- [Alert Block](https://docs.slack.dev/reference/block-kit/blocks/alert-block) — Slack
+- [Card Block](https://docs.slack.dev/reference/block-kit/blocks/card-block) — Slack
+- [Carousel Block](https://docs.slack.dev/reference/block-kit/blocks/carousel-block) — Slack
 - [Block Kit Elements](https://docs.slack.dev/reference/block-kit/block-elements) — Slack
 - [Block Kit Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
+- [Streaming Messages](https://docs.slack.dev/reference/methods/chat.startStream/) — Slack
 - [Work Objects](https://docs.slack.dev/messaging/work-objects) — Slack
 - [Surfaces](https://docs.slack.dev/surfaces) — Slack
 - [Modals](https://docs.slack.dev/surfaces/modals) — Slack

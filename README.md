@@ -64,7 +64,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
 
 ### slack-block-kit
 
-Slack Block Kit UI framework for building rich message layouts, modals, and App Home views. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, or designing rich message layouts. Covers all 15 block types, 20 interactive elements, composition objects, surfaces, and Work Objects.
+Slack Block Kit UI framework for building rich message layouts, modals, App Home views, and AI agent responses. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, streaming agent output, or designing rich message layouts. Covers all 18 block types, 20 interactive elements, composition objects, surfaces, and Work Objects.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit

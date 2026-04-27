@@ -3,8 +3,11 @@
 > Sources:
 > - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
+> - [Alert Block](https://docs.slack.dev/reference/block-kit/blocks/alert-block) — Slack
+> - [Card Block](https://docs.slack.dev/reference/block-kit/blocks/card-block) — Slack
+> - [Carousel Block](https://docs.slack.dev/reference/block-kit/blocks/carousel-block) — Slack
 
-All 15 block types with full property tables, constraints, and surface compatibility.
+All 18 block types with full property tables, constraints, and surface compatibility.
 
 ---
 
@@ -150,7 +153,108 @@ Container for interactive elements.
 
 ---
 
-## 6. Image Block
+## 6. Alert Block
+
+Callout for status, risk, confirmation, or urgency.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"alert"` |
+| `text` | text object | Yes | `plain_text` or `mrkdwn` |
+| `level` | string | No | `"default"`, `"info"`, `"warning"`, `"error"`, or `"success"`; defaults to `"default"` |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages
+
+```json
+{
+  "type": "alert",
+  "text": {
+    "type": "mrkdwn",
+    "text": "*Dependency conflict detected* before deploy."
+  },
+  "level": "warning"
+}
+```
+
+---
+
+## 7. Card Block
+
+Compact, scannable preview for entities, records, summaries, or agent results.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"card"` |
+| `icon` | image object | No | Small image next to title/subtitle |
+| `hero_image` | image object | No | Top image |
+| `title` | text object | No | Max 150 chars |
+| `subtitle` | text object | No | Max 150 chars |
+| `body` | text object | No | Max 200 chars |
+| `actions` | button[] | No | Action buttons shown at bottom |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages
+
+At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute.
+
+```json
+{
+  "type": "card",
+  "icon": {
+    "type": "image",
+    "image_url": "https://example.com/icon.png",
+    "alt_text": "Icon"
+  },
+  "title": {
+    "type": "mrkdwn",
+    "text": "Daily Standup Reminder"
+  },
+  "subtitle": {
+    "type": "mrkdwn",
+    "text": "Runs every weekday at *9:00 AM*"
+  },
+  "body": {
+    "type": "mrkdwn",
+    "text": "Last run: Today at 9:00 AM. Status: Success"
+  },
+  "actions": [
+    {
+      "type": "button",
+      "text": { "type": "plain_text", "text": "View Logs" },
+      "action_id": "view_logs"
+    }
+  ]
+}
+```
+
+---
+
+## 8. Carousel Block
+
+Horizontal group of cards for options, recommendations, search results, or next steps.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"carousel"` |
+| `elements` | card[] | Yes | Minimum 1 card, maximum 10 cards |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages
+
+```json
+{
+  "type": "carousel",
+  "elements": [
+    { "type": "card", "title": { "type": "mrkdwn", "text": "Option A" } },
+    { "type": "card", "title": { "type": "mrkdwn", "text": "Option B" } }
+  ]
+}
+```
+
+---
+
+## 9. Image Block
 
 Standalone image.
 
@@ -188,7 +292,7 @@ Using Slack file:
 
 ---
 
-## 7. Rich Text Block
+## 10. Rich Text Block
 
 Formatted text with nested structure. See [RICH-TEXT.md](RICH-TEXT.md) for deep dive.
 
@@ -202,7 +306,7 @@ Formatted text with nested structure. See [RICH-TEXT.md](RICH-TEXT.md) for deep 
 
 ---
 
-## 8. Table Block
+## 11. Table Block
 
 Tabular data display.
 
@@ -255,7 +359,7 @@ Tabular data display.
 
 ---
 
-## 9. Markdown Block
+## 12. Markdown Block
 
 Standard Markdown rendering, designed for AI app output.
 
@@ -267,9 +371,9 @@ Standard Markdown rendering, designed for AI app output.
 
 **Surfaces:** Messages only
 
-**Supports:** bold, italic, strikethrough, links, headers (h1+), ordered/unordered lists, inline code, code blocks, block quotes, images (as hyperlinks), character escaping.
+**Supports:** bold, italic, strikethrough, links, headers (all header levels render at the same size), ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (as hyperlinks), and character escaping.
 
-**Does NOT support:** syntax highlighting, horizontal rules, tables, task lists.
+**Note:** A single markdown block may translate into multiple Slack blocks after rendering.
 
 **Escaping:** Use backslash to render special characters literally. Supported: `\`, `` ` ``, `*`, `_`, `{`, `}`, `[`, `]`, `(`, `)`, `#`, `+`, `-`, `.`, `!`, `&`.
 
@@ -279,7 +383,7 @@ Standard Markdown rendering, designed for AI app output.
 
 ---
 
-## 10. Context Actions Block
+## 13. Context Actions Block
 
 Message-level feedback and action buttons.
 
@@ -322,7 +426,7 @@ Message-level feedback and action buttons.
 
 ---
 
-## 11. Input Block
+## 14. Input Block
 
 Collects user data via form elements.
 
@@ -342,7 +446,7 @@ Collects user data via form elements.
 
 ---
 
-## 12. Video Block
+## 15. Video Block
 
 Embedded video player.
 
@@ -366,7 +470,7 @@ Embedded video player.
 
 ---
 
-## 13. File Block
+## 16. File Block
 
 Remote file reference. Read-only — appears when retrieving messages containing remote files.
 
@@ -387,7 +491,7 @@ Cannot be directly added to messages by apps. Shows up when retrieving messages 
 
 ---
 
-## 14. Plan Block
+## 17. Plan Block
 
 Container for displaying sequential tasks or workflow steps, designed for AI agent output.
 
@@ -425,7 +529,7 @@ Container for displaying sequential tasks or workflow steps, designed for AI age
 
 ---
 
-## 15. Task Card Block
+## 18. Task Card Block
 
 Displays a single task with title, status, optional details/output, and source URLs. Used standalone or inside a `plan` block.
 

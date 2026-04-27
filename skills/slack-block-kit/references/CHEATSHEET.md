@@ -14,10 +14,13 @@
 | Divider | `divider` | Msg, Modal, Home | No fields |
 | Context | `context` | Msg, Modal, Home | 10 elements (text + image) |
 | Actions | `actions` | Msg, Modal, Home | 25 elements |
+| Alert | `alert` | Msg | Status/risk callout. Levels: default/info/warning/error/success |
+| Card | `card` | Msg | Compact preview. Title/subtitle 150 chars, body 200 chars |
+| Carousel | `carousel` | Msg | 1-10 card elements |
 | Image | `image` | Msg, Modal, Home | alt_text required, png/jpg/gif |
 | Rich Text | `rich_text` | Msg, Modal, Home | Nested sub-elements |
 | Table | `table` | Msg only | 100 rows, 20 cols, 1/msg. First row = header. Rows are arrays of `raw_text`/`rich_text` cells. No `columns` prop |
-| Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD |
+| Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD incl. tables, task lists, dividers, syntax-highlighted code |
 | Context Actions | `context_actions` | Msg only | 5 elements |
 | Input | `input` | Modal, Msg, Home | label required, many element types |
 | Video | `video` | Msg, Modal, Home | links.embed:write scope |
@@ -31,7 +34,7 @@
 
 | Element | Type String | Compatible Blocks |
 |---------|------------|-------------------|
-| Button | `button` | section, actions |
+| Button | `button` | section, actions, card |
 | Overflow Menu | `overflow` | section, actions |
 | Select Menu | `static_select` / `external_select` / `users_select` / `conversations_select` / `channels_select` | section, actions, input |
 | Multi-Select | `multi_static_select` / `multi_external_select` / `multi_users_select` / `multi_conversations_select` / `multi_channels_select` | section, actions, input |
@@ -116,6 +119,8 @@
 | Header text | 150 chars |
 | Context elements | 10 |
 | Actions elements | 25 |
+| Card title / subtitle / body | 150 / 150 / 200 chars |
+| Carousel cards | 1-10 |
 | Table rows / cols | 100 / 20 |
 | Tables per message | 1 |
 | Modal title | 24 chars |

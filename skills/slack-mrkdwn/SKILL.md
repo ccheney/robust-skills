@@ -18,7 +18,7 @@ Slack has two completely different markup syntaxes. Using the wrong one is the m
 
 Standard Markdown syntax (`**bold**`, `[text](url)`, `# Heading`) renders as literal text in mrkdwn contexts. Slack mrkdwn syntax (`*bold*`, `<url|text>`) renders as literal text in markdown blocks. Never mix them.
 
-The `markdown` block (`type: "markdown"`) accepts standard Markdown and translates it for Slack rendering. Supports: headings, bold, italic, strikethrough, lists, links, blockquotes, code blocks, images (rendered as link text). Does **not** support: syntax-highlighted code blocks, horizontal rules, tables, task lists. A single input block may produce multiple output blocks. Cumulative limit across all `markdown` blocks in one payload: 12,000 characters.
+The `markdown` block (`type: "markdown"`) accepts standard Markdown and translates it for Slack rendering. Supports: headings, bold, italic, strikethrough, lists, links, blockquotes, code blocks with optional syntax highlighting, horizontal rules/dividers, tables, task lists, and images (rendered as link text). A single input block may produce multiple output blocks. Cumulative limit across all `markdown` blocks in one payload: 12,000 characters.
 
 ## mrkdwn Syntax
 
@@ -28,7 +28,7 @@ The `markdown` block (`type: "markdown"`) accepts standard Markdown and translat
 | Italic | `_italic_` | Not `*italic*` |
 | Strikethrough | `~strikethrough~` | Not `~~strikethrough~~` |
 | Inline code | `` `code` `` | Same as standard Markdown |
-| Code block | ` ```code``` ` | No syntax highlighting |
+| Code block | ` ```code``` ` | No syntax highlighting in mrkdwn; use a `markdown` block with language-tagged fences for highlighting |
 | Blockquote | `> quoted text` | Prefix each line |
 | Link | `<https://example.com\|display text>` | Not `[text](url)` |
 | Emoji | `:emoji_name:` | Standard or custom. Direct Unicode also works |
@@ -174,8 +174,10 @@ When displaying user-generated content that may contain these characters, always
 The text object is the most common composition object in Block Kit. It determines how text is rendered.
 
 ```json
-{ "type": "mrkdwn", "text": "*bold* and _italic_", "verbatim": false }
-{ "type": "plain_text", "text": "No formatting", "emoji": true }
+[
+  { "type": "mrkdwn", "text": "*bold* and _italic_", "verbatim": false },
+  { "type": "plain_text", "text": "No formatting", "emoji": true }
+]
 ```
 
 `mrkdwn` supports Slack mrkdwn syntax. `plain_text` renders literally. `emoji: true` converts `:emoji:` to rendered emoji (plain_text only). Min 1 char, max 3000 chars (section `fields` max 2000 chars each, max 10 fields).

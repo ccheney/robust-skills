@@ -20,7 +20,7 @@ All 20 interactive element types with properties, constraints, and compatible bl
 | `confirm` | confirm object | No | Confirmation dialog |
 | `accessibility_label` | string | No | Screen reader text, max 75 chars |
 
-**Blocks:** section (accessory), actions
+**Blocks:** section (accessory), actions, card (`actions` array)
 
 ---
 
