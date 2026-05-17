@@ -8,7 +8,7 @@ npx skills add https://github.com/ccheney/robust-skills
 
 ### clean-ddd-hexagonal
 
-Apply Clean Architecture + DDD + Hexagonal patterns to backend services. Use when designing APIs, microservices, domain models, aggregates, repositories, bounded contexts, or scalable backend structure. Language-agnostic (Go, Rust, Python, TypeScript, Java, C#).
+Apply an opinionated synthesis of Clean Architecture + DDD + Hexagonal patterns to backend services. Use when designing APIs, microservices, domain models, aggregates, repositories, bounded contexts, or scalable backend structure. Language-agnostic (Go, Rust, Python, TypeScript, Java, C#).
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill clean-ddd-hexagonal
