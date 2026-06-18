@@ -1,6 +1,6 @@
 # robust-skills
 
-Architectural taste for agentic engineering and agents. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), Slack Block Kit, and Slack mrkdwn formatting.
+Architectural taste for agentic engineering and agents. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2025), Slack Block Kit, Slack mrkdwn formatting, Microsoft Teams Adaptive Cards, and Teams message formatting.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
@@ -68,4 +68,20 @@ Slack Block Kit UI framework for building rich message layouts, modals, App Home
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
+```
+
+### teams-message-formatting
+
+Microsoft Teams text formatting syntax across bot activity text, Adaptive Card Markdown, Microsoft Graph chatMessage HTML, Incoming Webhook/Workflows messages, MessageCards, mentions, emoji, links, code blocks, and escaping. Use when formatting Teams message text, constructing Teams mentions, writing Graph chatMessage bodies, or debugging Teams rendering issues.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill teams-message-formatting
+```
+
+### teams-adaptive-cards
+
+Microsoft Teams Adaptive Cards for rich message layouts, notifications, approvals, forms, message extensions, bot responses, Workflows webhooks, Incoming Webhooks, and Microsoft Graph chatMessage attachments. Use when constructing, validating, wrapping, or migrating Teams card payloads. Includes transport-specific wrappers and a Teams card linter.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill teams-adaptive-cards
 ```

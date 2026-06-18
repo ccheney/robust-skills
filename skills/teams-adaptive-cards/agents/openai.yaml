@@ -1,0 +1,4 @@
+interface:
+  display_name: "Teams Adaptive Cards"
+  short_description: "Build robust Microsoft Teams Adaptive Cards"
+  default_prompt: "Use $teams-adaptive-cards to build a Microsoft Teams Adaptive Card payload for a bot, Graph message, or workflow webhook."

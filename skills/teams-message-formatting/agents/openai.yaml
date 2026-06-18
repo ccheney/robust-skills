@@ -1,0 +1,4 @@
+interface:
+  display_name: "Teams Message Formatting"
+  short_description: "Format Microsoft Teams message text correctly"
+  default_prompt: "Use $teams-message-formatting to format a Microsoft Teams bot, Graph, or Adaptive Card message."
