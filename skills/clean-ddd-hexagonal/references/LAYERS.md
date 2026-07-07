@@ -9,6 +9,17 @@
 > Supplemental synthesis:
 > - [Clean Architecture: Standing on the Shoulders of Giants](https://herbertograca.com/2017/09/28/clean-architecture-standing-on-the-shoulders-of-giants/) — Herberto Graça
 
+## Contents
+
+- [The Four Layers](#the-four-layers)
+- [Domain Layer (Innermost)](#domain-layer-innermost)
+- [Application Layer](#application-layer)
+- [Infrastructure Layer](#infrastructure-layer)
+- [Presentation Layer](#presentation-layer)
+- [Dependency Flow](#dependency-flow)
+- [Composition Root](#composition-root)
+- [Language-Agnostic Structure](#language-agnostic-structure)
+
 ## The Four Layers
 
 | Layer | Responsibility | Dependencies |
@@ -17,6 +28,8 @@
 | **Application** | Use cases, orchestration | Domain |
 | **Infrastructure** | External systems, frameworks | Application, Domain |
 | **Presentation** | API/UI entry points | Application |
+
+**Presentation is optional as a separate layer.** In the 3-layer default from `SKILL.md`, controllers and other driver adapters live under `infrastructure/http/`. This file also shows the 4-layer variant where they get their own top-level `presentation/` folder. Choose one home for controllers per codebase — never both.
 
 This reference uses a DDD-centered variant: aggregate repository interfaces live in the Domain layer, while use-case ports and application-owned outbound ports live in the Application layer. A stricter Hexagonal layout may put all driven ports under `application/ports/driven/` instead. Both are acceptable when dependencies still point inward and infrastructure implements, rather than owns, the abstractions.
 
@@ -63,11 +76,17 @@ domain/
 // domain/order/order.ts
 import { AggregateRoot } from '../shared/aggregate_root';
 import { OrderItem } from './order_item';
-import { Money } from './value_objects';
+import { Money, OrderId, CustomerId, OrderStatus } from './value_objects';
 import { OrderPlaced, OrderShipped } from './events';
-import { InsufficientStockError } from './errors';
+import {
+  InsufficientStockError,
+  InvalidQuantityError,
+  InvalidOrderStateError,
+} from './errors';
+import { Product } from '../product/product';
 
 export class Order extends AggregateRoot<OrderId> {
+  private readonly customerId: CustomerId;
   private items: OrderItem[] = [];
   private status: OrderStatus;
 
@@ -154,18 +173,24 @@ application/
 ### Example: Use Case Handler
 
 ```typescript
+// application/orders/place_order/port.ts
+import { OrderId } from '@/domain/order/value_objects';
+import { PlaceOrderCommand } from './command';
+
+export interface IPlaceOrderUseCase {
+  execute(command: PlaceOrderCommand): Promise<OrderId>;
+}
+
 // application/orders/place_order/handler.ts
 import { Order } from '@/domain/order/order';
+import { OrderId } from '@/domain/order/value_objects';
 import { IOrderRepository } from '@/domain/order/repository';
 import { IProductRepository } from '@/domain/product/repository';
 import { IUnitOfWork } from '@/application/shared/unit_of_work';
 import { IEventPublisher } from '@/application/shared/event_publisher';
 import { PlaceOrderCommand } from './command';
-import { OrderNotFoundError, ProductNotFoundError } from '@/application/shared/errors';
-
-export interface IPlaceOrderUseCase {
-  execute(command: PlaceOrderCommand): Promise<OrderId>;
-}
+import { IPlaceOrderUseCase } from './port';
+import { ProductNotFoundError } from '@/application/shared/errors';
 
 export class PlaceOrderHandler implements IPlaceOrderUseCase {
   constructor(
@@ -202,6 +227,8 @@ export class PlaceOrderHandler implements IPlaceOrderUseCase {
   }
 }
 ```
+
+**Reliability caveat:** publishing events after commit (as above) is fine for in-process handlers, but a crash between `commit()` and `publishAll()` drops events. When other services depend on these events, persist them to an outbox table inside the same transaction instead — see the outbox pattern in [CQRS-EVENTS.md](CQRS-EVENTS.md#outbox-pattern).
 
 ### Command/Query DTOs
 
@@ -321,6 +348,8 @@ class PostgresOrderRepository implements IOrderRepository:
 
 Entry points to the application. Adapts external requests to application commands/queries.
 
+This is the 4-layer variant: if you use a top-level `presentation/`, remove `http/`, `grpc/`, and other driver adapters from `infrastructure/` — they move here.
+
 ### Contents
 
 ```
@@ -406,34 +435,36 @@ flowchart TB
     end
 
     subgraph Application["Application"]
+        Port1["IPlaceOrderUseCase (driver port)"]
         Handler["PlaceOrderHandler"]
-        Port1["IPlaceOrderUseCase (port)"]
-        Port2["IOrderRepository"]
+        EventPub["IEventPublisher (driven port)"]
         Handler -.->|implements| Port1
-        Handler -->|uses| Port2
+        Handler -->|uses| EventPub
     end
 
     subgraph Domain["Domain"]
         Aggregate["Order (Aggregate Root)"]
-        RepoInterface["IOrderRepository (interface)"]
+        RepoInterface["IOrderRepository (driven port)"]
     end
 
     subgraph Infrastructure["Infrastructure"]
         PgRepo["PostgresOrderRepository"]
         RabbitMQ["RabbitMQEventPublisher"]
-        PgRepo -.->|implements| RepoInterface
-        RabbitMQ -.->|implements| EventPub["IEventPublisher"]
     end
 
-    REST -->|calls| Handler
-    Application -->|defines interfaces| Domain
-    Infrastructure -->|implements| Domain
+    REST -->|calls via port| Port1
+    Handler -->|uses| RepoInterface
+    Handler -->|invokes behavior on| Aggregate
+    PgRepo -.->|implements| RepoInterface
+    RabbitMQ -.->|implements| EventPub
 
     style Presentation fill:#f59e0b,stroke:#d97706,color:white
     style Application fill:#3b82f6,stroke:#2563eb,color:white
     style Domain fill:#10b981,stroke:#059669,color:white
     style Infrastructure fill:#6366f1,stroke:#4f46e5,color:white
 ```
+
+Solid arrows are compile-time dependencies; dotted arrows are interface implementations. Every arrow crosses layer boundaries pointing inward (Infrastructure and Presentation depend on Application/Domain, never the reverse).
 
 ---
 

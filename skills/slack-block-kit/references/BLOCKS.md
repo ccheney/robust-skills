@@ -3,11 +3,34 @@
 > Sources:
 > - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
-> - [Alert Block](https://docs.slack.dev/reference/block-kit/blocks/alert-block) — Slack
-> - [Card Block](https://docs.slack.dev/reference/block-kit/blocks/card-block) — Slack
-> - [Carousel Block](https://docs.slack.dev/reference/block-kit/blocks/carousel-block) — Slack
 
-All 18 block types with full property tables, constraints, and surface compatibility.
+All 21 block types with full property tables, constraints, and surface compatibility.
+
+## Table of Contents
+
+| # | Block | Type string |
+|---|-------|-------------|
+| 1 | [Header](#1-header-block) | `header` |
+| 2 | [Section](#2-section-block) | `section` |
+| 3 | [Divider](#3-divider-block) | `divider` |
+| 4 | [Context](#4-context-block) | `context` |
+| 5 | [Actions](#5-actions-block) | `actions` |
+| 6 | [Alert](#6-alert-block) | `alert` |
+| 7 | [Card](#7-card-block) | `card` |
+| 8 | [Carousel](#8-carousel-block) | `carousel` |
+| 9 | [Container](#9-container-block) | `container` |
+| 10 | [Image](#10-image-block) | `image` |
+| 11 | [Rich Text](#11-rich-text-block) | `rich_text` |
+| 12 | [Table](#12-table-block) | `table` |
+| 13 | [Data Table](#13-data-table-block) | `data_table` |
+| 14 | [Data Visualization](#14-data-visualization-block) | `data_visualization` |
+| 15 | [Markdown](#15-markdown-block) | `markdown` |
+| 16 | [Context Actions](#16-context-actions-block) | `context_actions` |
+| 17 | [Input](#17-input-block) | `input` |
+| 18 | [Video](#18-video-block) | `video` |
+| 19 | [File](#19-file-block) | `file` |
+| 20 | [Plan](#20-plan-block) | `plan` |
+| 21 | [Task Card](#21-task-card-block) | `task_card` |
 
 ---
 
@@ -39,10 +62,10 @@ Primary content block with text, fields, and accessory.
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"section"` |
-| `text` | text object | Preferred | Max 3000 chars. Not required if `fields` provided |
+| `text` | text object | Preferred | Min 1, max 3000 chars. Not required if `fields` provided |
 | `fields` | text object[] | No | Max 10 items, each max 2000 chars. Can replace or supplement `text` |
 | `accessory` | element | No | One compatible element |
-| `expand` | boolean | No | Forces full display without "see more" |
+| `expand` | boolean | No | Forces full display without "see more" — useful for AI assistant apps posting long messages |
 | `block_id` | string | No | Max 255 chars |
 
 **Surfaces:** Messages, Modals, Home tabs
@@ -155,16 +178,16 @@ Container for interactive elements.
 
 ## 6. Alert Block
 
-Callout for status, risk, confirmation, or urgency.
+Callout for status, risk, confirmation, or urgency. **Currently only supported in modals** — do not put alert blocks in messages or Home tabs.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"alert"` |
-| `text` | text object | Yes | `plain_text` or `mrkdwn` |
+| `text` | text object | Yes | `plain_text` or `mrkdwn`, max 200 chars |
 | `level` | string | No | `"default"`, `"info"`, `"warning"`, `"error"`, or `"success"`; defaults to `"default"` |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages
+**Surfaces:** Modals only
 
 ```json
 {
@@ -186,17 +209,19 @@ Compact, scannable preview for entities, records, summaries, or agent results.
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"card"` |
-| `icon` | image object | No | Small image next to title/subtitle |
-| `hero_image` | image object | No | Top image |
-| `title` | text object | No | Max 150 chars |
-| `subtitle` | text object | No | Max 150 chars |
-| `body` | text object | No | Max 200 chars |
-| `actions` | button[] | No | Action buttons shown at bottom |
+| `icon` | image element | No | Small image next to title/subtitle. URL max 3000 chars, alt_text max 2000 |
+| `slack_icon` | Slack icon object | No | Built-in icon next to title/subtitle. Mutually exclusive with `icon` |
+| `hero_image` | image element | No | Top image. URL max 3000 chars |
+| `title` | text object | No | `plain_text` or `mrkdwn`, max 150 chars |
+| `subtitle` | text object | No | `plain_text` or `mrkdwn`, max 150 chars |
+| `body` | text object | No | `plain_text` or `mrkdwn`, max 200 chars |
+| `subtext` | text object | No | Rendered below body. `plain_text` or `mrkdwn`, max 200 chars |
+| `actions` | button[] | No | Max 3 buttons. `danger` buttons left-align; `primary`/unstyled right-align (`primary` furthest right) |
 | `block_id` | string | No | Max 255 chars |
 
 **Surfaces:** Messages
 
-At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute.
+At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute. For the Slack icon object (`{ "type": "icon", "name": "rocket" }`), see [COMPOSITION.md](COMPOSITION.md#slack-icon-object).
 
 ```json
 {
@@ -254,7 +279,51 @@ Horizontal group of cards for options, recommendations, search results, or next 
 
 ---
 
-## 9. Image Block
+## 9. Container Block
+
+Groups related blocks under a title, optionally collapsible. Useful for record previews, bulk-update summaries, and grouped content.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"container"` |
+| `title` | text object | Yes | `plain_text` only, max 150 chars |
+| `child_blocks` | block[] | Yes | Max 10 blocks from the supported list below |
+| `subtitle` | text object | No | `plain_text` or `mrkdwn`, max 150 chars |
+| `icon` | image element | No | Small image next to title/subtitle. URL max 3000 chars, alt_text max 2000 |
+| `width` | string | No | `"narrow"`, `"standard"` (default), `"wide"`, or `"full"` |
+| `is_collapsible` | boolean | No | Default `false`. When `true`, the block collapses to show only the title |
+| `default_collapsed` | boolean | No | Default `false`. Only applies when `is_collapsible` is `true` |
+| `block_id` | string | No | Max 255 chars |
+
+**Supported child blocks:** actions, context, divider, file, header, image, input, rich_text, section, table, video. Containers cannot nest containers, cards, or AI blocks (plan, task_card).
+
+```json
+{
+  "type": "container",
+  "title": { "type": "plain_text", "text": "Bulk update: 2 records selected" },
+  "subtitle": { "type": "plain_text", "text": "Review changes before confirming" },
+  "is_collapsible": true,
+  "child_blocks": [
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*DCW-1024*\nStatus: Open → Closed" } },
+    { "type": "divider" },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "text": "Confirm All" },
+          "style": "primary",
+          "action_id": "bulk_confirm"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 10. Image Block
 
 Standalone image.
 
@@ -292,7 +361,7 @@ Using Slack file:
 
 ---
 
-## 10. Rich Text Block
+## 11. Rich Text Block
 
 Formatted text with nested structure. See [RICH-TEXT.md](RICH-TEXT.md) for deep dive.
 
@@ -306,28 +375,28 @@ Formatted text with nested structure. See [RICH-TEXT.md](RICH-TEXT.md) for deep 
 
 ---
 
-## 11. Table Block
+## 12. Table Block
 
-Tabular data display.
+Basic tabular data display. Supports filtering and basic interactivity only — for pagination, sorting, and clickable cells, use the [data table block](#13-data-table-block) instead.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"table"` |
-| `rows` | cell[][] | Yes | Max 100 rows. Each row is an array of cell objects (max 20 cells). First row = header |
-| `column_settings` | setting[] | No | Max 20, with `align` and `is_wrapped` |
+| `rows` | cell[][] | Yes | Max 100 rows. Each row is an array of max 20 cell objects. First row = header |
+| `column_settings` | setting[] | No | Max 20 items, with `align` and `is_wrapped`. Use `null` to skip a column; columns beyond the array get defaults |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages only
+**Surfaces:** Messages only (via `blocks` or `attachments` in `chat.postMessage`)
 
 **There is no `columns` property.** The first row in `rows` acts as the header row.
 
 **Row structure:** Each row is a flat array of cell objects — NOT an object with a `cells` property.
 
-**Cell types:** `{ "type": "raw_text", "text": "..." }` for plain text, or `{ "type": "rich_text", "elements": [...] }` for formatted content (links, mentions, emoji, bold).
+**Cell types:** `{ "type": "raw_text", "text": "..." }` for plain text, `{ "type": "raw_number", "value": 42, "text": "42" }` for numeric values, or `{ "type": "rich_text", "elements": [...] }` for formatted content (links, mentions, emoji, bold).
 
 **Column settings:** `align` (`left`/`center`/`right`, default `left`), `is_wrapped` (boolean, default `false`).
 
-**Limit:** One table per message. Multiple tables cause `invalid_attachments` error.
+**Character limits:** A single table's character count across all cells cannot exceed 10,000 characters, and the aggregate character count across all table cells in a single message also cannot exceed 10,000. Break large tables into separate messages.
 
 ```json
 {
@@ -359,19 +428,137 @@ Tabular data display.
 
 ---
 
-## 12. Markdown Block
+## 13. Data Table Block
+
+Rich table with pagination, sorting, filtering, and interactivity (clickable links in cells, Work Object flexpanes).
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"data_table"` |
+| `rows` | cell[][] | Yes | Min 2 rows (header + 1 data row), max 101 rows (header + 100). All rows must have the same number of cells. 1–20 columns |
+| `caption` | string | Yes | Table caption (used as the HTML caption element) |
+| `page_size` | integer | No | Rows per page, 1–100. Defaults to 5 |
+| `row_header_column_index` | integer | No | 0-based index of the column that uniquely identifies each row (used by screen readers). Defaults to 0 |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages (via `chat.postMessage`)
+
+**Cell types:** `raw_text`, `raw_number` (`{ "type": "raw_number", "value": 42, "text": "42" }`), `rich_text`. Header row cells cannot be `rich_text`.
+
+**Sorting:** Alphabetical by default; numeric when every cell in a column is `raw_number`.
+
+**Character limits:** Same as table block — 10,000 chars per table and 10,000 aggregate across all table cells per message.
+
+```json
+{
+  "type": "data_table",
+  "caption": "Department badge levels",
+  "rows": [
+    [
+      { "type": "raw_text", "text": "Name" },
+      { "type": "raw_text", "text": "Department" },
+      { "type": "raw_text", "text": "Badge" }
+    ],
+    [
+      { "type": "raw_text", "text": "Data Refinement" },
+      { "type": "raw_text", "text": "MDR" },
+      {
+        "type": "rich_text",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [{ "type": "text", "text": "Blue", "style": { "bold": true } }]
+          }
+        ]
+      }
+    ]
+  ]
+}
+```
+
+---
+
+## 14. Data Visualization Block
+
+Renders pie, bar, area, or line charts natively in Slack.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Must be `"data_visualization"` |
+| `title` | string | Yes | Label above the chart, max 50 chars |
+| `chart` | object | Yes | Chart payload — `type` must be `"pie"`, `"bar"`, `"area"`, or `"line"` |
+| `block_id` | string | No | Max 255 chars |
+
+**Surfaces:** Messages
+
+**Pie charts** require `segments` (1–12): each `{ "label": "...", "value": n }` with label ≤20 chars and value > 0. Rendered percentage = value / sum of all segment values.
+
+**Bar, area, and line charts** require:
+- `series` (1–12 data series): each `{ "name": "...", "data": [...] }`. Name ≤20 chars, unique within the chart. `data` is 1–20 points of `{ "label": "...", "value": n }` (label ≤20 chars; negative values permitted). Area series layer in array order (first at back); bar series group by label.
+- `axis_config`: `{ "categories": [...], "x_label": "...", "y_label": "..." }`. `categories` (required) defines valid x-axis labels and their left-to-right order; labels ≤20 chars. `x_label`/`y_label` optional, ≤50 chars.
+
+**Runtime validation rules:**
+- Every `data_point.label` in every series must match a value in `axis_config.categories`
+- Series cannot omit data points — exactly one entry per category
+- Series names must be unique within a chart
+
+```json
+{
+  "type": "data_visualization",
+  "title": "Daily Active Users",
+  "chart": {
+    "type": "line",
+    "series": [
+      {
+        "name": "Free Tier",
+        "data": [
+          { "label": "Mon", "value": 12000 },
+          { "label": "Tue", "value": 13500 },
+          { "label": "Wed", "value": 15200 }
+        ]
+      }
+    ],
+    "axis_config": {
+      "categories": ["Mon", "Tue", "Wed"],
+      "x_label": "Day",
+      "y_label": "Users"
+    }
+  }
+}
+```
+
+Pie example:
+
+```json
+{
+  "type": "data_visualization",
+  "title": "Ticket Sources",
+  "chart": {
+    "type": "pie",
+    "segments": [
+      { "label": "Email", "value": 45 },
+      { "label": "Chat", "value": 28 },
+      { "label": "Phone", "value": 18 }
+    ]
+  }
+}
+```
+
+---
+
+## 15. Markdown Block
 
 Standard Markdown rendering, designed for AI app output.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"markdown"` |
-| `text` | string | Yes | Standard Markdown, 12,000 chars cumulative per payload |
+| `text` | string | Yes | Standard Markdown, 12,000 chars cumulative across all markdown blocks per payload |
 | `block_id` | string | No | Ignored and not retained |
 
 **Surfaces:** Messages only
 
-**Supports:** bold, italic, strikethrough, links, headers (all header levels render at the same size), ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (as hyperlinks), and character escaping.
+**Supports:** bold, italic, strikethrough, links, headers (all header levels render at the same size), ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (rendered as hyperlink text), and character escaping.
 
 **Note:** A single markdown block may translate into multiple Slack blocks after rendering.
 
@@ -383,7 +570,7 @@ Standard Markdown rendering, designed for AI app output.
 
 ---
 
-## 13. Context Actions Block
+## 16. Context Actions Block
 
 Message-level feedback and action buttons.
 
@@ -426,7 +613,7 @@ Message-level feedback and action buttons.
 
 ---
 
-## 14. Input Block
+## 17. Input Block
 
 Collects user data via form elements.
 
@@ -446,7 +633,7 @@ Collects user data via form elements.
 
 ---
 
-## 15. Video Block
+## 18. Video Block
 
 Embedded video player.
 
@@ -470,7 +657,7 @@ Embedded video player.
 
 ---
 
-## 16. File Block
+## 19. File Block
 
 Remote file reference. Read-only — appears when retrieving messages containing remote files.
 
@@ -491,14 +678,14 @@ Cannot be directly added to messages by apps. Shows up when retrieving messages 
 
 ---
 
-## 17. Plan Block
+## 20. Plan Block
 
 Container for displaying sequential tasks or workflow steps, designed for AI agent output.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"plan"` |
-| `title` | string | Yes | Plan title, max 255 chars |
+| `title` | string | Yes | Plan title in plain text. Slack's field table calls it an object, but the official example passes a plain string — follow the example |
 | `tasks` | task_card[] | No | Array of task card blocks |
 | `block_id` | string | No | Max 255 chars |
 
@@ -529,7 +716,7 @@ Container for displaying sequential tasks or workflow steps, designed for AI age
 
 ---
 
-## 18. Task Card Block
+## 21. Task Card Block
 
 Displays a single task with title, status, optional details/output, and source URLs. Used standalone or inside a `plan` block.
 

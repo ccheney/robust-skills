@@ -2,13 +2,27 @@
 
 Theming, configuration, custom styling, and troubleshooting for Mermaid diagrams.
 
+## Contents
+
+- [Configuration](#configuration) — init directive
+- [Themes](#themes) and [Theme Variables](#theme-variables)
+- [Styling](#styling) — classDef, style, linkStyle
+- [Layout Engine](#layout-engine) — ELK renderer
+- [Security Levels](#security-levels)
+- [Troubleshooting](#troubleshooting) — special characters, debugging
+- [Frontmatter Configuration](#frontmatter-configuration)
+- [Directive Reference](#directive-reference)
+- [Accessibility](#accessibility)
+- [Performance Tips](#performance-tips)
+- [Export Options](#export-options)
+
 ---
 
 # Configuration
 
 ## Init Directive
 
-Configure diagrams using the init directive:
+Configure diagrams using the init directive. It must be immediately followed by a diagram — a directive alone renders nothing:
 
 ```mermaid
 %%{init: { 'theme': 'dark' } }%%
@@ -342,12 +356,14 @@ Test at: https://mermaid.live
 
 ## Arrow Syntax by Diagram Type
 
-| Diagram | Sync | Async | Dotted |
-|---------|------|-------|--------|
+| Diagram | Solid arrow | Async/open | Dotted |
+|---------|-------------|------------|--------|
 | Flowchart | `-->` | N/A | `-.->` |
-| Sequence | `->>` | `-->>` | `-->>` |
+| Sequence | `->>` (sync) | `-)` | `-->>` (response) |
 | Class | `-->` | N/A | `..>` |
 | State | `-->` | N/A | N/A |
+
+Arrow syntax does not transfer between diagram types — `->>` in a flowchart or `-.->` in a sequence diagram are parse errors.
 
 ---
 
@@ -414,9 +430,20 @@ flowchart LR
 
 # Accessibility
 
+## accTitle and accDescr
+
+Mermaid's built-in accessibility fields render as SVG `<title>`/`<desc>` for screen readers:
+
+```mermaid
+flowchart LR
+    accTitle: Login flow
+    accDescr: User submits credentials, the app validates them against the auth service
+    A[User] --> B[App] --> C[Auth]
+```
+
 ## Alt Text
 
-For screen readers, provide context before diagrams:
+Also provide context in prose before diagrams:
 
 ```markdown
 The following diagram shows the authentication flow:
@@ -470,5 +497,11 @@ const svg = await mermaid.render('id', diagramText);
 ## CLI
 
 ```bash
-npx @mermaid-js/mermaid-cli -i input.md -o output.svg
+# Single diagram file -> SVG (also .png, .pdf)
+npx -y @mermaid-js/mermaid-cli -i diagram.mmd -o diagram.svg
+
+# Markdown file: renders every ```mermaid block to an image, rewrites links
+npx -y @mermaid-js/mermaid-cli -i input.md -o output.md
 ```
+
+The CLI is also the fastest way to validate generated diagrams — a syntax error exits non-zero with a parse message.

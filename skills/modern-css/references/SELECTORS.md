@@ -2,6 +2,16 @@
 
 > Sources: [CSS Selectors Level 4](https://www.w3.org/TR/selectors-4/), [MDN CSS Selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_selectors), [CSS Wrapped 2025](https://chrome.dev/css-wrapped-2025/). All selectors below are Baseline unless noted.
 
+## Contents
+
+- [`:has()` — The Parent Selector](#has--the-parent-selector)
+- [`:is()` vs `:where()` — Selector List Matching](#is-vs-where--selector-list-matching)
+- [`:not()` Enhanced — Complex Negation](#not-enhanced--complex-negation)
+- [`:focus-visible` — Accessible Focus Styling](#focus-visible--accessible-focus-styling)
+- [Scroll-Driven State: `:target` and Scroll-State Queries](#scroll-driven-state-target-and-scroll-state-queries)
+- [Modern Pseudo-Elements Reference](#modern-pseudo-elements-reference)
+- [Combining Modern Selectors](#combining-modern-selectors)
+
 ---
 
 ## `:has()` — The Parent Selector
@@ -261,8 +271,11 @@ section:target { animation: flash 1s ease-out; }
 
 For true scroll-spy behavior (styling based on scroll position), use scroll-state container queries. These track stuck (sticky) and snapped (scroll-snap) states.
 
+As with all container queries, rules inside `@container` can only style **descendants** of the container — never the container itself. Put the visual styles on an inner wrapper element. See [SCROLL.md](SCROLL.md#scroll-state-container-queries) for the full pattern.
+
 ```css
-/* Stuck state — detect when sticky element is stuck */
+/* Stuck state — detect when sticky element is stuck.
+   Styles apply to .sticky-header-inner, a child of the container. */
 .sticky-header {
   position: sticky;
   top: 0;
@@ -270,7 +283,7 @@ For true scroll-spy behavior (styling based on scroll position), use scroll-stat
 }
 
 @container scroll-state(stuck: top) {
-  .sticky-header {
+  .sticky-header-inner {
     box-shadow: 0 2px 8px oklch(0 0 0 / 0.15);
     border-block-end: 1px solid oklch(0.85 0 0);
   }
@@ -283,11 +296,11 @@ For true scroll-spy behavior (styling based on scroll position), use scroll-stat
 }
 
 @container scroll-state(snapped: x) {
-  .carousel-item { scale: 1.05; opacity: 1; }
+  .carousel-item-content { scale: 1.05; opacity: 1; }
 }
 ```
 
-Feature-detect: `@supports (container-type: scroll-state) { ... }`
+**Support:** Chromium-only (Chrome/Edge 133+) as of mid-2026. Feature-detect: `@supports (container-type: scroll-state) { ... }`
 
 ---
 
@@ -301,6 +314,20 @@ Feature-detect: `@supports (container-type: scroll-state) { ... }`
 | `::backdrop` | Overlay behind `<dialog>` or fullscreen | Dimming/blurring behind modals |
 | `::placeholder` | Placeholder text in inputs | Styling hint text (color, font, opacity) |
 | `::selection` | User-highlighted text | Brand-colored text selection |
+| `::details-content` | Content area of `<details>` | Animating accordions (Baseline since Sep 2025: Chrome 131+, Firefox 143+, Safari 18.4+) |
+
+```css
+/* Animate <details> open/close — no JS accordion needed */
+details::details-content {
+  block-size: 0;
+  overflow: clip;
+  interpolate-size: allow-keywords; /* Chromium-only: enables 0 → auto interpolation */
+  transition: block-size 0.3s ease, content-visibility 0.3s ease allow-discrete;
+}
+details[open]::details-content {
+  block-size: auto;
+}
+```
 
 ```css
 li::marker { color: oklch(0.55 0.2 260); font-size: 1.2em; }
@@ -311,9 +338,9 @@ input::placeholder { color: oklch(0.6 0 0); font-style: italic; }
 ::selection { background: oklch(0.55 0.2 260 / 0.3); color: oklch(0.2 0 0); }
 ```
 
-### View Transition Pseudo-Elements (Baseline)
+### View Transition Pseudo-Elements (Baseline Newly Available Oct 2025)
 
-Exist only during a view transition. Customize animation between old and new states.
+Exist only during a same-document view transition (Baseline since Firefox 144, October 2025). Customize animation between old and new states.
 
 | Pseudo-Element | What It Targets |
 |---|---|
@@ -330,11 +357,12 @@ Exist only during a view transition. Customize animation between old and new sta
 ::view-transition-old(root) { animation-duration: 0.2s; }
 ```
 
-### Chrome-Only / Emerging (Feature-Detect Required)
+### Chromium-Only / Emerging (Feature-Detect Required)
+
+As of mid-2026 these ship only in Chromium (Safari 27 has announced customizable `<select>` support). Treat as progressive enhancement.
 
 | Pseudo-Element | What It Targets | Replaces |
 |---|---|---|
-| `::details-content` | Content area of `<details>` | JS accordion animation |
 | `::picker(select)` | Dropdown of customizable `<select>` | Custom dropdown widgets |
 | `::picker-icon` | Dropdown arrow on `<select>` | CSS hacks for arrow styling |
 | `::checkmark` | Checkmark in `<option>` | Custom checkmark styling |
@@ -344,17 +372,6 @@ Exist only during a view transition. Customize animation between old and new sta
 | `::scroll-marker-group` | Container for scroll markers | JS carousel dot container |
 
 ```css
-/* Animate <details> open/close */
-details::details-content {
-  transition: block-size 0.3s ease, content-visibility 0.3s ease;
-  block-size: 0;
-  overflow: clip;
-}
-details[open]::details-content {
-  block-size: auto;
-  interpolate-size: allow-keywords;
-}
-
 /* Native carousel controls */
 .carousel { overflow-x: auto; scroll-snap-type: x mandatory; }
 .carousel::scroll-button(inline-start) { content: '<'; }

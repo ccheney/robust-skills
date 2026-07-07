@@ -1,6 +1,20 @@
 # Drizzle Migrations
 
-Comprehensive reference for managing database migrations with drizzle-kit.
+Comprehensive reference for managing database migrations with drizzle-kit
+(stable drizzle-kit 0.3x; v1.0 differences noted inline).
+
+## Contents
+
+- [Configuration](#configuration)
+- [Commands](#commands)
+- [Migration Workflow](#migration-workflow)
+- [Push vs Generate](#push-vs-generate)
+- [Migration Patterns](#migration-patterns)
+- [Custom Migrations](#custom-migrations)
+- [Migration Table](#migration-table)
+- [Rollback Strategies](#rollback-strategies)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -26,13 +40,25 @@ export default defineConfig({
     url: process.env.DATABASE_URL!,
   },
 
-  // Optional: verbose logging
-  verbose: true,
+  // Optional: must match the casing passed to drizzle() at runtime
+  casing: 'snake_case',
 
-  // Optional: strict mode
+  // Optional: verbose logging; strict prompts before risky push statements
+  verbose: true,
   strict: true,
+
+  // Optional: where the migrations journal table lives
+  // (defaults: table "__drizzle_migrations" in schema "drizzle")
+  migrations: {
+    table: '__drizzle_migrations',
+    schema: 'drizzle',
+  },
 });
 ```
+
+Note: drizzle-kit@1.0 (beta/RC) removes the `--strict` flag/`strict` behavior
+because `push` always prompts for confirmation on data-loss statements
+(`--force` to skip).
 
 ### Multiple Schema Files
 
@@ -77,18 +103,24 @@ Generate SQL migrations from schema changes.
 
 ```bash
 npx drizzle-kit generate
+npx drizzle-kit generate --name=add_posts   # readable file name
+npx drizzle-kit generate --custom --name=seed-users   # empty file for hand-written SQL
 ```
 
 Output:
 ```
 drizzle/
   0000_initial.sql
-  0001_add_posts_table.sql
+  0001_add_posts.sql
   meta/
     0000_snapshot.json
     0001_snapshot.json
     _journal.json
 ```
+
+The `meta/` folder and `_journal.json` are part of the migration state — commit
+them, and never edit or hand-create files in `drizzle/` outside of `generate`
+(the journal won't know about them and `migrate` will skip or mismatch).
 
 ### migrate
 
@@ -186,7 +218,7 @@ runMigrations().catch(console.error);
 
 ```bash
 # Run before app starts
-node -r tsx src/db/migrate.ts
+npx tsx src/db/migrate.ts
 ```
 
 #### Option 2: CI/CD Migration
@@ -279,12 +311,15 @@ Generated SQL:
 ALTER TABLE "users" ADD COLUMN "name" text NOT NULL DEFAULT 'Unknown';
 ```
 
-### Renaming a Column
+### Renaming a Column or Table
 
-**Warning:** Drizzle may generate DROP + ADD instead of RENAME.
+`drizzle-kit generate` cannot tell a rename from a drop+create, so it prompts
+interactively ("column renamed or deleted?"). Answer "renamed" to get `ALTER ...
+RENAME`; answering wrong (or blindly accepting in CI) produces DROP + ADD and
+**loses data**. Always review the generated SQL for renames:
 
 ```sql
--- Manual migration
+-- What you want to see
 ALTER TABLE "users" RENAME COLUMN "name" TO "full_name";
 ```
 
@@ -345,10 +380,17 @@ DROP TABLE "old_table";
 
 ### Adding Custom SQL
 
-Create a migration file manually:
+Generate an empty, journal-registered migration file — do NOT create SQL files
+in `drizzle/` by hand (they won't be tracked in `meta/_journal.json`):
+
+```bash
+npx drizzle-kit generate --custom --name=posts-search
+```
+
+Then fill in the generated file:
 
 ```sql
--- drizzle/0005_custom_migration.sql
+-- drizzle/0005_posts-search.sql
 
 -- Add full-text search
 ALTER TABLE posts ADD COLUMN search_vector tsvector;
@@ -370,7 +412,8 @@ CREATE TRIGGER posts_search_update
 ### Data Migrations
 
 ```sql
--- drizzle/0006_migrate_data.sql
+-- Generated with: npx drizzle-kit generate --custom --name=backfill-names
+-- drizzle/0006_backfill-names.sql
 
 -- Migrate data from old structure to new
 UPDATE users SET full_name = first_name || ' ' || last_name
@@ -384,16 +427,21 @@ UPDATE posts SET word_count = array_length(string_to_array(content, ' '), 1);
 
 ## Migration Table
 
-Drizzle tracks migrations in `__drizzle_migrations` table:
+Drizzle tracks applied migrations in `__drizzle_migrations`, which lives in the
+`drizzle` schema by default (not `public`):
 
 ```sql
-SELECT * FROM __drizzle_migrations;
+SELECT * FROM drizzle.__drizzle_migrations;
 ```
 
 | id | hash | created_at |
 |----|------|------------|
 | 1 | abc123 | 2024-01-15 |
 | 2 | def456 | 2024-01-20 |
+
+Change the location with the `migrations: { table, schema }` config option
+(must match between drizzle-kit and any programmatic `migrate()` call via
+`migrationsTable`/`migrationsSchema`).
 
 ---
 
@@ -466,12 +514,16 @@ COMMIT;
 
 ### 5. Handle Downtime
 
-For zero-downtime deployments:
+For zero-downtime deployments, build indexes without locking writes:
 
 ```sql
--- Create index concurrently (no lock)
 CREATE INDEX CONCURRENTLY users_email_idx ON users(email);
 ```
+
+Caveat: `CREATE INDEX CONCURRENTLY` cannot run inside a transaction, and the
+Drizzle migrator applies each migration file transactionally. Run concurrent
+index builds outside the migration pipeline (ops script/psql), or accept a
+brief lock with a plain `CREATE INDEX` in the migration.
 
 ### 6. Version Control
 
@@ -497,14 +549,13 @@ CREATE INDEX CONCURRENTLY users_email_idx ON users(email);
 
 ### "Migration already applied"
 
-```bash
-# Check migration status
-SELECT * FROM __drizzle_migrations;
-
-# If needed, manually mark as applied
-INSERT INTO __drizzle_migrations (hash, created_at)
-VALUES ('migration_hash', NOW());
+```sql
+-- Check migration status (note the drizzle schema)
+SELECT * FROM drizzle.__drizzle_migrations;
 ```
+
+If a migration ran manually and only needs recording, insert its hash into that
+table — but prefer fixing the workflow (only ever apply via `migrate`).
 
 ### "Schema out of sync"
 

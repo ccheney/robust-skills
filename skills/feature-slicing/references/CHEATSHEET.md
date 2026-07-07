@@ -1,51 +1,52 @@
 # FSD Quick Reference
 
-> **Sources:** [Tutorial](https://feature-sliced.design/docs/get-started/tutorial) | [Layers](https://feature-sliced.design/docs/reference/layers) | [Slices & Segments](https://feature-sliced.design/docs/reference/slices-segments)
+> **Sources:** [Layers](https://feature-sliced.design/docs/reference/layers) | [Slices & Segments](https://feature-sliced.design/docs/reference/slices-segments) | [Public API](https://feature-sliced.design/docs/reference/public-api)
 
 ## Layer Hierarchy
 
 ```
-app/      → Providers, routing, global styles       [NO slices, REQUIRED]
-pages/    → Route screens, one slice per route      [HAS slices, REQUIRED]
-widgets/  → Complex reusable UI blocks              [HAS slices, optional]
-features/ → User interactions with business value   [HAS slices, optional]
-entities/ → Business domain models                  [HAS slices, optional]
-shared/   → Project-agnostic infrastructure         [NO slices, REQUIRED]
+app/      → Providers, routing, global styles          [segments only, REQUIRED]
+pages/    → Route screens; default home for code       [slices, REQUIRED]
+widgets/  → Reused UI blocks, may own logic/data       [slices, optional]
+features/ → Reused user interactions                   [slices, optional]
+entities/ → Reused business domain models              [slices, optional]
+shared/   → Infrastructure: UI kit, API client, utils  [segments only, REQUIRED]
 ```
 
-**Import Rule:** Only import from layers BELOW. Never sideways or up.
+**Import Rule:** only import from layers BELOW. Never sideways or up.
+**Deprecated:** `processes/` — move contents to `features/` and `app/`.
 
 ---
 
 ## Import Matrix
 
-|  | app | pages | widgets | features | entities | shared |
-|--|-----|-------|---------|----------|----------|--------|
-| **app** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| can import → | app | pages | widgets | features | entities | shared |
+|--------------|-----|-------|---------|----------|----------|--------|
+| **app** | ✅¹ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **pages** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
 | **widgets** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | **features** | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **entities** | ❌ | ❌ | ❌ | ❌ | @x* | ✅ |
-| **shared** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **entities** | ❌ | ❌ | ❌ | ❌ | @x² | ✅ |
+| **shared** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅¹ |
 
-*Use @x notation for cross-entity references
+¹ `app/` and `shared/` have no slices — their segments import each other freely
+² Cross-entity references only via `@x` notation
 
 ---
 
-## Quick Decision Trees
-
-### "Where does this code go?"
+## "Where does this code go?" (pages-first, v2.1)
 
 ```
-├─ App-wide config, providers, routing    → app/
-├─ Full page / route component            → pages/
-├─ Complex reusable UI block              → widgets/
-├─ User action with business value        → features/
-├─ Business domain object (data model)    → entities/
-└─ Reusable, domain-agnostic code         → shared/
+├─ Used by exactly ONE page              → that page's slice (even forms/logic)
+├─ App-wide config, providers, routing   → app/
+├─ Infra with no domain knowledge        → shared/
+├─ Reused across pages:
+│  ├─ Large UI block (may own logic)     → widgets/
+│  ├─ User action (verb)                 → features/
+│  └─ Domain model/data (noun)           → entities/
 ```
 
-### "Feature or Entity?"
+### Feature or Entity?
 
 | Entity (noun) | Feature (verb) |
 |---------------|----------------|
@@ -54,8 +55,8 @@ shared/   → Project-agnostic infrastructure         [NO slices, REQUIRED]
 | `comment` | `write-comment` |
 | `order` | `checkout` |
 
-**Entities:** THINGS with identity, displayed in lists
-**Features:** ACTIONS with side effects, triggered by user
+**Entities:** THINGS with identity, displayed in lists.
+**Features:** ACTIONS with side effects, triggered by the user — and only if reused; single-page interactions stay in the page.
 
 ---
 
@@ -63,103 +64,76 @@ shared/   → Project-agnostic infrastructure         [NO slices, REQUIRED]
 
 | Segment | Purpose | Examples |
 |---------|---------|----------|
-| `ui/` | Components, styles | `UserCard.tsx`, `Button.tsx` |
-| `api/` | Backend calls, DTOs | `getUser()`, `createOrder()` |
-| `model/` | Types, schemas, stores | `User`, `userSchema`, `useUserStore` |
-| `lib/` | Slice utilities | `formatUserName()` |
-| `config/` | Configuration | Feature flags, constants |
+| `ui/` | Components, styles, formatters | `UserCard.tsx` |
+| `api/` | Backend calls, DTOs, mappers | `getUser()`, `createOrder()` |
+| `model/` | Types, schemas, stores, logic | `User`, `userSchema`, `useUserStore` |
+| `lib/` | Slice-internal utilities | `formatUserName()` |
+| `config/` | Configuration, feature flags | constants |
 
-**Naming:** Use purpose-driven names (`api/`, `model/`) not essence-based (`hooks/`, `types/`).
+Purpose-driven names only — never `hooks/`, `components/`, `types/`, `utils/`.
 
 ---
 
 ## File Structure Templates
 
-### Entity
+### Entity / Feature slice (one index, no segment indexes)
 ```
-entities/{name}/
-├── ui/
-│   ├── {Name}Card.tsx
-│   └── index.ts
-├── api/
-│   ├── {name}Api.ts
-│   ├── queries.ts
-│   └── index.ts
-├── model/
-│   ├── types.ts
-│   ├── schema.ts
-│   ├── mapper.ts
-│   └── index.ts
-└── index.ts
+entities/{name}/            features/{name}/
+├── ui/                     ├── ui/
+│   └── {Name}Card.tsx      │   └── {Name}Form.tsx
+├── api/                    ├── api/
+│   └── {name}Api.ts        │   └── {name}Api.ts
+├── model/                  ├── model/
+│   ├── types.ts            │   ├── schema.ts
+│   └── schema.ts           │   └── store.ts
+└── index.ts                └── index.ts
 ```
 
-### Feature
-```
-features/{name}/
-├── ui/
-│   ├── {Name}Form.tsx
-│   ├── {Name}Button.tsx
-│   └── index.ts
-├── api/
-│   ├── {name}Api.ts
-│   └── index.ts
-├── model/
-│   ├── types.ts
-│   ├── schema.ts
-│   ├── store.ts
-│   └── index.ts
-└── index.ts
-```
-
-### Page
+### Page slice
 ```
 pages/{name}/
 ├── ui/
 │   ├── {Name}Page.tsx
-│   └── index.ts
+│   └── (page-local blocks live here too)
 ├── api/
 │   └── loader.ts
-├── model/
-│   └── schema.ts
 └── index.ts
 ```
 
 ---
 
-## Public API Pattern
+## Public API Rules
 
 ```typescript
-// entities/user/index.ts
+// entities/user/index.ts — explicit named exports only
 export { UserCard } from './ui/UserCard';
-export { UserAvatar } from './ui/UserAvatar';
 export { getUser, updateUser } from './api/userApi';
-export { useUser, useUsers } from './api/queries';
 export type { User, UserRole } from './model/types';
-export { userSchema } from './model/schema';
-export { mapUserDTO } from './model/mapper';
 ```
 
-**Import from public API only:**
 ```typescript
-// ✅
+// ✅ Consume via public API
 import { UserCard, type User } from '@/entities/user';
 
-// ❌
+// ❌ Deep import
 import { UserCard } from '@/entities/user/ui/UserCard';
+
+// ✅ Inside the slice: relative imports (never your own index.ts)
+import { userSchema } from '../model/schema';
 ```
+
+- One `index.ts` per slice — no segment indexes on sliced layers
+- No root `shared/index.ts` — per segment (`shared/api/index.ts`), per component for `shared/ui` (`@/shared/ui/button`)
+- No `export *`
 
 ---
 
 ## Cross-Entity References (@x)
 
-When entities must reference each other:
-
-```
-entities/product/@x/order.ts  → API for order to import
-```
+Entities layer only:
 
 ```typescript
-// entities/product/@x/order.ts
+// entities/product/@x/order.ts — exports intended for the order entity
 export type { ProductId } from '../model/types';
 
 // entities/order/model/types.ts
@@ -168,15 +142,18 @@ import type { ProductId } from '@/entities/product/@x/order';
 
 ---
 
-## TypeScript Path Aliases
+## Tooling
+
+```bash
+npm i -D steiger @feature-sliced/steiger-plugin
+npx steiger ./src          # official FSD linter; --watch during refactors
+```
 
 ```json
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "paths": { "@/*": ["./src/*"] }
   }
 }
 ```
@@ -187,20 +164,18 @@ import type { ProductId } from '@/entities/product/@x/order';
 
 | ❌ Don't | ✅ Do |
 |----------|-------|
-| Import from higher layer | Import from lower layers only |
-| Cross-slice import (same layer) | Use lower layer or @x |
-| Generic segments: `components/`, `hooks/` | Purpose segments: `ui/`, `lib/` |
-| Wildcard exports: `export *` | Explicit exports |
-| Business logic in `shared/` | Keep shared domain-agnostic |
-| Single-use widgets | Keep in page slice |
-| Everything is a feature | Only reused interactions |
-| Import from internal paths | Always use `index.ts` |
+| Import from a higher layer | Import from lower layers only |
+| Cross-slice import (same layer) | Move code down, `@x` (entities), or compose above |
+| Business logic in `shared/` | Domain rules live in entities/features/pages |
+| Extract single-use code to features/widgets | Keep it in the page slice (pages-first) |
+| Scaffold all 6 layers for a small app | Start with `app` + `pages` + `shared` |
+| Generic segments: `components/`, `hooks/` | Purpose segments: `ui/`, `model/`, `lib/` |
+| Wildcard exports: `export *` | Explicit named exports |
+| Deep imports into slices | Import the slice `index.ts` |
 
 ---
 
 ## Minimal FSD Setup
-
-Start small, add layers as needed:
 
 ```
 src/
@@ -209,7 +184,7 @@ src/
 └── shared/
 ```
 
-Add `entities/`, `features/`, `widgets/` when complexity grows.
+Add `entities/`, `features/`, `widgets/` only when something is reused by 2+ pages.
 
 ---
 
@@ -217,7 +192,7 @@ Add `entities/`, `features/`, `widgets/` when complexity grows.
 
 | Resource | Link |
 |----------|------|
-| Official Docs | [feature-sliced.design](https://feature-sliced.design) |
-| Examples | [feature-sliced/examples](https://github.com/feature-sliced/examples) |
-| Awesome FSD | [feature-sliced/awesome](https://github.com/feature-sliced/awesome) |
-| v2.1 Notes | [Pages Come First!](https://github.com/feature-sliced/documentation/releases/tag/v2.1) |
+| Official docs | https://feature-sliced.design |
+| Examples | https://github.com/feature-sliced/examples |
+| Steiger linter | https://github.com/feature-sliced/steiger |
+| v2.1 notes ("Pages first") | https://github.com/feature-sliced/documentation/releases/tag/v2.1 |

@@ -8,6 +8,16 @@
 
 Testing strategies for Clean Architecture + DDD + Hexagonal systems.
 
+## Contents
+
+- [Testing Pyramid](#testing-pyramid)
+- [Unit Tests](#unit-tests) — domain (no mocks), value objects, application (mock ports)
+- [Integration Tests](#integration-tests) — adapters against real infrastructure
+- [Architecture Tests](#architecture-tests) — enforce the dependency rule in CI
+- [Test Organization](#test-organization)
+- [Test Fixtures & Builders](#test-fixtures--builders)
+- [Key Testing Principles](#key-testing-principles)
+
 ## Testing Pyramid
 
 ```mermaid
@@ -266,7 +276,7 @@ describe('PlaceOrderHandler', () => {
 
     expect(orderId).toBeDefined();
 
-    const savedOrder = await orderRepo.findById(OrderId.from(orderId));
+    const savedOrder = await orderRepo.findById(orderId);
     expect(savedOrder).not.toBeNull();
     expect(savedOrder!.items).toHaveLength(2);
     expect(savedOrder!.total.amount).toBe(40); // 2*10 + 1*20
@@ -506,11 +516,14 @@ describe('Orders API', () => {
 
 ## Architecture Tests
 
-Verify architectural rules are followed.
+Verify architectural rules are followed automatically, so the dependency rule survives refactors and new contributors. Tooling by language: `tsarch` (TypeScript, shown below — npm package is `tsarch`, GitHub repo is `ts-arch/ts-arch`), ArchUnit (Java/Kotlin), NetArchTest or ArchUnitNET (.NET), import-linter (Python), go-arch-lint or depguard (Go).
 
 ```typescript
 // tests/architecture/dependency_rules.test.ts
-import { filesOfProject } from 'ts-arch';
+import 'tsarch/dist/jest'; // registers the toPassAsync matcher
+import { filesOfProject } from 'tsarch';
+
+jest.setTimeout(60000); // architecture tests parse the whole project
 
 describe('Architecture', () => {
   describe('Dependency Rules', () => {
@@ -544,38 +557,19 @@ describe('Architecture', () => {
       await expect(rule).toPassAsync();
     });
 
-    it('domain should have no external framework dependencies', async () => {
+    it('domain should be free of dependency cycles', async () => {
       const rule = filesOfProject()
         .inFolder('domain')
-        .shouldNot()
-        .dependOnFiles()
-        .matchingPattern('node_modules/(express|pg|axios|typeorm)/');
-
-      await expect(rule).toPassAsync();
-    });
-  });
-
-  describe('Naming Conventions', () => {
-    it('repositories should be named *Repository', async () => {
-      const rule = filesOfProject()
-        .inFolder('domain/**/repository')
         .should()
-        .matchPattern('.*Repository\\.ts$');
-
-      await expect(rule).toPassAsync();
-    });
-
-    it('domain events should be named in past tense', async () => {
-      const rule = filesOfProject()
-        .inFolder('domain/**/events')
-        .should()
-        .matchPattern('.*(Created|Updated|Deleted|Confirmed|Shipped|Cancelled)\\.ts$');
+        .beFreeOfCycles();
 
       await expect(rule).toPassAsync();
     });
   });
 });
 ```
+
+To ban specific framework imports from the domain (ORM, HTTP clients), lint rules are usually simpler than architecture tests — e.g., ESLint `no-restricted-imports` scoped to `src/domain/**`, or `import-linter` "forbidden" contracts in Python. Enforce naming conventions (repositories end in `Repository`, events in past tense) the same way.
 
 ---
 

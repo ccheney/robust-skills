@@ -2,6 +2,20 @@
 
 Sequential, parallel, batched execution, concurrency pools, retry with exponential backoff, timeout wrappers, async debounce, async throttle, for-await-of, async generators, stream chunking, AbortController cancellation, semaphore pattern.
 
+## Contents
+
+- [Sequential Execution](#sequential-execution)
+- [Parallel Execution](#parallel-execution)
+- [Batched Execution](#batched-execution)
+- [Concurrency Pool](#concurrency-pool)
+- [Retry Pattern](#retry-pattern)
+- [Timeout Wrapper](#timeout-wrapper)
+- [Debounce Async](#debounce-async)
+- [Throttle Async](#throttle-async)
+- [Async Iteration](#async-iteration)
+- [Cancellation Patterns](#cancellation-patterns)
+- [Semaphore Pattern](#semaphore-pattern)
+
 ## Sequential Execution
 
 ```javascript

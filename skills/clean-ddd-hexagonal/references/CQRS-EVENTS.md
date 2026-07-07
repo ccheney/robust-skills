@@ -9,6 +9,20 @@
 > - [Strengthening Your Domain: Domain Events](https://lostechies.com/jimmybogard/2010/04/08/strengthening-your-domain-domain-events/) — Jimmy Bogard
 > - [Domain Events: Design and Implementation](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation) — Microsoft
 
+## Contents
+
+- [CQRS Overview](#cqrs-overview)
+- [Commands vs Queries](#commands-vs-queries)
+- [Read Model (Projection)](#read-model-projection)
+- [Domain Events](#domain-events)
+- [Domain Events vs Integration Events](#domain-events-vs-integration-events)
+- [Event Dispatcher Pattern](#event-dispatcher-pattern)
+- [Outbox Pattern](#outbox-pattern)
+- [When to Use CQRS](#when-to-use-cqrs)
+- [Event Sourcing: Critical Considerations](#event-sourcing-critical-considerations)
+- [Saga Pattern (Cross-Aggregate Workflows)](#saga-pattern-cross-aggregate-workflows)
+- [Idempotent Consumer Pattern](#idempotent-consumer-pattern)
+
 ## CQRS Overview
 
 **Command Query Responsibility Segregation** separates read and write operations into different models.
@@ -84,6 +98,7 @@ export class PlaceOrderHandler {
 
     for (const item of command.items) {
       const product = await this.productRepo.findById(item.productId);
+      if (!product) throw new ProductNotFoundError(item.productId);
       order.addItem(product.id, item.quantity, product.price);
     }
 
@@ -94,6 +109,8 @@ export class PlaceOrderHandler {
   }
 }
 ```
+
+Publishing after `save` (as above) can drop events if the process crashes between the two calls. Acceptable for in-process side effects; for cross-service events use the [outbox pattern](#outbox-pattern).
 
 ### Queries (Read Side)
 
@@ -460,7 +477,11 @@ dispatcher.register('order.shipped', new SendShippingNotificationHandler(orderRe
 
 ## Outbox Pattern
 
-Ensures events are published reliably (exactly-once semantics).
+Ensures events are published reliably. Writing the event to an outbox table in the **same transaction** as the aggregate removes the dual-write problem (crash between DB commit and broker publish loses the event).
+
+The guarantee is **at-least-once delivery, not exactly-once**: the message relay can crash after publishing but before marking a message processed, so it may publish the same message again. Consumers must therefore be [idempotent](#idempotent-consumer-pattern).
+
+The relay that moves outbox rows to the broker is implemented either by **polling** the outbox table (shown below) or by **transaction log tailing** (CDC tools such as Debezium).
 
 ```
 interface OutboxMessage:
@@ -572,7 +593,7 @@ Evolve to separate databases only when needed.
 
 ## Event Sourcing: Critical Considerations
 
-> **Warning:** "Extremely difficult to add Event Sourcing to systems not originally designed for it." — Martin Fowler
+> **Warning:** "It's very hard to retrofit these patterns onto a system that wasn't built with Event Sourcing." — Martin Fowler
 
 ### When Event Sourcing Makes Sense
 
@@ -619,21 +640,25 @@ Saga: PlaceOrderSaga
 
 ## Idempotent Consumer Pattern
 
-**Required for reliable event processing.** Messages may be delivered more than once.
+**Required for reliable event processing.** Brokers and the outbox relay both deliver at-least-once, so every consumer must tolerate duplicates.
 
 ```
 class OrderConfirmedHandler:
-    processedIds: Set<string>
+    db: Database
 
     handle(event: OrderConfirmed):
-        if event.eventId in processedIds:
-            return
+        db.transaction((tx) => {
+            inserted = tx.processedMessages.insertIfAbsent({id: event.eventId})
+            if not inserted:
+                return  # duplicate delivery, already handled
 
-        doWork(event)
-        processedIds.add(event.eventId)
+            doWork(event, tx)
+        })
 ```
 
+The dedup record and the work must commit **in the same transaction** — an in-memory set or a separate write reintroduces the race (crash after work, before recording the ID → work runs twice).
+
 **Implementation options:**
-- Store processed message IDs in database
-- Use message broker's deduplication features
-- Design handlers to be naturally idempotent
+- Store processed message IDs in the consumer's database, transactionally with the work (shown above)
+- Use the message broker's deduplication features (note: usually time-windowed)
+- Design handlers to be naturally idempotent (e.g., idempotent upserts, state-machine guards)

@@ -15,9 +15,11 @@ function usage(exitCode = 0) {
 Targets:
   card     Raw Adaptive Card JSON
   bot      Bot Framework/Teams SDK activity or attachment
-  webhook  Incoming Webhook/Workflows message wrapper
+  webhook  Workflows webhook message wrapper (same shape as retired Incoming Webhooks)
   graph    Microsoft Graph chatMessage payload
   auto     Infer target from payload shape
+
+Exit codes: 0 = no errors (warnings allowed), 1 = errors or invalid JSON, 2 = usage error.
 `);
   process.exit(exitCode);
 }
@@ -417,8 +419,18 @@ function validateElement(node, path, version, target) {
     if (version && versionLt(version, "1.5")) {
       error(path, "CodeBlock requires a newer Adaptive Card version; use version 1.5 or link to code/logs.");
     }
-    if (!node.language) warn(`${path}.language`, "CodeBlock should include a language such as JSON, TypeScript, Python, or PlainText.");
+    if (!node.language) warn(`${path}.language`, "CodeBlock should include a language such as Json, TypeScript, Python, or PlainText.");
     if (!node.codeSnippet) error(`${path}.codeSnippet`, "CodeBlock requires codeSnippet.");
+    info(path, "CodeBlock renders only in Teams web and desktop clients; mobile users need fallbackText or a link.");
+  }
+
+  if (node.type?.startsWith("Chart.") || node.type === "Icon" || node.type === "CompoundButton") {
+    if (version && versionLt(version, "1.5")) {
+      error(path, `${node.type} requires Adaptive Card version 1.5 in Teams.`);
+    }
+    if (!node.fallback) {
+      info(`${path}.fallback`, `${node.type} is capability-gated; consider a fallback element for hosts that cannot render it.`);
+    }
   }
 
   if (node.type?.startsWith("Input.")) {
@@ -438,8 +450,10 @@ function validateElement(node, path, version, target) {
   }
 
   if (node.type === "Action.Submit") {
-    if (target === "webhook" || target === "graph") {
-      warn(path, "Action.Submit needs a bot/backend invoke path; webhook and Graph cards are usually not suitable.");
+    if (target === "webhook") {
+      error(path, "Action.Submit is not supported in webhook cards; use Action.OpenUrl or a bot.");
+    } else if (target === "graph") {
+      warn(path, "Action.Submit needs a bot/backend invoke path; Graph-sent cards have no bot backend.");
     }
     if (Object.prototype.hasOwnProperty.call(node, "isEnabled")) {
       warn(`${path}.isEnabled`, "Teams does not support isEnabled for Action.Submit.");

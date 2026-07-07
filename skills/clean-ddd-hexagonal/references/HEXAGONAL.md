@@ -8,9 +8,20 @@
 > Implementation guide:
 > - [Hexagonal Architecture Pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/hexagonal-architecture.html) — AWS
 
+## Contents
+
+- [Core Concept](#core-concept)
+- [Ports](#ports)
+- [Adapters](#adapters)
+- [Naming Conventions](#naming-conventions)
+- [Key Asymmetry](#key-asymmetry)
+- [Configurability via Adapters](#configurability-via-adapters)
+- [Strong vs Weak Hexagonal](#strong-vs-weak-hexagonal)
+- [Benefits](#benefits)
+
 ## Core Concept
 
-> "Allow an application to equally be driven by users, programs, automated tests, or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases."
+> "Allow an application to equally be driven by users, programs, automated test or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases."
 > — Alistair Cockburn
 
 **Design validation technique:** The pattern was designed with FIT testing in mind—business experts can write test cases before any GUI exists. If you can run your entire application from test fixtures, your hexagonal boundaries are correct.

@@ -1,6 +1,6 @@
 # Teams Mentions Reference
 
-Mentions are not just text. Teams requires visible mention markup plus metadata. If the metadata does not exactly match, Teams renders ordinary text or does not notify the target.
+Mentions are not just text. Teams requires visible mention markup plus metadata. If the metadata does not exactly match the visible text, Teams renders ordinary text and notifies nobody.
 
 ## Bot User Mentions
 
@@ -25,24 +25,36 @@ Bot text messages use `<at>Name</at>` in `text` and a matching entity in `entiti
 
 Rules:
 
-- `entities[].text` must exactly match a substring in `text`.
-- Use the Teams user ID from the incoming activity, roster, or Teams context.
-- Do not rely on parsing display names from message text.
-- Remove the bot's own recipient mention from incoming channel/group-chat commands before command parsing.
+- `entities[].text` must exactly match a substring in `text`, including any `@` prefix you choose to show.
+- `mentioned.id` accepts a Teams user ID (`29:...`) from the incoming activity or roster, a Microsoft Entra Object ID, or a UPN (`ada@contoso.com`). Entra Object ID and UPN work in bot text, Adaptive Card bodies, and message extension responses, and still trigger activity feed notifications.
+- Do not parse display names out of message text to build IDs; users can edit visible text.
+- Bots can't mention `@everyone`, and channel/team mentions are not supported in bot messages.
 
 ## Bot Tag Mentions
 
-Tag mentions are supported only in bot-to-client text and Adaptive Card messages.
+Bots can mention tags in channel text messages and Adaptive Cards. The wire format is a mention entity whose `mentioned` object carries `"type": "tag"` — without it, Teams treats the mention as a user mention and it fails:
+
+```json
+{
+  "type": "mention",
+  "text": "<at>On-Call Team</at>",
+  "mentioned": {
+    "id": "base64-encoded-tag-id",
+    "name": "On-Call Team",
+    "type": "tag"
+  }
+}
+```
+
+Get the tag ID from the Microsoft Graph [List teamworkTags](https://learn.microsoft.com/en-us/graph/api/teamworktag-list?view=graph-rest-1.0) API.
 
 Limitations:
 
-- Not supported in shared channels.
-- Not supported in private channels.
-- Not supported in connectors.
-- Not supported in bot invoke flow.
-- Subject to per-thread throttling.
+- Only in bot-to-client text and Adaptive Card messages, and only in channels.
+- Not supported in shared or private channels, in connectors, in the bot invoke flow, or in Teams operated by 21Vianet.
+- Throttled: per bot per thread, at most 2 tag-mention messages per 5 seconds (5 per minute), and at most 10 tags per message.
 
-Use tag mentions carefully; they can notify many people.
+Tag mentions can notify many people; require explicit user intent before sending one.
 
 ## Adaptive Card Mentions
 
@@ -51,7 +63,7 @@ Adaptive Cards can mention users in `TextBlock` and `FactSet` content. Include v
 ```json
 {
   "type": "AdaptiveCard",
-  "version": "1.2",
+  "version": "1.5",
   "body": [
     {
       "type": "TextBlock",
@@ -76,13 +88,13 @@ Adaptive Cards can mention users in `TextBlock` and `FactSet` content. Include v
 
 Notes:
 
-- Channel and team mentions are not supported in bot Adaptive Card messages.
-- Incoming Webhook Adaptive Cards support user mentions, not bot mentions.
-- Message size still matters: mentions add metadata and can push webhooks over the 28 KB limit.
+- Channel and team mentions are not supported in bot messages, card or text.
+- Workflows/Incoming Webhook Adaptive Cards support user mentions (including Entra Object ID and UPN), not bot mentions.
+- Mentions add metadata weight: stay under 28 KB for webhook cards and 100 KB for bot messages.
 
 ## Graph chatMessage Mentions
 
-Graph mentions use indexed `<at id="N">Text</at>` tags in HTML body and matching `mentions` entries.
+Graph mentions use indexed `<at id="N">Text</at>` tags in an HTML body and matching `mentions` entries.
 
 ```json
 {
@@ -109,9 +121,34 @@ Graph mentions use indexed `<at id="N">Text</at>` tags in HTML body and matching
 Rules:
 
 - `body.contentType` must be `html` when mentions are present.
-- `<at id="0">...</at>` must correspond to `mentions[0].id`.
-- The `mentionText` should match the visible text.
-- Graph supports mention entities for users, bots, teams, channels, chats, and tags, but support varies by API path and tenant state.
+- The number in `<at id="N">` must equal `mentions[N].id`, and `mentionText` must match the visible text.
+- The `mentioned` object holds exactly one identity: `user` (as above), `application` (bots), `tag`, or `conversation` for a team or channel.
+
+Team mention via Graph:
+
+```json
+{
+  "body": {
+    "contentType": "html",
+    "content": "<div><at id=\"0\">Platform Team</at> release is out.</div>"
+  },
+  "mentions": [
+    {
+      "id": 0,
+      "mentionText": "Platform Team",
+      "mentioned": {
+        "conversation": {
+          "id": "68a3e365-f7d9-4a56-b499-24332a9cc572",
+          "displayName": "Platform Team",
+          "conversationIdentityType": "team"
+        }
+      }
+    }
+  ]
+}
+```
+
+Use `conversationIdentityType: "channel"` with the channel thread ID to mention a channel.
 
 ## Mention Safety
 
@@ -120,7 +157,8 @@ Rules:
 | Visible text only | No notification | Add entities/mentions metadata |
 | Metadata only | No visible mention | Add `<at>...</at>` text |
 | Mismatched text | Mention ignored | Keep exact text synchronized |
-| Display name used as ID | Mention fails | Use stable Teams/AAD IDs |
+| Display name used as ID | Mention fails | Use Teams ID, Entra Object ID, or UPN |
+| Tag entity missing `"type": "tag"` | Treated as (failing) user mention | Add the type to `mentioned` |
 | Broad tag/team mention by default | Unwanted notifications | Require explicit user intent |
 
 ## Incoming Mentions In Bot Messages
@@ -128,7 +166,7 @@ Rules:
 Every channel or group-chat message sent to a bot normally contains an @mention of the bot. Strip the bot mention before interpreting commands:
 
 - C#: `Activity.RemoveRecipientMention()`
-- JavaScript: `TurnContext.removeMentionText(activity, recipient.id)`
+- JavaScript: `TurnContext.removeMentionText(activity, activity.recipient.id)`
 - Python: `TurnContext.remove_recipient_mention(turn_context.activity)`
 
-Treat the `entities` collection as authoritative for mentioned users; users can edit visible text.
+Treat the `entities` collection as authoritative for who was mentioned; users can edit the visible text.

@@ -7,6 +7,14 @@ The rich text block is Slack's most expressive formatting system. It's the forma
 
 **Surfaces:** Messages, Modals, Home tabs
 
+## Table of Contents
+
+- [Structure](#structure)
+- [Sub-Element Types](#sub-element-types): [rich_text_section](#rich_text_section), [rich_text_list](#rich_text_list), [rich_text_preformatted](#rich_text_preformatted), [rich_text_quote](#rich_text_quote)
+- [Inline Element Types](#inline-element-types): text, link, emoji, user, channel, usergroup, broadcast, date, color
+- [Style Object](#style-object)
+- [Complete Example](#complete-example)
+
 ---
 
 ## Structure

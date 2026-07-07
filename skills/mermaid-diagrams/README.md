@@ -1,6 +1,6 @@
 # mermaid-diagrams
 
-Generate Mermaid diagrams in markdown. This skill activates automatically when you ask for diagrams, charts, visualizations, or system documentation.
+Generate Mermaid diagrams in markdown. This skill activates automatically when you ask for diagrams, charts, visualizations, or system documentation. Syntax verified against Mermaid v11.16 (2026).
 
 ## Supported Diagram Types
 
@@ -10,8 +10,10 @@ Generate Mermaid diagrams in markdown. This skill activates automatically when y
 | **Data Modeling** | Class, ER |
 | **Planning** | Gantt, Timeline, Kanban |
 | **Visualization** | Pie, Quadrant, XY Chart, Sankey, Treemap |
-| **Architecture** | C4, Architecture, Block |
+| **Architecture** | C4 (experimental), Architecture (beta), Block |
 | **Other** | Mindmap, Git Graph, User Journey, Requirement, Packet |
+
+XY Chart, Packet, Block, Kanban, and Sankey now use stable keywords (`xychart`, `packet`, `block`, `kanban`, `sankey`); their old `-beta` declarations still parse as legacy aliases. Architecture (`architecture-beta`) and Treemap (`treemap-beta`) remain beta.
 
 ## Example Usage
 
@@ -25,21 +27,21 @@ Generate Mermaid diagrams in markdown. This skill activates automatically when y
 
 ## Skill Structure
 
-- **[SKILL.md](SKILL.md)** - Main skill file (concise overview)
+- **[SKILL.md](SKILL.md)** - Main skill file (decision tree, core patterns, gotchas)
 - **Reference Files:**
   - [FLOWCHARTS.md](references/FLOWCHARTS.md) - Flowchart syntax
   - [SEQUENCE.md](references/SEQUENCE.md) - Sequence diagrams
   - [CLASS-ER.md](references/CLASS-ER.md) - Class & ER diagrams
   - [STATE-JOURNEY.md](references/STATE-JOURNEY.md) - State & user journey
-  - [DATA-CHARTS.md](references/DATA-CHARTS.md) - Gantt, Pie, Timeline, Charts
-  - [ARCHITECTURE.md](references/ARCHITECTURE.md) - C4, Architecture, Block, Kanban
+  - [DATA-CHARTS.md](references/DATA-CHARTS.md) - Gantt, Pie, Timeline, XY, Sankey, Treemap, Mindmap, Git Graph
+  - [ARCHITECTURE.md](references/ARCHITECTURE.md) - C4, Architecture, Block, Kanban, Packet, Requirement
   - [ADVANCED.md](references/ADVANCED.md) - Configuration & styling
   - [CHEATSHEET.md](references/CHEATSHEET.md) - Quick reference
 
 ## Did You Know Mermaid Can Do This?
 
 ```mermaid
-sankey-beta
+sankey
 
 Visitors,Signed Up,4200
 Visitors,Bounced,8500
@@ -68,7 +70,7 @@ quadrantChart
 ```
 
 ```mermaid
-xychart-beta
+xychart
     title "Monthly Active Users (2024)"
     x-axis [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
     y-axis "Users (thousands)" 0 --> 150

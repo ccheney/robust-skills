@@ -208,6 +208,29 @@ Provide either `url` or `id` (not both):
 
 ---
 
+## Slack Icon Object
+
+References a built-in Slack icon for use in card blocks. Renders next to the card's title/subtitle in place of a custom `icon` image (the two are mutually exclusive).
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `type` | string | Yes | Always `"icon"` |
+| `name` | string | Yes | One of the built-in icon names below |
+
+**Icon names:** `archive`, `book`, `bookmark`, `bot`, `bug`, `calendar`, `call`, `caret-left`, `caret-right`, `check`, `clipboard`, `code`, `comment`, `compass`, `copy`, `cube`, `download`, `edit`, `email`, `eye-closed`, `eye-open`, `file`, `flag`, `folder`, `gear`, `globe`, `heart`, `help`, `image`, `info`, `key`, `lightbulb`, `link`, `map`, `mobile`, `new-window`, `pin`, `plus`, `refine`, `refresh`, `rocket`, `save`, `screen`, `share`, `sparkle`, `star`, `star-filled`, `tag`, `thumbs-down`, `thumbs-up`, `trash`, `upload`, `user`, `warning`.
+
+```json
+{
+  "type": "card",
+  "slack_icon": { "type": "icon", "name": "rocket" },
+  "title": { "type": "mrkdwn", "text": "Deploy complete" }
+}
+```
+
+**Used in:** card block (`slack_icon` property).
+
+---
+
 ## Trigger Object
 
 Contains trigger information for workflow buttons.

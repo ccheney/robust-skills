@@ -2,6 +2,18 @@
 
 > Sources: [CSS Containment Level 2](https://www.w3.org/TR/css-contain-2/), [CSS Logical Properties Level 1](https://www.w3.org/TR/css-logical-1/), [CSS Text Level 4](https://www.w3.org/TR/css-text-4/), [MDN Web Docs: CSS](https://developer.mozilla.org/en-US/docs/Web/CSS). All features below are Baseline unless noted otherwise.
 
+## Contents
+
+- [`content-visibility: auto` — Skip Off-Screen Rendering](#content-visibility-auto--skip-off-screen-rendering)
+- [CSS Containment — The `contain` Property](#css-containment--the-contain-property)
+- [`will-change` — Compositor Hints](#will-change--compositor-hints)
+- [Typography](#typography)
+- [Logical Properties — Writing-Direction-Aware CSS](#logical-properties--writing-direction-aware-css)
+- [Accessibility Media Queries](#accessibility-media-queries)
+- [Progressive Enhancement Meta-Pattern](#progressive-enhancement-meta-pattern)
+- [Modern Viewport Units](#modern-viewport-units)
+- [Performance Checklist](#performance-checklist)
+
 ---
 
 ## `content-visibility: auto` — Skip Off-Screen Rendering
@@ -201,6 +213,8 @@ h3 { font-size: var(--text-2xl); }
 ### `text-box` — Optical Vertical Centering
 
 `text-box` (shorthand for `text-box-trim` and `text-box-edge`) trims extra space above and below text from the font's line-height metrics. This invisible space causes text to appear off-center in buttons, badges, and tight containers.
+
+**Not Baseline as of mid-2026:** Chrome/Edge 133+ and Safari 18.2+ support it; Firefox does not (implementation in progress). Degrades gracefully — untrimmed text just keeps its default metrics. Feature-detect with `@supports (text-box: trim-both cap alphabetic)`.
 
 ```css
 /* ❌ Padding hacks to compensate for font metrics */

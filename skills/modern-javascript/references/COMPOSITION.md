@@ -2,6 +2,16 @@
 
 Currying, partial application, pipe, compose, point-free style, memoization with TTL and LRU, Maybe monad, Result monad, transducers, debounce, throttle, once.
 
+## Contents
+
+- [Higher-Order Functions](#higher-order-functions)
+- [Function Composition](#function-composition)
+- [Memoization](#memoization)
+- [Functor and Monad Patterns](#functor-and-monad-patterns)
+- [Transducers (Advanced)](#transducers-advanced)
+- [Practical Utilities](#practical-utilities)
+- [Best Practices](#best-practices)
+
 ## Higher-Order Functions
 
 ### Functions as Arguments
@@ -85,7 +95,7 @@ processText('  Hello World  ');  // 'hello-world'
 
 ```javascript
 // With arguments
-const getNames = users => users.map(user => user.name);
+const getNamesExplicit = users => users.map(user => user.name);
 
 // Point-free
 const prop = key => obj => obj[key];
@@ -226,7 +236,7 @@ const city = user
   .getOrElse('Unknown');
 
 // Or use optional chaining (simpler for most cases)
-const city = user?.address?.city ?? 'Unknown';
+const cityDirect = rawUser?.address?.city ?? 'Unknown';
 ```
 
 ### Result (Either)

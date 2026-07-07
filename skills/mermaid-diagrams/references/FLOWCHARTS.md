@@ -2,6 +2,22 @@
 
 Flowcharts visualize processes, algorithms, and decision flows using nodes and edges.
 
+## Contents
+
+- [Basic Syntax](#basic-syntax)
+- [Direction](#direction)
+- [Node Shapes](#node-shapes)
+- [Edge Types](#edge-types)
+- [Subgraphs](#subgraphs)
+- [Multi-Target Edges](#multi-target-edges)
+- [Markdown in Labels](#markdown-in-labels)
+- [Icons](#icons)
+- [Click Events](#click-events)
+- [Styling](#styling)
+- [Layout Engine](#layout-engine)
+- [Gotchas](#gotchas)
+- [Examples](#examples)
+
 ---
 
 ## Basic Syntax
@@ -334,6 +350,16 @@ flowchart TB
 
 ---
 
+## Gotchas
+
+- **`end` is reserved.** A lowercase node ID or label `end` breaks parsing because it terminates subgraphs. Use `End`, `stop`, or wrap it: `e[end]`.
+- **`o` and `x` after an edge are arrow heads.** `A---oB` parses as a circle-ended edge to `B`, not an edge to node `oB`. Add a space (`A--- oB`) or capitalize the node ID.
+- **Node IDs must not collide with subgraph IDs.** A node `Build` inside `subgraph Build` throws "would create a cycle". Use a distinct ID with display text in brackets: `Compile[Build]`.
+- **Quote labels containing special characters.** Parentheses, brackets, colons, or leading digits inside unquoted labels break parsing: use `A["Fetch (retry)"]`. Escape literal quotes/hashes inside quoted labels with `#quot;` and `#35;`.
+- **Comments are `%%` on their own line**, not `//` or `#`.
+
+---
+
 ## Examples
 
 ### Microservices Architecture
@@ -386,7 +412,7 @@ flowchart LR
     subgraph Build
         Lint[Lint]
         Test[Test]
-        Build[Build]
+        Compile[Build]
     end
 
     subgraph Deploy
@@ -394,8 +420,8 @@ flowchart LR
         Prod[Production]
     end
 
-    Git --> Lint --> Test --> Build
-    Build --> Staging
+    Git --> Lint --> Test --> Compile
+    Compile --> Staging
     Staging -->|approved| Prod
 
     style Prod fill:#10b981

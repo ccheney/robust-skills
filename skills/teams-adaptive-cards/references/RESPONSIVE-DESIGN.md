@@ -27,6 +27,32 @@ Teams supports a root `msteams.width` hint:
 
 Use full width for dashboards, tables, or dense operational cards. Do not use it to compensate for overcrowded design. Full-width cards still appear in narrow contexts.
 
+## Per-Width Layouts With targetWidth
+
+Cards have a fixed layout by default; `targetWidth` (v1.5) shows or hides individual elements per card width so one card can carry both a narrow and a wide layout. Elements without `targetWidth` are always visible.
+
+| Value | Visible when |
+|-------|--------------|
+| `veryNarrow` | Meeting side panel |
+| `narrow` | Phone in portrait |
+| `standard` | Phone landscape, tablet portrait, desktop chat |
+| `wide` | Tablet landscape, full-width desktop card |
+
+Ranges use `atLeast:` / `atMost:` prefixes, e.g. `"targetWidth": "atLeast:standard"` or `"targetWidth": "atMost:narrow"`.
+
+```json
+{
+  "type": "ColumnSet",
+  "targetWidth": "atLeast:standard",
+  "columns": [
+    { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "Role", "wrap": true } ] },
+    { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Platform Architect", "wrap": true } ] }
+  ]
+}
+```
+
+Pair a wide `ColumnSet` (`atLeast:standard`) with a stacked equivalent (`atMost:narrow`) so narrow clients get vertical layout instead of squeezed columns.
+
 ## Text
 
 Rules:

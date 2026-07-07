@@ -2,6 +2,18 @@
 
 Mermaid supports various chart types for data visualization, project planning, and chronological representation.
 
+## Contents
+
+- [Gantt Charts](#gantt-charts) — `gantt` (stable)
+- [Pie Charts](#pie-charts) — `pie` (stable)
+- [Timeline Diagrams](#timeline-diagrams) — `timeline` (stable)
+- [Quadrant Charts](#quadrant-charts) — `quadrantChart` (stable)
+- [XY Charts](#xy-charts) — `xychart` (stable; `xychart-beta` is a legacy alias)
+- [Sankey Diagrams](#sankey-diagrams) — `sankey` (experimental; `sankey-beta` is a legacy alias)
+- [Treemap Diagrams](#treemap-diagrams) — `treemap-beta` (beta; syntax may evolve)
+- [Mindmaps](#mindmaps) — `mindmap` (stable)
+- [Git Graphs](#git-graphs) — `gitGraph` (stable)
+
 ---
 
 # Gantt Charts
@@ -351,12 +363,12 @@ quadrantChart
 
 # XY Charts
 
-Line and bar charts for data trends.
+Line and bar charts for data trends. Declared with `xychart` (stable since v11; the old `xychart-beta` keyword still parses). Add `horizontal` after the keyword for horizontal orientation.
 
 ## Basic Syntax
 
 ```mermaid
-xychart-beta
+xychart
     title "Monthly Sales"
     x-axis [Jan, Feb, Mar, Apr, May, Jun]
     y-axis "Revenue ($K)" 0 --> 100
@@ -367,7 +379,7 @@ xychart-beta
 ## Line Chart
 
 ```mermaid
-xychart-beta
+xychart
     title "User Growth"
     x-axis [Q1, Q2, Q3, Q4]
     y-axis "Users (thousands)" 0 --> 500
@@ -378,7 +390,7 @@ xychart-beta
 ## Combined
 
 ```mermaid
-xychart-beta
+xychart
     title "Revenue vs Costs"
     x-axis [Jan, Feb, Mar, Apr, May, Jun]
     y-axis "Amount ($K)" 0 --> 150
@@ -391,12 +403,12 @@ xychart-beta
 
 # Sankey Diagrams
 
-Flow and allocation visualization.
+Flow and allocation visualization. Declared with `sankey` (the old `sankey-beta` keyword still parses). Marked experimental in the official docs — the CSV-like syntax may be extended. Each line is `source,target,value`; quote node names containing commas.
 
 ## Basic Syntax
 
 ```mermaid
-sankey-beta
+sankey
 
 Website, Signup, 100
 Website, Bounce, 300
@@ -409,7 +421,7 @@ Trial, Churn, 40
 ## Example: Budget Flow
 
 ```mermaid
-sankey-beta
+sankey
 
 Revenue, Engineering, 450
 Revenue, Marketing, 200
@@ -431,7 +443,7 @@ Marketing, Content, 30
 ## Example: User Journey Flow
 
 ```mermaid
-sankey-beta
+sankey
 
 Homepage, Products, 450
 Homepage, About, 100
@@ -451,7 +463,7 @@ Checkout, Fail, 30
 
 # Treemap Diagrams
 
-Hierarchical data with area representation.
+Hierarchical data with area representation. Still beta (`treemap-beta`) — syntax may evolve. Parent nodes are quoted strings; leaves take `"Name": value`; hierarchy comes from indentation.
 
 ## Basic Syntax
 

@@ -1,12 +1,21 @@
 # Architecture Diagrams
 
-Mermaid provides several diagram types for system architecture: Architecture diagrams, Block diagrams, C4 diagrams, and Kanban boards.
+Mermaid provides several diagram types for system architecture and structured layouts: Architecture, Block, C4, Kanban, Packet, and Requirement diagrams.
+
+## Contents
+
+- [Architecture Diagrams](#architecture-diagrams-1) — `architecture-beta` (beta, v11.1+)
+- [Block Diagrams](#block-diagrams) — `block` (stable; `block-beta` is a legacy alias)
+- [C4 Diagrams](#c4-diagrams) — `C4Context`, `C4Container`, `C4Component`, `C4Dynamic`, `C4Deployment` (experimental)
+- [Kanban Diagrams](#kanban-diagrams) — `kanban` (stable)
+- [Packet Diagrams](#packet-diagrams) — `packet` (stable; `packet-beta` is a legacy alias)
+- [Requirement Diagrams](#requirement-diagrams) — `requirementDiagram` (stable)
 
 ---
 
 # Architecture Diagrams
 
-Cloud and CI/CD infrastructure visualization using icons and groups.
+Cloud and CI/CD infrastructure visualization using icons and groups. Declared with `architecture-beta` (still beta as of v11.16 — the official docs use the beta keyword).
 
 ## Basic Syntax
 
@@ -172,12 +181,12 @@ architecture-beta
 
 # Block Diagrams
 
-System component layouts with flexible positioning.
+System component layouts with flexible positioning. Declared with `block` (the old `block-beta` keyword still parses as a legacy alias).
 
 ## Basic Syntax
 
 ```mermaid
-block-beta
+block
     columns 3
     a b c
     d e f
@@ -190,7 +199,7 @@ block-beta
 Control layout width:
 
 ```mermaid
-block-beta
+block
     columns 4
     a b c d
     e f g h
@@ -199,7 +208,7 @@ block-beta
 ## Block Width (Spanning)
 
 ```mermaid
-block-beta
+block
     columns 3
     a:1 b:2
     c:3
@@ -208,7 +217,7 @@ block-beta
 ## Block Shapes
 
 ```mermaid
-block-beta
+block
     columns 4
     a["Rectangle"]
     b("Rounded")
@@ -224,7 +233,7 @@ block-beta
 ## Nested Blocks
 
 ```mermaid
-block-beta
+block
     columns 2
 
     block:frontend
@@ -252,7 +261,7 @@ block-beta
 ## Connections
 
 ```mermaid
-block-beta
+block
     columns 3
 
     A["Client"] --> B["API Gateway"]
@@ -267,7 +276,7 @@ block-beta
 ## Styling
 
 ```mermaid
-block-beta
+block
     columns 3
     Frontend Backend Database
 
@@ -285,7 +294,7 @@ block-beta
 ## Example: Three-Tier Architecture
 
 ```mermaid
-block-beta
+block
     columns 3
 
     block:presentation["Presentation Tier"]
@@ -323,7 +332,7 @@ block-beta
 
 # C4 Diagrams
 
-Software architecture using the C4 model (Context, Container, Component, Code).
+Software architecture using the C4 model (Context, Container, Component, Code). Marked experimental in the official docs — syntax is stable in practice but may change. For maximum portability, a flowchart with subgraphs covers most architecture needs.
 
 ## Diagram Types
 
@@ -540,13 +549,12 @@ kanban
 
 ## Task Metadata
 
+Metadata attaches to a task with a single `@{ ... }` block immediately after the closing bracket, on the same line. Separate `@{ }` blocks on their own lines fail to parse. Quote values containing spaces with single quotes.
+
 ```mermaid
 kanban
     Backlog
-        task1[User authentication]
-        @{ ticket: AUTH-123 }
-        @{ assigned: john }
-        @{ priority: High }
+        task1[User authentication]@{ ticket: AUTH-123, assigned: 'john', priority: 'High' }
 ```
 
 ### Metadata Keys
@@ -555,7 +563,7 @@ kanban
 |-----|-------------|
 | `ticket` | Issue/ticket number |
 | `assigned` | Assignee |
-| `priority` | Priority level |
+| `priority` | `'Very High'`, `'High'`, `'Low'`, or `'Very Low'` |
 
 ---
 
@@ -585,14 +593,11 @@ kanban
         task2[Setup JWT auth]
 
     In Progress
-        task3[Implement login API]
-        @{ assigned: alice }
-        task4[Write login tests]
-        @{ assigned: bob }
+        task3[Implement login API]@{ assigned: 'alice' }
+        task4[Write login tests]@{ assigned: 'bob' }
 
     Review
-        task5[Database schema]
-        @{ assigned: charlie }
+        task5[Database schema]@{ assigned: 'charlie' }
 
     Done
         task6[Project setup]
@@ -603,12 +608,12 @@ kanban
 
 # Packet Diagrams
 
-Network protocol visualization.
+Network protocol visualization. Declared with `packet` (stable; the old `packet-beta` keyword still parses).
 
 ## Basic Syntax
 
 ```mermaid
-packet-beta
+packet
     0-15: "Source Port"
     16-31: "Destination Port"
     32-63: "Sequence Number"
@@ -625,7 +630,7 @@ Two syntaxes:
 ## Example: TCP Packet
 
 ```mermaid
-packet-beta
+packet
     0-15: "Source Port"
     16-31: "Destination Port"
     32-63: "Sequence Number"
@@ -648,7 +653,7 @@ packet-beta
 ## Example: UDP Packet
 
 ```mermaid
-packet-beta
+packet
     title UDP Packet
     +16: "Source Port"
     +16: "Destination Port"
@@ -663,25 +668,29 @@ packet-beta
 
 System requirements and traceability.
 
+Field values can be quoted or unquoted, but unquoted values containing hyphens (`REQ-001`, `UI-001`) break the parser — always quote IDs and doc references: `id: "REQ-001"`.
+
 ## Basic Syntax
 
 ```mermaid
 requirementDiagram
 
     requirement user_login {
-        id: REQ-001
-        text: Users must be able to log in
+        id: "REQ-001"
+        text: "Users must be able to log in"
         risk: low
         verifymethod: test
     }
 
     element login_page {
         type: ui_component
-        docref: UI-001
+        docref: "UI-001"
     }
 
     login_page - satisfies -> user_login
 ```
+
+Valid `risk` values: `low`, `medium`, `high`. Valid `verifymethod` values: `analysis`, `inspection`, `test`, `demonstration`.
 
 ## Requirement Types
 
@@ -714,34 +723,34 @@ requirementDiagram
 requirementDiagram
 
     requirement auth_system {
-        id: REQ-100
-        text: System shall provide user authentication
+        id: "REQ-100"
+        text: "System shall provide user authentication"
         risk: high
         verifymethod: test
     }
 
     functionalRequirement login {
-        id: REQ-101
-        text: Users can log in with email/password
+        id: "REQ-101"
+        text: "Users can log in with email/password"
         risk: medium
         verifymethod: test
     }
 
     functionalRequirement mfa {
-        id: REQ-102
-        text: System shall support MFA
+        id: "REQ-102"
+        text: "System shall support MFA"
         risk: high
         verifymethod: demonstration
     }
 
     element auth_service {
         type: service
-        docref: SVC-001
+        docref: "SVC-001"
     }
 
     element auth_tests {
         type: test_suite
-        docref: TEST-001
+        docref: "TEST-001"
     }
 
     auth_system - contains -> login

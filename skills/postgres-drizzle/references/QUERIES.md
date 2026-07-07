@@ -1,6 +1,23 @@
 # Drizzle Query Patterns
 
-Comprehensive reference for querying PostgreSQL with Drizzle ORM.
+Comprehensive reference for querying PostgreSQL with Drizzle ORM using the
+SQL-like API (`db.select()` etc. — identical in 0.x and v1.0). For `db.query.*`
+relational queries see [RELATIONS.md](RELATIONS.md).
+
+## Contents
+
+- [Query Operators](#query-operators)
+- [Select Queries](#select-queries)
+- [Ordering & Pagination](#ordering--pagination)
+- [Joins](#joins)
+- [Aggregations](#aggregations)
+- [Subqueries](#subqueries)
+- [Insert Operations](#insert-operations)
+- [Update Operations](#update-operations)
+- [Delete Operations](#delete-operations)
+- [Raw SQL](#raw-sql)
+- [Prepared Statements](#prepared-statements)
+- [Transactions](#transactions)
 
 ---
 
@@ -169,15 +186,18 @@ async function getPosts(filters: Filters) {
       filters.categoryId
         ? eq(posts.categoryId, filters.categoryId)
         : undefined,
-      filters.minPrice
+      filters.minPrice !== undefined   // not truthiness: 0 is a valid price
         ? gte(posts.price, filters.minPrice)
         : undefined,
-      filters.maxPrice
+      filters.maxPrice !== undefined
         ? lte(posts.price, filters.maxPrice)
         : undefined,
     ));
 }
 ```
+
+`and()`/`or()` ignore `undefined` arguments, which is what makes this pattern
+work. An empty `and()` is `undefined`, so `.where(undefined)` returns all rows.
 
 ---
 
@@ -324,7 +344,11 @@ import { count, sum, avg, min, max, countDistinct } from 'drizzle-orm';
 ### Basic Aggregates
 
 ```typescript
-// Count all rows
+// Count all rows — shorthand
+const total = await db.$count(users);                          // number
+const active = await db.$count(users, eq(users.status, 'active'));
+
+// Count all rows — explicit
 const [{ total }] = await db
   .select({ total: count() })
   .from(users);
@@ -448,16 +472,22 @@ const usersWithoutPosts = await db
   );
 ```
 
-### Scalar Subquery
+### Correlated Scalar Subquery
+
+Self-referencing correlations need a table alias — comparing `posts.authorId`
+to itself is always true:
 
 ```typescript
+import { alias } from 'drizzle-orm/pg-core';
+
+const p = alias(posts, 'p');
+
 const postsWithAuthorCount = await db
   .select({
     post: posts,
-    authorPostCount: db
-      .select({ count: count() })
-      .from(posts)
-      .where(eq(posts.authorId, posts.authorId)),
+    authorPostCount: sql<number>`(
+      SELECT count(*) FROM ${p} WHERE ${p.authorId} = ${posts.authorId}
+    )`.as('author_post_count'),
   })
   .from(posts);
 ```
@@ -649,10 +679,13 @@ const result = await db
 .where(sql`${users.email} ~* ${pattern}`)  // PostgreSQL regex
 
 // Typed raw query
-const users = await db.execute<{ id: string; name: string }>(
+const rows = await db.execute<{ id: string; name: string }>(
   sql`SELECT id, name FROM users WHERE status = 'active'`
 );
 ```
+
+Note on `db.execute()` result shape: with postgres.js the result is the row
+array itself; with node-postgres it's a `pg` result object — read `result.rows`.
 
 ### SQL Operators
 
@@ -672,7 +705,10 @@ const users = await db.execute<{ id: string; name: string }>(
 
 ## Prepared Statements
 
-Improve performance by preparing queries once:
+Improve performance by preparing queries once. Caveat: named server-side
+prepared statements break behind transaction-mode poolers (PgBouncer < 1.21,
+Supavisor) — see
+[PERFORMANCE.md](PERFORMANCE.md#transaction-pooling-limitations).
 
 ```typescript
 // Prepare
@@ -715,6 +751,9 @@ const result = await db.transaction(async (tx) => {
   return user;
 });
 ```
+
+Use `tx` for every statement inside the callback. A query on `db` runs on a
+different connection outside the transaction and will not roll back.
 
 ### Nested Transactions (Savepoints)
 

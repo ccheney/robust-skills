@@ -6,6 +6,21 @@
 > - [OKLCH in CSS: why we moved from RGB and HSL](https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl) — Evil Martians
 > - [MDN: CSS Color](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_colors) — Mozilla
 
+Everything in this file — `oklch()`, `oklab()`, `color-mix()`, relative color syntax, `light-dark()`, `color()` — is Baseline as of mid-2026. Use freely.
+
+## Contents
+
+- [Why Modern Color Spaces Matter](#why-modern-color-spaces-matter)
+- [Modern Syntax: Space-Separated Values](#modern-syntax-space-separated-values)
+- [OKLCH — The Recommended Color Space](#oklch--the-recommended-color-space)
+- [OKLab — Best for Gradient Interpolation](#oklab--best-for-gradient-interpolation)
+- [Display-P3 — Wide-Gamut Colors](#display-p3--wide-gamut-colors)
+- [`color-mix()` — Blending Colors](#color-mix--blending-colors)
+- [Relative Color Syntax — Deriving Colors from Tokens](#relative-color-syntax--deriving-colors-from-tokens)
+- [`light-dark()` and `color-scheme` — Theming](#light-dark-and-color-scheme--theming)
+- [Putting It All Together](#putting-it-all-together)
+- [Anti-Patterns](#anti-patterns)
+
 ---
 
 ## Why Modern Color Spaces Matter

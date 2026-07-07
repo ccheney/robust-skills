@@ -2,6 +2,16 @@
 
 > Sources: [Scroll-Driven Animations Level 1](https://www.w3.org/TR/scroll-animations-1/), [CSS Conditional Rules Level 5](https://www.w3.org/TR/css-conditional-5/) (scroll-state queries), [CSS Overflow Level 5](https://www.w3.org/TR/css-overflow-5/) (scroll markers/buttons), [MDN: Scroll-Driven Animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations), [CSS Wrapped 2025](https://chrome.dev/css-wrapped-2025/).
 
+## Contents
+
+- [Why This Exists](#why-this-exists)
+- [`scroll()` — Scroll Progress Timeline](#scroll--scroll-progress-timeline)
+- [`view()` — View Progress Timeline](#view--view-progress-timeline)
+- [Scroll-State Container Queries](#scroll-state-container-queries)
+- [Native CSS Carousels](#native-css-carousels)
+- [`scrollend` Event](#scrollend-event)
+- [Accessibility](#accessibility)
+
 ---
 
 ## Why This Exists
@@ -30,7 +40,7 @@ flowchart LR
     C4 --> C5["Use: fade-in on scroll, reveal animations"]
 ```
 
-Scroll-driven animations are **Baseline**. Use freely.
+**Support (mid-2026): NOT Baseline.** Chrome/Edge 115+ and Safari 26+ support scroll-driven animations; Firefox has a complete implementation behind a flag (`layout.css.scroll-driven-animations.enabled`, on by default in Nightly — expected to ship soon). Design them as progressive enhancement: browsers that don't understand `animation-timeline` simply run the animation on the normal clock (instantly, with default `0s` duration) and settle on the final state — content stays visible, the scroll effect just doesn't happen. Use `@supports (animation-timeline: view())` when you want cleanly separated fallback styling.
 
 ---
 
@@ -267,7 +277,7 @@ When the animated element differs from the tracked element, use a named timeline
 
 Boolean state detection for scroll-related properties. Unlike scroll-driven animations (which map progress to a timeline), these toggle discrete states.
 
-**Feature-detect with `@supports (container-type: scroll-state)`.**
+**Support: Chromium-only (Chrome/Edge 133+) as of mid-2026. Feature-detect with `@supports (container-type: scroll-state)`.**
 
 **CRITICAL RULE**: The styled element must be a **child** of the scroll-state container. You cannot style the container itself. This is the same child-only rule as size container queries.
 
@@ -413,7 +423,7 @@ Values: `top`, `bottom`, `left`, `right`, `inset-block-start`, `inset-block-end`
 
 Built-in pseudo-elements for carousel controls. The browser generates accessible prev/next buttons and pagination markers natively — no JavaScript, no ARIA wiring. Keyboard navigation, screen reader announcements, and focus management are automatic.
 
-**Feature-detect with `@supports selector(::scroll-button(inline-start))`.**
+**Support: Chromium-only (Chrome/Edge 135+) as of mid-2026. Feature-detect with `@supports selector(::scroll-button(inline-start))`.** In other browsers the carousel remains a plain scroll-snap container — usable, just without generated controls.
 
 ### `::scroll-button()` — Prev/Next Navigation
 
@@ -527,7 +537,7 @@ Use markers as a table-of-contents. The marker for the currently visible section
 
 ## `scrollend` Event
 
-Native event when scrolling completes. Fires once, after all momentum and snap settling. Replaces debounced scroll listeners. Part of **Interop 2025**.
+Native event when scrolling completes. Fires once, after all momentum and snap settling. Replaces debounced scroll listeners. **Baseline since September 2025** (Chrome 114+, Firefox 109+, Safari 26+).
 
 ```javascript
 // ❌ Old: debounced scroll listener

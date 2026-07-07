@@ -1,5 +1,9 @@
 # Drizzle + PostgreSQL Quick Reference
 
+Syntax below is stable drizzle-orm 0.x (npm `latest`). For v1.0 (beta/RC)
+projects, relations and `db.query.*` filters differ — see the
+[RQB v2 section in RELATIONS.md](RELATIONS.md#relational-queries-v2-drizzle-orm-v10).
+
 ---
 
 ## Schema Definition
@@ -8,7 +12,8 @@
 
 ```typescript
 import { pgTable, uuid, text, varchar, integer, bigint, boolean,
-  timestamp, date, numeric, json, jsonb, pgEnum, serial } from 'drizzle-orm/pg-core';
+  timestamp, date, numeric, json, jsonb, pgEnum, serial,
+  index, uniqueIndex, check } from 'drizzle-orm/pg-core';
 
 // Primary Keys
 id: uuid('id').primaryKey().defaultRandom(),           // UUIDv4
@@ -44,20 +49,26 @@ tags: text('tags').array(),
 ```typescript
 email: text('email').notNull().unique(),
 status: text('status').notNull().default('pending'),
-price: numeric('price').check(sql`price > 0`),
 
 // Foreign Key
 authorId: uuid('author_id').references(() => users.id, { onDelete: 'cascade' }),
+
+// Check constraints are table-level (no .check() on columns)
+}, (table) => [
+  check('price_positive', sql`${table.price} > 0`),
+]);
 ```
 
 ### Indexes
 
 ```typescript
 }, (table) => [
-  index('idx_name').on(table.column),                    // B-tree
-  uniqueIndex('idx_unique').on(table.column),            // Unique
-  index('idx_composite').on(table.col1, table.col2),     // Composite
-  index('idx_partial').on(table.col).where(sql`...`),    // Partial
+  index('idx_name').on(table.column),                        // B-tree (default)
+  uniqueIndex('idx_unique').on(table.column),                // Unique
+  index('idx_composite').on(table.col1, table.col2),         // Composite
+  index('idx_partial').on(table.col).where(sql`...`),        // Partial
+  index('idx_gin').using('gin', table.data),                 // GIN (method first!)
+  index('idx_gin_path').using('gin', table.data.op('jsonb_path_ops')),
 ]);
 ```
 
@@ -298,6 +309,10 @@ await db.transaction(async (tx) => {
 ```typescript
 import { count, sum, avg, min, max } from 'drizzle-orm';
 
+// Count shorthand
+const total = await db.$count(users);
+const active = await db.$count(users, eq(users.active, true));
+
 // Count
 const [{ total }] = await db.select({ total: count() }).from(users);
 
@@ -321,6 +336,7 @@ const getUser = db.select().from(users)
   .prepare('get_user');
 
 const user = await getUser.execute({ id });
+// Behind transaction-mode PgBouncer/Supavisor: postgres(url, { prepare: false })
 ```
 
 ---
@@ -328,12 +344,13 @@ const user = await getUser.execute({ id });
 ## drizzle-kit Commands
 
 ```bash
-npx drizzle-kit generate   # Generate migration from schema
-npx drizzle-kit migrate    # Apply migrations
-npx drizzle-kit push       # Push schema directly (dev)
-npx drizzle-kit pull       # Introspect existing DB
-npx drizzle-kit studio     # Open Drizzle Studio
-npx drizzle-kit check      # Verify migrations
+npx drizzle-kit generate            # Generate migration from schema
+npx drizzle-kit generate --custom   # Empty migration for hand-written SQL
+npx drizzle-kit migrate             # Apply migrations
+npx drizzle-kit push                # Push schema directly (dev)
+npx drizzle-kit pull                # Introspect existing DB
+npx drizzle-kit studio              # Open Drizzle Studio
+npx drizzle-kit check               # Verify migrations
 ```
 
 ---
@@ -372,10 +389,14 @@ export const db = drizzle(client, { schema });
 
 ```typescript
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
 import * as schema from './schema';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// One-liner: Drizzle creates a Pool internally
+export const db = drizzle(process.env.DATABASE_URL!, { schema });
+
+// Or bring your own Pool
+import { Pool } from 'pg';
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 20 });
 export const db = drizzle(pool, { schema });
 ```
 
@@ -406,13 +427,13 @@ export const db = drizzle(pool, { schema });
 
 ## Quick Tips
 
-1. **Use UUIDv7** over UUIDv4 for better index performance
-2. **Use relational queries** to avoid N+1
-3. **Add indexes** on foreign keys and frequently filtered columns
-4. **Use partial indexes** for filtered subsets
-5. **Use prepared statements** for repeated queries
-6. **Set `shared_buffers`** to 25% of RAM
-7. **Use `EXPLAIN ANALYZE`** to debug slow queries
-8. **Use transactions** for related operations
+1. **Check drizzle-orm version first** — 0.x (`relations()`) vs 1.0 (`defineRelations`)
+2. **Use UUIDv7** (PG18+) or identity columns over UUIDv4/serial for index locality
+3. **Use relational queries** to avoid N+1
+4. **Add indexes** on foreign keys and frequently filtered columns
+5. **Use partial indexes** for filtered subsets
+6. **Use `timestamp(..., { withTimezone: true })`** everywhere
+7. **Use `EXPLAIN (ANALYZE, BUFFERS)`** to debug slow queries
+8. **Use `tx`, not `db`,** inside transactions
 9. **Use connection pooling** in production
 10. **Run `generate` not `push`** for production migrations

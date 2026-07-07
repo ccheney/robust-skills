@@ -6,6 +6,20 @@
 > - [Effective Aggregate Design](https://www.dddcommunity.org/library/vernon_2011/) — Vaughn Vernon
 > - [Repository Pattern](https://martinfowler.com/eaaCatalog/repository.html) — Martin Fowler (PoEAA)
 
+## Contents
+
+- [Building Blocks Overview](#building-blocks-overview)
+- [Entity](#entity)
+- [Value Object](#value-object)
+- [Aggregate](#aggregate)
+- [Repository](#repository)
+- [Domain Event](#domain-event)
+- [Domain Service](#domain-service)
+- [Factory](#factory)
+- [Specification Pattern](#specification-pattern)
+
+Code in this file is language-neutral pseudocode; adapt idioms (constructors, generics, error handling) to your target language. See [CHEATSHEET.md](CHEATSHEET.md) for TypeScript templates.
+
 ## Building Blocks Overview
 
 ```mermaid

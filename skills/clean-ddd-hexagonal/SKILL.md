@@ -62,6 +62,22 @@ Where does it go?
 └─ Implements a port                      → adapter (infrastructure)
 ```
 
+**Sharp edges** — the placements LLMs most often get wrong:
+
+| Code | Layer | Why |
+|------|-------|-----|
+| Business invariant ("order needs items to confirm") | Domain (entity method) | It's a rule, not orchestration |
+| Input format validation (JSON shape, required fields) | Adapter (controller/DTO) | Protocol concern, not business rule |
+| Transaction begin/commit | Application | Use case = transaction boundary |
+| ORM entity / table model | Infrastructure | Map to domain objects; never let ORM entities BE domain entities |
+| Domain ↔ DB mapping | Infrastructure (mapper) | Persistence detail |
+| Authorization ("is user allowed?") | Application (policy) or adapter middleware | Domain stays auth-agnostic; encode role RULES in domain only if they're business rules |
+| Clock, UUID generation | Port in domain/application; adapter in infrastructure | Keeps domain deterministic and testable |
+| Reacting to a domain event | Application (event handler) | Side effects = orchestration |
+| Query joining many tables for a screen | Read model (application interface, infrastructure impl) | Don't force it through aggregates |
+
+**Litmus test for anemic domain models:** if an application service reads state out of an entity, decides, then writes state back (`if (order.status === 'draft') order.status = 'confirmed'`), move that logic into the entity as `order.confirm()`. Handlers should read like a script: load aggregate → call one behavior method → save → publish.
+
 ### "Is this an Entity or Value Object?"
 
 ```
@@ -115,6 +131,10 @@ src/
 
 **Port placement:** This skill defaults to a DDD-centered layout where aggregate repository interfaces live beside the aggregate in `domain/`. A stricter Hexagonal layout may instead put driven ports under `application/ports/driven/`. Pick one convention per codebase and keep the dependency rule intact.
 
+**Presentation layer:** Driver adapters (REST/gRPC/CLI) live under `infrastructure/` in this default layout. Some codebases lift them into a fourth top-level `presentation/` layer instead ([references/LAYERS.md](references/LAYERS.md) shows that variant). Use one home for controllers, not both.
+
+**Event publishing:** Saving an aggregate and then publishing its events to a broker are two writes; a crash between them silently drops events. When events must reach other services reliably, write them to an outbox table in the same transaction as the aggregate — see the outbox pattern in [references/CQRS-EVENTS.md](references/CQRS-EVENTS.md).
+
 ## DDD Building Blocks
 
 | Pattern | Purpose | Layer | Key Rule |
@@ -152,15 +172,17 @@ src/
 
 ## Reference Documentation
 
-| File | Purpose |
-|------|---------|
-| [references/LAYERS.md](references/LAYERS.md) | Complete layer specifications |
-| [references/DDD-STRATEGIC.md](references/DDD-STRATEGIC.md) | Bounded contexts, context mapping |
-| [references/DDD-TACTICAL.md](references/DDD-TACTICAL.md) | Entities, value objects, aggregates (pseudocode) |
-| [references/HEXAGONAL.md](references/HEXAGONAL.md) | Ports, adapters, naming |
-| [references/CQRS-EVENTS.md](references/CQRS-EVENTS.md) | Command/query separation, events |
-| [references/TESTING.md](references/TESTING.md) | Unit, integration, architecture tests |
-| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick decision guide |
+Read the matching file before doing the task in the left column:
+
+| Before you... | Read |
+|---------------|------|
+| Write code in any layer, wire dependency injection, or decide 3-layer vs 4-layer | [references/LAYERS.md](references/LAYERS.md) |
+| Split a system into services/contexts, integrate with a legacy or third-party system (ACL), run Event Storming | [references/DDD-STRATEGIC.md](references/DDD-STRATEGIC.md) |
+| Model an entity, value object, aggregate, repository, domain service, or factory | [references/DDD-TACTICAL.md](references/DDD-TACTICAL.md) |
+| Define ports/adapters, name interfaces, or lay out a ports-first structure | [references/HEXAGONAL.md](references/HEXAGONAL.md) |
+| Add commands/queries, domain vs integration events, outbox, sagas, or evaluate CQRS/Event Sourcing | [references/CQRS-EVENTS.md](references/CQRS-EVENTS.md) |
+| Write unit/integration/architecture tests for any layer | [references/TESTING.md](references/TESTING.md) |
+| Answer a quick "which pattern/which layer" question without deep-diving | [references/CHEATSHEET.md](references/CHEATSHEET.md) |
 
 ## Sources
 

@@ -8,10 +8,10 @@ The same Adaptive Card content appears in different envelopes depending on where
 |---------|-------------------------|---------|---------------------|
 | Bot Framework / Teams SDK | Yes | Activity attachment | Bot |
 | Message extensions | Yes | Extension result attachment | Bot/message extension |
-| Incoming Webhook | Yes for card wrapper | Top-level message + attachments | No bot invoke |
-| Workflows webhook | Yes when flow posts Adaptive Card | Usually message wrapper or flow-specific body | Flow actions, not bot card invoke |
+| Workflows webhook | Yes | Top-level message + attachments | Flow actions, not bot card invoke |
 | Microsoft Graph chatMessage | Yes as attachment | Body placeholder + attachments | Not a bot invoke path |
-| Connectors | Connector cards/MessageCard legacy | MessageCard | Legacy actionable message path |
+| Incoming Webhook (O365 connector) | Retired May 2026 | — | Migrate to Workflows |
+| Connectors / MessageCard | Retired May 2026 | — | Migrate to Workflows or bot |
 | Tabs | No direct Adaptive Card surface | Use app UI | App frontend |
 
 ## Bots
@@ -44,13 +44,14 @@ Use bots for:
 - Universal Actions with `Action.Execute`.
 - User-specific views and refresh.
 - SSO-backed cards.
+- People picker and dynamic typeahead inputs.
 
 Bot constraints:
 
 - The app must be installed where the bot sends proactive messages.
 - Channel/group-chat bots often need to be @mentioned unless RSC permissions are granted.
 - Large teams and welcome/proactive messages require anti-spam restraint.
-- Message size can be larger than webhook limits, but still design compactly.
+- Bot messages allow up to ~100 KB, larger than webhook limits, but still design compactly.
 
 ## Message Extensions
 
@@ -68,9 +69,9 @@ Notes:
 - Universal Actions and refresh are supported for specific message-extension scenarios.
 - Keep cards self-contained; the user may insert or share them into a conversation.
 
-## Incoming Webhook
+## Workflows Webhook
 
-Incoming webhook card payloads use the message attachment wrapper:
+Workflows in Teams are powered by Power Automate. A flow created from the "When a Teams webhook request is received" template exposes a URL; POST the message wrapper to it and the flow posts the Adaptive Card into the channel or chat.
 
 ```json
 {
@@ -98,27 +99,12 @@ Constraints:
 
 - Message size limit is 28 KB.
 - Rate limit is about four requests per second; use retry/backoff.
-- Use `Action.OpenUrl` for actions.
-- Do not rely on `Action.Submit` or `Action.Execute` without a bot.
-- Microsoft has moved the strategic path to Workflows/Power Automate and notification bots.
-
-## Workflows
-
-Workflows in Teams are powered by Power Automate. They can receive webhook requests and then post messages or Adaptive Cards to Teams channels/chats.
-
-Use Workflows when:
-
-- The integration is a simple external webhook notification.
-- Users should configure the flow in Teams.
-- The flow needs to transform incoming data before posting.
-- No custom Teams bot is warranted.
-
-Limitations:
-
+- Use `Action.OpenUrl` for actions; `Action.Submit` is unsupported and `Action.Execute` has no bot to reach.
+- Messages post under the fixed "Flow bot" identity; no custom icon/name.
 - Workflows are owned by users, not the team/channel; assign co-owners for continuity.
-- Private-channel flow-bot support can be limited; posting on behalf of a user may be used.
-- MessageCard button rendering is not supported in the Workflows replacement path.
-- For robust product integrations, consider a notification bot.
+- Private/shared channels are supported since April 2026; verify posting mode per channel type.
+
+See [WEBHOOKS-WORKFLOWS.md](WEBHOOKS-WORKFLOWS.md) for the connector retirement timeline and MessageCard migration.
 
 ## Microsoft Graph chatMessage
 
@@ -128,11 +114,11 @@ Graph can send a chatMessage with an Adaptive Card attachment:
 {
   "body": {
     "contentType": "html",
-    "content": "<attachment id=\"card-1\"></attachment>"
+    "content": "<attachment id=\"74d20c7f-34aa-4a7f-b74e-2b30004247c5\"></attachment>"
   },
   "attachments": [
     {
-      "id": "card-1",
+      "id": "74d20c7f-34aa-4a7f-b74e-2b30004247c5",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
       "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Graph card\",\"wrap\":true}]}"
@@ -146,23 +132,23 @@ Use Graph when the requirement is truly delegated user-send into existing chats/
 Do not use Graph as a shortcut for an app/bot notification service:
 
 - Normal send permissions are delegated (`ChannelMessage.Send` / `ChatMessage.Send`).
-- Application permission is migration-only.
+- Application permission (`Teamwork.Migrate.All`) is migration-only.
 - Graph messages are subject to Teams usage policy; do not send log streams.
 
-## Connectors And MessageCard
+See [GRAPH-ATTACHMENTS.md](GRAPH-ATTACHMENTS.md) for the full wrapper rules.
 
-Connector cards/MessageCards are legacy. Maintain existing payloads only when required.
+## Connectors And MessageCard (Retired)
 
-Migration guidance:
+Office 365 connectors, connector cards, and connector-based Incoming Webhooks stopped working in May 2026. If you encounter a MessageCard payload or a `webhook.office.com` connector URL:
 
-- Convert MessageCard `sections[].facts` to `FactSet`.
-- Convert `potentialAction.OpenUri` to `Action.OpenUrl`.
+- Recreate the endpoint as a Workflows webhook and update the sending system's URL.
+- Convert MessageCard `sections[].facts` to `FactSet`, `potentialAction.OpenUri` to `Action.OpenUrl`.
 - Replace `HttpPOST`/`ActionCard` interactions with bot-backed Adaptive Card actions or a web destination.
-- Move external incoming webhooks to Workflows or notification bots.
+- Workflows accepts MessageCard payloads for migration, but interactive MessageCard elements do not work — convert to Adaptive Cards.
 
 ## Outgoing Webhooks
 
-Outgoing webhooks receive @mentioned messages and synchronously return a response. Adaptive Card responses can be sent, but card actions are restricted to `openURL`.
+Outgoing webhooks receive @mentioned messages and synchronously return a response. Adaptive Card responses can be sent, but card actions are restricted to `openUrl`.
 
 Use outgoing webhooks only for narrow request/response integrations. For richer workflows, use a bot.
 
@@ -175,5 +161,5 @@ Use outgoing webhooks only for narrow request/response integrations. For richer 
 | User-delegated manual message | Graph chatMessage |
 | Link preview | Message extension link unfurl |
 | Search result insertion | Message extension search command |
-| Legacy connector migration | Workflows or bot Adaptive Card |
+| Legacy connector/MessageCard migration | Workflows webhook + Adaptive Card |
 | External system without Teams app | Workflows webhook |

@@ -1,6 +1,6 @@
 # Graph chatMessage Adaptive Card Attachments
 
-Microsoft Graph uses a different wrapper from bots and webhooks. A Teams Adaptive Card sent through Graph is a `chatMessage` with an HTML body placeholder and a matching attachment.
+Microsoft Graph uses a different wrapper from bots and webhooks. A Teams Adaptive Card sent through Graph is a `chatMessage` with an HTML body placeholder and a matching attachment — no `{ "type": "message" }` wrapper.
 
 ## Minimal Graph Card Message
 
@@ -8,11 +8,11 @@ Microsoft Graph uses a different wrapper from bots and webhooks. A Teams Adaptiv
 {
   "body": {
     "contentType": "html",
-    "content": "<attachment id=\"card-1\"></attachment>"
+    "content": "<attachment id=\"74d20c7f-34aa-4a7f-b74e-2b30004247c5\"></attachment>"
   },
   "attachments": [
     {
-      "id": "card-1",
+      "id": "74d20c7f-34aa-4a7f-b74e-2b30004247c5",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
       "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"fallbackText\":\"Status update\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Status update\",\"wrap\":true}]}"
@@ -25,9 +25,9 @@ Microsoft Graph uses a different wrapper from bots and webhooks. A Teams Adaptiv
 
 - `body.contentType` must be `html` when using an attachment placeholder.
 - `body.content` must include `<attachment id="..."></attachment>`.
-- The placeholder ID must match an `attachments[].id`.
-- Adaptive card attachment `contentType` must be `application/vnd.microsoft.card.adaptive`.
-- Attachment `content` is commonly JSON-stringified card content.
+- The placeholder ID must exactly match an `attachments[].id`. Graph's own examples use a GUID; generate a GUID per attachment rather than a human label.
+- Adaptive Card attachment `contentType` must be `application/vnd.microsoft.card.adaptive`.
+- Attachment `content` is the card as a JSON **string** (serialize the card object before embedding), with `contentUrl: null`.
 - Do not use the webhook `{ "type": "message" }` wrapper for Graph.
 
 ## With Body Text Around Card
@@ -36,11 +36,11 @@ Microsoft Graph uses a different wrapper from bots and webhooks. A Teams Adaptiv
 {
   "body": {
     "contentType": "html",
-    "content": "<p>Incident update</p><attachment id=\"incident-card\"></attachment>"
+    "content": "<p>Incident update</p><attachment id=\"5f7e8d3a-1b2c-4d5e-9f0a-6b7c8d9e0f1a\"></attachment>"
   },
   "attachments": [
     {
-      "id": "incident-card",
+      "id": "5f7e8d3a-1b2c-4d5e-9f0a-6b7c8d9e0f1a",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
       "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"API latency is elevated\",\"wrap\":true}]}"
@@ -69,7 +69,7 @@ You can include mentions in `body.content` and `mentions` while also including c
 {
   "body": {
     "contentType": "html",
-    "content": "<p><at id=\"0\">Ada Lovelace</at> please review:</p><attachment id=\"card-1\"></attachment>"
+    "content": "<p><at id=\"0\">Ada Lovelace</at> please review:</p><attachment id=\"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\"></attachment>"
   },
   "mentions": [
     {
@@ -86,7 +86,7 @@ You can include mentions in `body.content` and `mentions` while also including c
   ],
   "attachments": [
     {
-      "id": "card-1",
+      "id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
       "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Approval requested\",\"wrap\":true}]}"
@@ -95,14 +95,14 @@ You can include mentions in `body.content` and `mentions` while also including c
 }
 ```
 
-Card-internal mentions still need card `msteams.entities` inside the Adaptive Card content.
+Graph `mentions` metadata covers the HTML body only. Card-internal `<at>...</at>` mentions still need `msteams.entities` inside the Adaptive Card content itself.
 
 ## Validation Checklist
 
 - Parse the JSON payload.
 - Extract all `<attachment id="...">` body placeholders.
 - Verify every placeholder has a matching attachment.
-- Verify every Adaptive Card attachment content parses as JSON.
+- Verify every Adaptive Card attachment content parses as JSON (it should be a string that contains JSON).
 - Validate each card independently.
 - Confirm the send path is delegated and appropriate.
 - Keep payload purposeful; do not stream logs to Teams.
@@ -112,10 +112,10 @@ Card-internal mentions still need card `msteams.entities` inside the Adaptive Ca
 | Failure | Cause | Fix |
 |---------|-------|-----|
 | Card missing | No body placeholder | Add `<attachment id="..."></attachment>` |
-| Attachment ignored | ID mismatch | Match placeholder and attachment IDs |
-| Bad request | Card content is object where string expected by client/code path | JSON-stringify content for Graph |
+| Attachment ignored | ID mismatch | Match placeholder and attachment IDs exactly |
+| Bad request | Card content sent as an object where the API expects a string | JSON-stringify the card for Graph |
 | HTML renders oddly | Unsupported Teams HTML | Use simple body HTML |
-| Button does not invoke app | Graph is not bot backend | Use bot card for interaction |
+| Button does not invoke app | Graph is not a bot backend | Use a bot card for interaction |
 | Mention not notifying | Missing `mentions` metadata | Add Graph mention object |
 
 ## When Not To Use Graph

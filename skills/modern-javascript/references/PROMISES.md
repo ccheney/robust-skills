@@ -2,13 +2,20 @@
 
 Promise creation, Promise.withResolvers(), async/await, try/catch, error-first returns, top-level await, Promise.all(), Promise.allSettled(), Promise.race(), Promise.any(), anti-patterns to avoid.
 
+## Contents
+
+- [Promise Fundamentals](#promise-fundamentals)
+- [Async/Await](#asyncawait)
+- [Promise Combinators](#promise-combinators)
+- [Anti-Patterns](#anti-patterns)
+
 ## Promise Fundamentals
 
 ### Creating Promises
 
 ```javascript
 // Basic Promise
-const promise = new Promise((resolve, reject) => {
+const basic = new Promise((resolve, reject) => {
   setTimeout(() => {
     if (success) {
       resolve(result);
@@ -27,6 +34,10 @@ someEvent.on('error', reject);
 // Already resolved/rejected
 const resolved = Promise.resolve(42);
 const rejected = Promise.reject(new Error('Failed'));
+
+// ES2025: Promise.try() — start a chain from a function that may
+// throw synchronously; sync throws become rejections
+const attempt = Promise.try(() => riskyOperation());
 ```
 
 ### Promise Chaining
@@ -201,7 +212,9 @@ try {
 async function getUser(id) {
   return await fetchUser(id);
 }
+```
 
+```javascript
 // ✅ Just return the promise
 function getUser(id) {
   return fetchUser(id);
@@ -211,11 +224,13 @@ function getUser(id) {
 ### Sequential when parallel is possible
 
 ```javascript
-// ❌ Sequential (slow)
+// ❌ Sequential (slow) — each await waits for the previous
 const users = await fetchUsers();
 const posts = await fetchPosts();
 const comments = await fetchComments();
+```
 
+```javascript
 // ✅ Parallel (fast)
 const [users, posts, comments] = await Promise.all([
   fetchUsers(),
@@ -232,7 +247,9 @@ async function process() {
   const data = await fetchData();  // If this fails, crash
   return transform(data);
 }
+```
 
+```javascript
 // ✅ Handle errors
 async function process() {
   try {
@@ -254,18 +271,24 @@ async function mixed() {
     // This doesn't work with await
   });
 }
+```
 
+```javascript
 // ✅ Promisify callbacks
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 const readFile = promisify(fs.readFile);
 
 async function clean() {
   const data = await readFile('file.txt');
   return data;
 }
+```
 
-// Or use fs.promises
-import { readFile } from 'fs/promises';
+```javascript
+// ✅ Or better, use the promise-based API directly
+import { readFile } from 'node:fs/promises';
+
+const data = await readFile('file.txt', 'utf8');
 ```
 
 ### Creating promise inside loop

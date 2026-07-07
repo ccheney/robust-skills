@@ -2,6 +2,20 @@
 
 Comprehensive reference for defining relations and using the relational queries API.
 
+## Contents
+
+- [Overview](#overview)
+- [Defining Relations](#defining-relations)
+- [One-to-Many](#one-to-many)
+- [One-to-One](#one-to-one)
+- [Many-to-Many](#many-to-many)
+- [Self-Referential](#self-referential)
+- [Relational Queries API](#relational-queries-api)
+- [Complex Examples](#complex-examples)
+- [Type Inference](#type-inference)
+- [Relations vs Joins](#relations-vs-joins)
+- [Relational Queries v2 (drizzle-orm v1.0)](#relational-queries-v2-drizzle-orm-v10)
+
 ---
 
 ## Overview
@@ -13,7 +27,15 @@ Drizzle has two query APIs:
 | **SQL-like** (`db.select()...`) | Complex queries, joins, aggregations | Manual |
 | **Relational** (`db.query...`) | Nested data, simple CRUD | Yes |
 
-Relations are **application-level** (not database constraints). They enable the relational queries API.
+Relations are **application-level** (not database constraints). They enable the
+relational queries API. Always define both the FK (`.references()` in the table)
+and the relation — one does not imply the other.
+
+**Version note:** everything up to the final section uses the **stable 0.x**
+`relations()` API (npm `latest`). drizzle-orm v1.0 (beta/RC — and the syntax shown
+on orm.drizzle.team's main docs pages) replaces it with `defineRelations()`; see
+[Relational Queries v2](#relational-queries-v2-drizzle-orm-v10). Never mix the two
+APIs in one project.
 
 ---
 
@@ -23,7 +45,7 @@ Relations are **application-level** (not database constraints). They enable the 
 
 ```typescript
 import { relations } from 'drizzle-orm';
-import { pgTable, uuid, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, primaryKey } from 'drizzle-orm/pg-core';
 ```
 
 ---
@@ -96,6 +118,8 @@ export const profiles = pgTable('profiles', {
 
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
+  // No config on this side: the FK lives on profiles, so Drizzle
+  // infers the join from profilesRelations below
   profile: one(profiles),
 }));
 
@@ -622,3 +646,96 @@ const userWithPosts = await db
   .where(eq(users.id, userId));
 // [{ users: { id, name }, posts: { id, title } | null }, ...]
 ```
+
+---
+
+## Relational Queries v2 (drizzle-orm v1.0)
+
+drizzle-orm v1.0 (in beta/RC as of mid-2026; check `package.json`) removes the
+`relations()` API above and replaces it with **RQB v2**. If the project depends on
+`drizzle-orm@1.0.0-beta.*` / `1.0.0-rc.*` / `1.x`, use this section instead.
+
+Summary of what changed:
+
+| v1 (stable 0.x) | v2 (drizzle-orm 1.0) |
+|-----------------|----------------------|
+| `relations(table, ...)` per table | One `defineRelations(schema, (r) => ...)` for the whole schema |
+| `drizzle(client, { schema })` | `drizzle(client, { relations })` |
+| `fields` / `references` | `from` / `to` (single column or array) |
+| `relationName: 'x'` for disambiguation | `alias: 'x'` |
+| Many-to-many via explicit junction nesting | `.through()` — junction handled automatically |
+| `where: eq(users.id, 1)` or callback | Object filters: `where: { id: 1 }` |
+| `orderBy: [desc(users.createdAt)]` or callback | `orderBy: { createdAt: 'desc' }` |
+| Cannot filter parents by related rows | Can: `where: { posts: { title: { like: 'M%' } } }` |
+
+### Defining Relations (v2)
+
+```typescript
+// relations.ts
+import { defineRelations } from 'drizzle-orm';
+import * as schema from './schema';
+
+export const relations = defineRelations(schema, (r) => ({
+  users: {
+    posts: r.many.posts(),                    // inferred from posts.author
+    // Many-to-many through a junction table:
+    groups: r.many.groups({
+      from: r.users.id.through(r.usersToGroups.userId),
+      to: r.groups.id.through(r.usersToGroups.groupId),
+    }),
+  },
+  posts: {
+    author: r.one.users({
+      from: r.posts.authorId,
+      to: r.users.id,
+      optional: false,   // author is non-nullable in the result type
+    }),
+  },
+}));
+```
+
+### Initialization (v2)
+
+```typescript
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { relations } from './relations';
+
+export const db = drizzle(process.env.DATABASE_URL!, { relations });
+```
+
+### Querying (v2)
+
+```typescript
+// Object-style filters — no eq()/and() imports needed for db.query
+const usersWithPosts = await db.query.users.findMany({
+  where: {
+    AND: [
+      { OR: [{ id: { gt: 10 } }, { name: { like: 'John%' } }] },
+      { age: 15 },
+    ],
+  },
+  orderBy: { createdAt: 'desc' },
+  with: {
+    posts: {
+      where: { published: true },
+      limit: 10,
+      offset: 5,          // offset on nested relations is new in v2
+    },
+  },
+});
+
+// Filter parents by related rows (impossible in v1)
+const authorsOfMPosts = await db.query.users.findMany({
+  where: { posts: { title: { like: 'M%' } } },
+});
+
+// Many-to-many reads through the junction transparently
+const usersWithGroups = await db.query.users.findMany({
+  with: { groups: true },   // no usersToGroups nesting needed
+});
+```
+
+The SQL-like API (`db.select()`, `db.insert()`, operators like `eq`/`and`) is
+unchanged in v1.0 — only relations and `db.query.*` filters changed. Migration
+guide: https://orm.drizzle.team/docs/relations-v1-v2 and
+https://orm.drizzle.team/docs/v0-v1-changes

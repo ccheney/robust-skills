@@ -5,6 +5,24 @@
 
 Work Objects standardize how external entities (files, tasks, incidents) appear within Slack conversations. They extend link unfurling with rich, interactive entity previews.
 
+## Table of Contents
+
+- [Architecture](#architecture)
+- [Entity Types](#entity-types)
+- [Setup](#setup)
+- [Unfurl Implementation](#unfurl-implementation)
+- [Entity Payload Schema](#entity-payload-schema)
+- [Data Types](#data-types)
+- [Flexpane](#flexpane)
+- [Editable Fields](#editable-fields)
+- [Actions](#actions)
+- [Authentication](#authentication)
+- [Full-Size Preview](#full-size-preview)
+- [Automatic Refresh](#automatic-refresh)
+- [View Submission Handling](#view-submission-handling)
+- [Related Conversations](#related-conversations)
+- [Enterprise Search Integration](#enterprise-search-integration)
+
 ---
 
 ## Architecture
@@ -60,10 +78,14 @@ The `metadata` parameter (URL-encoded) contains the entity definition:
         "entity_type": "slack#/entities/task",
         "external_ref": { "id": "task-123", "type": "task" },
         "entity_payload": {
-          "attributes": { /* header info */ },
-          "fields": { /* entity-specific fields */ },
-          "custom_fields": [ /* optional custom fields */ ],
-          "display_order": [ /* field display order */ ]
+          "attributes": { "title": "Bug: Login page 500 error" },
+          "fields": {
+            "status": { "type": "string", "value": "In Progress", "display_name": "Status" }
+          },
+          "custom_fields": [
+            { "type": "string", "key": "sprint", "value": "Sprint 14", "display_name": "Sprint" }
+          ],
+          "display_order": ["status"]
         }
       }
     ]
@@ -94,7 +116,19 @@ Slack silently drops the entire metadata payload if any required field is missin
 {
   "channel": "C0123ABC",
   "text": "New task created",
-  "metadata": { /* same structure as unfurl */ }
+  "metadata": {
+    "entities": [
+      {
+        "url": "https://example.com/task/123",
+        "entity_type": "slack#/entities/task",
+        "external_ref": { "id": "task-123", "type": "task" },
+        "entity_payload": {
+          "attributes": { "title": "Bug: Login page 500 error" },
+          "fields": {}
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -253,7 +287,12 @@ Use `entity.presentDetails` with the `trigger_id` from the event to respond with
   "metadata": {
     "entity_type": "slack#/entities/task",
     "external_ref": { "id": "task-123", "type": "task" },
-    "entity_payload": { /* same structure as unfurl */ }
+    "entity_payload": {
+      "attributes": { "title": "Bug: Login page 500 error" },
+      "fields": {
+        "status": { "type": "string", "value": "In Progress", "display_name": "Status" }
+      }
+    }
   }
 }
 ```

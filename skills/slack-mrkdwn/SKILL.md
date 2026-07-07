@@ -1,6 +1,6 @@
 ---
 name: slack-mrkdwn
-description: Proactively apply when generating any Slack text content, chat.postMessage text fields, or text objects with type "mrkdwn". Triggers on mrkdwn, Slack formatting, Slack markdown, Slack bold, Slack italic, Slack link syntax, Slack mentions, Slack date formatting, Slack escaping, Slack text object, verbatim, plain_text, Slack mrkdwn vs markdown, Slack blockquote, Slack code block, Slack strikethrough, Slack user mention, Slack channel mention, Slack emoji, link_names, auto-parsing. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content for Slack, adding mentions or date formatting to messages, or debugging text rendering issues. Slack mrkdwn text formatting syntax for messages, text objects, and attachments.
+description: Proactively apply when generating any Slack text content, chat.postMessage text fields, or text objects with type "mrkdwn". Triggers on mrkdwn, Slack formatting, Slack markdown, Slack bold, Slack italic, Slack link syntax, Slack mentions, Slack date formatting, Slack escaping, Slack text object, verbatim, plain_text, Slack mrkdwn vs markdown, markdown_text, Slack blockquote, Slack code block, Slack strikethrough, Slack user mention, Slack channel mention, Slack emoji, link_names, auto-parsing, unfurl_links, mrkdwn_in. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content for Slack, adding mentions or date formatting to messages, streaming markdown to Slack, or debugging text rendering issues. Slack mrkdwn text formatting syntax for messages, text objects, and attachments.
 ---
 
 # Slack mrkdwn
@@ -13,12 +13,15 @@ Slack has two completely different markup syntaxes. Using the wrong one is the m
 
 | System | Used In | Bold | Link | Heading |
 |--------|---------|------|------|---------|
-| **Slack mrkdwn** | `text` field, text objects (`type: "mrkdwn"`), section fields | `*bold*` | `<url\|text>` | Not supported |
-| **Standard Markdown** | `markdown` block only | `**bold**` | `[text](url)` | `# Heading` |
+| **Slack mrkdwn** | `text` field, text objects (`type: "mrkdwn"`), section fields, attachment fields via `mrkdwn_in` | `*bold*` | `<url\|text>` | Not supported |
+| **Standard Markdown** | `markdown` block, `markdown_text` argument | `**bold**` | `[text](url)` | `# Heading` |
 
 Standard Markdown syntax (`**bold**`, `[text](url)`, `# Heading`) renders as literal text in mrkdwn contexts. Slack mrkdwn syntax (`*bold*`, `<url|text>`) renders as literal text in markdown blocks. Never mix them.
 
-The `markdown` block (`type: "markdown"`) accepts standard Markdown and translates it for Slack rendering. Supports: headings, bold, italic, strikethrough, lists, links, blockquotes, code blocks with optional syntax highlighting, horizontal rules/dividers, tables, task lists, and images (rendered as link text). A single input block may produce multiple output blocks. Cumulative limit across all `markdown` blocks in one payload: 12,000 characters.
+Standard Markdown surfaces (both designed for passing LLM output through unmodified):
+
+- The `markdown` block (`type: "markdown"`) accepts standard Markdown and translates it for Slack rendering. Supports: headings (all render at the same size), bold, italic, strikethrough, lists, links, blockquotes, code blocks with optional syntax highlighting, horizontal rules/dividers, tables, task lists, images (rendered as link text), and backslash escaping. A single input block may expand into multiple output blocks; `block_id` is not retained. Cumulative limit across all `markdown` blocks in one payload: 12,000 characters.
+- The `markdown_text` argument on `chat.postMessage` and streaming methods (`chat.startStream`, `chat.appendStream`) accepts standard Markdown directly. It cannot be combined with `blocks` or `text` (error: `markdown_text_conflict`). Limit: 12,000 characters.
 
 ## mrkdwn Syntax
 
@@ -31,7 +34,7 @@ The `markdown` block (`type: "markdown"`) accepts standard Markdown and translat
 | Code block | ` ```code``` ` | No syntax highlighting in mrkdwn; use a `markdown` block with language-tagged fences for highlighting |
 | Blockquote | `> quoted text` | Prefix each line |
 | Link | `<https://example.com\|display text>` | Not `[text](url)` |
-| Emoji | `:emoji_name:` | Standard or custom. Direct Unicode also works |
+| Emoji | `:emoji_name:` | Standard or custom. Direct Unicode also works; Slack stores and returns emoji in colon format |
 | Newline | `\n` | Literal newline in string |
 | Ordered list | `1. item` | Plain text, no special rendering |
 | Bullet list | `- item` | Rendered properly in `rich_text` blocks only |
@@ -61,12 +64,12 @@ URLs posted in text are auto-linked by Slack. Use `<url|text>` for custom displa
 
 ### Link Unfurling
 
-Slack previews ("unfurls") linked content. Control this per message:
+Slack previews ("unfurls") linked content. By default Slack unfurls links in messages posted by users and apps. Control this per message:
 
-| Parameter | Controls | Default (API) |
-|-----------|----------|---------------|
-| `unfurl_links` | Text-based content previews | `false` |
-| `unfurl_media` | Media (images, video, audio) previews | `true` |
+| Parameter | Controls |
+|-----------|----------|
+| `unfurl_links` | Text-based content previews |
+| `unfurl_media` | Media (images, video, audio) previews |
 
 Set both to `false` to suppress all previews. These are `chat.postMessage` parameters, not mrkdwn syntax.
 
@@ -101,22 +104,21 @@ Notifies all members of the user group.
 | Syntax | Scope | Caution |
 |--------|-------|---------|
 | `<!here>` | Active members in channel | Use sparingly |
-| `<!channel>` | All channel members | Triggers push notifications for everyone |
-| `<!everyone>` | All non-guest workspace members | Very disruptive |
+| `<!channel>` | All channel members, active or not | Triggers notifications for everyone |
+| `<!everyone>` | Every non-guest workspace member (via #general) | Very disruptive |
 
 ### Best Practice
 
 Always use IDs, not names. IDs are stable; names change:
 
 ```
-  <@U0123ABC456>       (user ID)
-  @chris                (name — may not resolve)
-
-  <#C0123ABC456>       (channel ID)
-  #general              (name — may not resolve)
+<@U0123ABC456>       user ID — works
+@chris               name — not parsed as a mention
+<#C0123ABC456>       channel ID — works
+#general             name — not parsed as a link
 ```
 
-To enable name-based parsing, set `link_names: 1` in the API call. This is fragile and discouraged.
+The `link_names` parameter now only finds and links **user groups** — it no longer links individual users. Don't rely on it; use `<@USERID>` and `<#CHANNELID>` syntax directly.
 
 ## Date Formatting
 
@@ -132,18 +134,18 @@ Displays dates/times localized to the reader's **device timezone** (not their Sl
 
 | Token | Example Output |
 |-------|---------------|
-| `{date_num}` | 2014-02-18 |
-| `{date}` | February 18th, 2014 (omits year if within ~6 months) |
+| `{date_num}` | 2014-02-18 (leading zeros; developer-friendly) |
+| `{date}` | February 18th, 2014 |
 | `{date_short}` | Feb 18, 2014 |
 | `{date_long}` | Tuesday, February 18th, 2014 |
 | `{date_pretty}` | Yesterday / February 18th, 2014 |
 | `{date_short_pretty}` | Yesterday / Feb 18, 2014 |
 | `{date_long_pretty}` | Yesterday / Tuesday, February 18th, 2014 |
 | `{time}` | 6:39 AM (12h) or 06:39 (24h) |
-| `{time_secs}` | 6:39:42 AM |
-| `{ago}` | 3 minutes ago / 4 hours ago |
+| `{time_secs}` | 6:39:42 AM (12h) or 06:39:42 (24h) |
+| `{ago}` | 3 minutes ago / 4 hours ago / 2 days ago |
 
-`_pretty` variants use relative terms ("yesterday", "today", "tomorrow") when applicable.
+`{date}`, `{date_short}`, and `{date_long}` omit the year when the date is less than six months in the past or future. `_pretty` variants use relative terms ("yesterday", "today", "tomorrow") when applicable.
 
 ### Examples
 
@@ -153,7 +155,7 @@ Displays dates/times localized to the reader's **device timezone** (not their Sl
 <!date^1392734382^{ago}|February 18th, 2014>
 ```
 
-Tokens can be mixed with literal text in the token string. The optional link (third `^`-separated parameter) makes the date a clickable hyperlink. Fallback text (after `|`) displays for clients that cannot render date formatting.
+Tokens can be mixed with literal text in the token string. The optional link (third `^`-separated parameter) makes the date a clickable hyperlink. Fallback text (after `|`) is required and displays for clients that cannot render date formatting — include timezone information in it, since the fallback cannot be localized.
 
 ## Escaping
 
@@ -180,7 +182,7 @@ The text object is the most common composition object in Block Kit. It determine
 ]
 ```
 
-`mrkdwn` supports Slack mrkdwn syntax. `plain_text` renders literally. `emoji: true` converts `:emoji:` to rendered emoji (plain_text only). Min 1 char, max 3000 chars (section `fields` max 2000 chars each, max 10 fields).
+`mrkdwn` supports Slack mrkdwn syntax. `plain_text` renders literally. `emoji: true` converts `:emoji:` to rendered emoji (plain_text only). Min 1 char, max 3000 chars (section `fields` max 2000 chars each, max 10 fields). For the top-level message `text` field, keep it under 4,000 chars for best results; Slack truncates messages over 40,000 chars.
 
 ### Where Each Type Is Allowed
 
@@ -193,8 +195,9 @@ The text object is the most common composition object in Block Kit. It determine
 | Placeholder | `plain_text` only |
 | Input label / hint | `plain_text` only |
 | Modal title / submit / close | `plain_text` only |
-| Option text | `plain_text` only |
-| Option description | `mrkdwn` or `plain_text` |
+| Option text (select, multi-select, overflow) | `plain_text` only |
+| Option text (checkboxes, radio buttons) | `mrkdwn` or `plain_text` |
+| Option description | `plain_text`; `mrkdwn` allowed in checkboxes/radio buttons |
 
 ### Verbatim Behavior
 
@@ -218,8 +221,9 @@ When `verbatim: true`:
 
 | Value | Effect |
 |-------|--------|
-| `"none"` (default) | mrkdwn formatting enabled; minimal auto-parsing of names/URLs |
-| `"full"` | Disables mrkdwn formatting; auto-parses URLs, channel names, user mentions |
+| Unset (default) | mrkdwn formatting enabled; URLs auto-hyperlinked |
+| `"none"` | mrkdwn formatting enabled; URL auto-hyperlinking disabled |
+| `"full"` | mrkdwn formatting **ignored**; aggressive auto-parsing of names/URLs |
 
 ### Disabling Auto-Parsing
 
@@ -227,7 +231,9 @@ When `verbatim: true`:
 
 **In message payloads:**
 - Omit `link_names` argument (or set to `0`)
-- Set `parse: "none"` to disable all auto-parsing
+- Set `parse: "none"` to also disable URL auto-linking
+
+Disabling auto-parsing matters for safety: if you pass third-party user input straight into published text, a string like `@everyone` could be auto-parsed and notify the whole workspace.
 
 ## Disabling Formatting Entirely
 
@@ -245,7 +251,8 @@ When `verbatim: true`:
 | `[text](url)` in mrkdwn | Renders literally | Use `<url\|text>` |
 | `# Heading` in mrkdwn | Renders as plain text | Use `header` block or `markdown` block |
 | `*bold*` in markdown block | Renders as italic | Use `**bold**` |
-| `link_names: 1` for mentions | Fragile — names change, IDs don't | Use `<@USERID>` directly |
+| `link_names: 1` for user mentions | No longer links users, only user groups | Use `<@USERID>` directly |
+| `markdown_text` alongside `blocks`/`text` | API error `markdown_text_conflict` | Send one or the other |
 | HTML-encoding beyond `&<>` | Renders literally | Only escape `&`, `<`, `>` |
 | Spaces in URLs | Breaks link parsing | URL-encode spaces as `%20` |
 | Combining `*bold*_italic_` without space | Rendering unreliable | Add space: `*bold* _italic_` |
@@ -261,7 +268,7 @@ The `attachments` array adds secondary content below the main message. One of `f
 | `pretext` | Text above the attachment block |
 | `author_name`, `author_link`, `author_icon` | Small author line (16px icon) |
 | `title`, `title_link` | Large heading with optional hyperlink |
-| `text` | Main body (auto-collapses at 700+ chars) |
+| `text` | Main body (auto-collapses at 700+ chars or 5+ line breaks) |
 | `fields` | Array of `{ title, value, short }` objects |
 | `image_url` | Full-width image (GIF, JPEG, PNG, BMP) |
 | `thumb_url` | Thumbnail (75px max) |
@@ -283,5 +290,7 @@ Only `"text"`, `"pretext"`, and `"fields"` are accepted values in `mrkdwn_in`. F
 - [Formatting Message Text](https://docs.slack.dev/messaging/formatting-message-text) — Slack
 - [Block Kit Composition Objects — Text Object](https://docs.slack.dev/reference/block-kit/composition-objects/text-object) — Slack
 - [Markdown Block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/) — Slack
+- [chat.postMessage](https://docs.slack.dev/reference/methods/chat.postMessage) — Slack (parse, link_names, markdown_text, unfurl behavior)
+- [Option Object](https://docs.slack.dev/reference/block-kit/composition-objects/option-object) — Slack
 - [Legacy Secondary Message Attachments](https://docs.slack.dev/legacy/legacy-messaging/legacy-secondary-message-attachments/) — Slack
 - [Messaging Overview](https://docs.slack.dev/messaging) — Slack

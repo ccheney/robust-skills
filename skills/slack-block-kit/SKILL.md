@@ -1,6 +1,6 @@
 ---
 name: slack-block-kit
-description: Proactively apply when generating Slack API payloads with blocks, chat.postMessage calls with structured content, streaming AI responses, or views.open/views.publish calls. Triggers on Block Kit, Slack blocks, section block, actions block, header block, divider block, context block, alert block, card block, carousel block, table block, markdown block, rich text block, image block, input block, video block, context_actions block, plan block, task_card block, chat.startStream, chat.appendStream, chat.stopStream, Slack modal, Slack App Home, Slack surfaces, Slack interactive elements, Slack button, Slack select menu, Slack overflow, Slack datepicker, Slack checkboxes, Slack radio buttons, Work Objects, Slack link unfurl, chat.postMessage blocks, views.open, views.update, views.push, views.publish, Slack composition objects. Use when building Block Kit payloads, constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, streaming agent output, or designing rich message layouts. Slack Block Kit UI framework for building rich message layouts, modals, App Home views, and AI agent responses.
+description: Proactively apply when generating Slack API payloads with blocks, chat.postMessage calls with structured content, streaming AI responses, or views.open/views.publish calls. Triggers on Block Kit, Slack blocks, section block, actions block, header block, context block, alert block, card block, carousel block, container block, table block, data table block, data visualization block, Slack chart, markdown block, rich text block, image block, input block, video block, context_actions block, plan block, task_card block, chat.startStream, chat.appendStream, chat.stopStream, Slack modal, Slack App Home, Slack surfaces, Slack interactive elements, Slack button, select menu, overflow, datepicker, checkboxes, radio buttons, Work Objects, Slack link unfurl, views.open, views.update, views.push, views.publish, Slack composition objects. Use when building Block Kit payloads, blocks arrays, modals, App Home views, interactive elements, link unfurling, streaming agent output, or rich message layouts.
 ---
 
 # Slack Block Kit
@@ -9,7 +9,7 @@ UI framework for building rich, interactive layouts in Slack messages, modals, a
 
 ## CRITICAL: Two Markup Systems
 
-Text inside Block Kit text objects uses Slack mrkdwn syntax (`*bold*`, `<url|text>`), NOT standard Markdown. The only exception is the `markdown` block which uses standard Markdown.
+Text inside Block Kit text objects uses Slack mrkdwn syntax (`*bold*`, `<url|text>`), NOT standard Markdown. The only exception is the `markdown` block, which accepts standard Markdown (`**bold**`, `[text](url)`). Mixing these up is the single most common Block Kit generation error.
 
 ## Quick Decision Trees
 
@@ -20,10 +20,11 @@ Response type?
 ├─ Conversational reply, short answer, <3 lines   → text only (no blocks)
 ├─ Multi-section summary, report, dashboard        → blocks
 ├─ Two-column key-value data                       → blocks (section fields)
-├─ Tabular data                                    → blocks (table)
-├─ Code with heading or surrounding context         → blocks
-├─ Visual separation needed between topics          → blocks
-└─ Feedback buttons or interactive elements         → blocks
+├─ Tabular data                                    → blocks (table / data_table)
+├─ Charts or metrics visualization                 → blocks (data_visualization)
+├─ Code with heading or surrounding context        → blocks
+├─ Visual separation needed between topics         → blocks
+└─ Feedback buttons or interactive elements        → blocks
 ```
 
 ### "Which block type?"
@@ -35,17 +36,20 @@ What am I rendering?
 ├─ Small metadata or secondary info   → context (images + text, 10 max)
 ├─ Horizontal separator               → divider
 ├─ Buttons, menus, date pickers       → actions (25 elements max)
-├─ Status, warning, success callout    → alert (severity + text)
-├─ Compact entity or summary preview   → card (optional image/actions)
-├─ Multiple comparable cards/options   → carousel (1-10 cards)
+├─ Status callout in a MODAL          → alert (modals only, 200 chars)
+├─ Compact entity or summary preview  → card (optional image/actions)
+├─ Multiple comparable cards/options  → carousel (1-10 cards)
+├─ Grouped/collapsible block set      → container (title + ≤10 child blocks)
 ├─ Standalone image                   → image (image_url or slack_file)
 ├─ Formatted text with lists, quotes  → rich_text (nested sub-elements)
-├─ Tabular data                       → table (100 rows, 20 cols, 1 per msg)
+├─ Simple static table                → table (100 rows, 20 cols)
+├─ Sortable/paginated table           → data_table (caption + 100 data rows)
+├─ Pie/bar/area/line chart            → data_visualization (native charts)
 ├─ LLM-generated markdown content     → markdown (standard MD, messages only)
 ├─ Embedded video player              → video (requires links.embed:write)
 ├─ Remote file reference              → file (read-only, source: "remote")
 ├─ Feedback thumbs up/down            → context_actions (messages only)
-├─ Collecting user input (modals)     → input (label + element)
+├─ Collecting user input              → input (label + element)
 ├─ AI agent task steps                → plan (sequential tasks, messages only)
 └─ Single task with status            → task_card (inside plan or standalone)
 ```
@@ -56,17 +60,27 @@ What am I rendering?
 Content source?
 ├─ Short formatted text, labels, fields     → mrkdwn in section/context
 ├─ Long-form LLM-generated content          → markdown block (standard MD)
-├─ LLM-generated tables/task lists/code      → markdown block
-├─ Programmatic tabular data                 → table block
+├─ LLM-generated tables/task lists/code     → markdown block
+├─ Programmatic tabular data                → table or data_table block
 ├─ Need headings                            → markdown block or header blocks
 └─ Mixed: structured layout + prose         → section/header blocks + markdown block
 ```
 
+### "table, data_table, or markdown table?"
+
+```
+├─ LLM already emitted a Markdown table          → markdown block
+├─ Static data, no interaction needed            → table
+└─ Users need sorting, paging, or clickable cells → data_table (caption required)
+```
+
 ## Block Types Overview
+
+Full property tables for all 21 blocks: [references/BLOCKS.md](references/BLOCKS.md). Highlights and sharp edges below.
 
 ### header
 
-Large bold text for section titles. `plain_text` only. Max 150 chars.
+Large bold text. `plain_text` only — mrkdwn is silently ignored. Max 150 chars.
 
 ```json
 { "type": "header", "text": { "type": "plain_text", "text": "Section Title", "emoji": true } }
@@ -74,30 +88,17 @@ Large bold text for section titles. `plain_text` only. Max 150 chars.
 
 ### section
 
-Primary content block. Supports text, two-column fields, and one accessory element.
-
-```json
-{
-  "type": "section",
-  "text": { "type": "mrkdwn", "text": "*Project Status*\nAll systems operational." }
-}
-```
-
-Two-column fields layout:
+Primary content block. Supports text (3000 chars), two-column `fields` (10 items, 2000 chars each), and one `accessory` element. Either `text` or `fields` is required. Set `expand: true` to prevent "see more" truncation on long AI responses.
 
 ```json
 {
   "type": "section",
   "fields": [
     { "type": "mrkdwn", "text": "*Status:*\nActive" },
-    { "type": "mrkdwn", "text": "*Owner:*\nChris" },
-    { "type": "mrkdwn", "text": "*Priority:*\nHigh" },
-    { "type": "mrkdwn", "text": "*Due:*\nFriday" }
+    { "type": "mrkdwn", "text": "*Owner:*\nChris" }
   ]
 }
 ```
-
-Either `text` or `fields` required (or both). Text max 3000 chars. Fields max 10 items, each max 2000 chars. Set `expand: true` to force full text display without "see more" truncation.
 
 Compatible accessories: button, overflow, datepicker, timepicker, select menus, multi-select menus, checkboxes, radio buttons, image.
 
@@ -112,13 +113,7 @@ Compatible accessories: button, overflow, datepicker, timepicker, select menus, 
 Small, muted text for metadata. Elements: mrkdwn text objects or image elements. Max 10 elements.
 
 ```json
-{
-  "type": "context",
-  "elements": [
-    { "type": "mrkdwn", "text": "Last updated: Feb 9, 2026" },
-    { "type": "mrkdwn", "text": "Source: deploy-bot" }
-  ]
-}
+{ "type": "context", "elements": [{ "type": "mrkdwn", "text": "Last updated: Feb 9, 2026 • deploy-bot" }] }
 ```
 
 ### actions
@@ -129,13 +124,7 @@ Interactive elements: buttons, select menus, overflow menus, date pickers. Max 2
 {
   "type": "actions",
   "elements": [
-    {
-      "type": "button",
-      "text": { "type": "plain_text", "text": "Approve", "emoji": true },
-      "style": "primary",
-      "action_id": "approve_action",
-      "value": "approved"
-    }
+    { "type": "button", "text": { "type": "plain_text", "text": "Approve" }, "style": "primary", "action_id": "approve_action", "value": "approved" }
   ]
 }
 ```
@@ -144,7 +133,7 @@ Button styles: `primary` (green), `danger` (red), or omit for default. Use `prim
 
 ### alert
 
-Callout for status, risk, confirmation, or urgency. Text accepts `plain_text` or `mrkdwn`. `level`: `default`, `info`, `warning`, `error`, or `success` (defaults to `default`).
+Callout for status, risk, or urgency. **Modals only** — putting an alert in a message payload is invalid. Text accepts `plain_text` or `mrkdwn`, max 200 chars. `level`: `default`, `info`, `warning`, `error`, or `success`. For message-surface callouts, use a section block with an emoji or a card instead.
 
 ```json
 {
@@ -156,7 +145,7 @@ Callout for status, risk, confirmation, or urgency. Text accepts `plain_text` or
 
 ### card
 
-Compact, scannable preview for entities, summaries, records, or agent results. At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute.
+Compact, scannable preview for entities, summaries, records, or agent results. At least one of `hero_image`, `title`, `actions`, or `body` is required.
 
 ```json
 {
@@ -165,16 +154,12 @@ Compact, scannable preview for entities, summaries, records, or agent results. A
   "subtitle": { "type": "mrkdwn", "text": "Runs every weekday at *9:00 AM*" },
   "body": { "type": "mrkdwn", "text": "Last run: Today at 9:00 AM. Status: Success" },
   "actions": [
-    {
-      "type": "button",
-      "text": { "type": "plain_text", "text": "View Logs" },
-      "action_id": "view_logs"
-    }
+    { "type": "button", "text": { "type": "plain_text", "text": "View Logs" }, "action_id": "view_logs" }
   ]
 }
 ```
 
-Fields: `icon` and `hero_image` are image objects; `title`, `subtitle`, and `body` are text objects; `actions` is an array of button elements. Title/subtitle max 150 chars. Body max 200 chars.
+Fields: `icon`/`hero_image` (image elements), `slack_icon` (built-in icon, mutually exclusive with `icon`), `title`/`subtitle` (150 chars), `body`/`subtext` (200 chars), `actions` (max 3 buttons; `danger` left-aligns, `primary`/unstyled right-align). No size attribute.
 
 ### carousel
 
@@ -190,77 +175,98 @@ Horizontal, scrollable group of card blocks for options, recommendations, search
 }
 ```
 
-### image
+### container
 
-Standalone image with alt text. Provide either `image_url` (public, max 3000 chars) or `slack_file` object. Formats: png, jpg, jpeg, gif.
+Groups up to 10 child blocks under a required `plain_text` title (150 chars). Optional `subtitle`, `icon`, `width` (`narrow`/`standard`/`wide`/`full`), and collapsing (`is_collapsible`, `default_collapsed`). Child blocks: actions, context, divider, file, header, image, input, rich_text, section, table, video — no nested containers, cards, or plan blocks.
 
 ```json
 {
-  "type": "image",
-  "image_url": "https://example.com/chart.png",
-  "alt_text": "Deployment success rate chart",
-  "title": { "type": "plain_text", "text": "Deploy Metrics" }
+  "type": "container",
+  "title": { "type": "plain_text", "text": "Bulk update: 2 records" },
+  "is_collapsible": true,
+  "child_blocks": [
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*DCW-1024*\nStatus: Open → Closed" } }
+  ]
 }
+```
+
+### image
+
+Standalone image with required alt text. Provide either `image_url` (public, max 3000 chars) or `slack_file` object. Formats: png, jpg, jpeg, gif.
+
+```json
+{ "type": "image", "image_url": "https://example.com/chart.png", "alt_text": "Deployment success rate chart" }
 ```
 
 ### rich_text
 
-Advanced formatted text with nested elements. Supports styled text, lists, code blocks, and quotes. See [references/RICH-TEXT.md](references/RICH-TEXT.md) for deep dive.
+Advanced formatted text with nested elements: styled text, lists, code blocks, quotes. See [references/RICH-TEXT.md](references/RICH-TEXT.md) before writing nested lists or inline mentions — the nesting rules are easy to get wrong.
 
 ```json
 {
   "type": "rich_text",
   "elements": [
-    {
-      "type": "rich_text_section",
-      "elements": [
-        { "type": "text", "text": "Key findings:", "style": { "bold": true } }
-      ]
-    },
+    { "type": "rich_text_section", "elements": [{ "type": "text", "text": "Key findings:", "style": { "bold": true } }] },
     {
       "type": "rich_text_list",
       "style": "bullet",
       "elements": [
-        { "type": "rich_text_section", "elements": [{ "type": "text", "text": "Latency reduced by 40%" }] },
-        { "type": "rich_text_section", "elements": [{ "type": "text", "text": "Error rate under 0.1%" }] }
+        { "type": "rich_text_section", "elements": [{ "type": "text", "text": "Latency reduced by 40%" }] }
       ]
     }
   ]
 }
 ```
 
-Sub-element types: `rich_text_section` (paragraph), `rich_text_list` (`style: "bullet"` or `"ordered"`, with `indent`, `offset`, `border`), `rich_text_preformatted` (code block), `rich_text_quote` (blockquote).
-
-Inline element types within sections: `text` (with optional `style: { bold, italic, strike, code, underline }`), `link`, `emoji`, `user`, `channel`, `usergroup`, `broadcast`, `date`, `color`.
+Sub-element types: `rich_text_section` (paragraph), `rich_text_list` (`style: "bullet"` or `"ordered"`), `rich_text_preformatted` (code block), `rich_text_quote` (blockquote). Inline types: `text`, `link`, `emoji`, `user`, `channel`, `usergroup`, `broadcast`, `date`, `color`.
 
 ### table
 
-Tabular data. One table per message (appended as attachment at bottom).
+Simple tabular data. Each row is a flat array of cell objects (NOT an object with a `cells` property). There is no `columns` property — the first row is the header. Cell types: `raw_text`, `raw_number`, `rich_text`. Max 100 rows, 20 columns, 10,000 chars across all cells (per table AND aggregate per message).
 
 ```json
 {
   "type": "table",
   "rows": [
-    [
-      { "type": "raw_text", "text": "Service" },
-      { "type": "raw_text", "text": "Status" },
-      { "type": "raw_text", "text": "Latency" }
-    ],
-    [
-      { "type": "raw_text", "text": "API" },
-      { "type": "raw_text", "text": "Healthy" },
-      { "type": "raw_text", "text": "12ms" }
-    ]
+    [{ "type": "raw_text", "text": "Service" }, { "type": "raw_text", "text": "Status" }],
+    [{ "type": "raw_text", "text": "API" }, { "type": "raw_text", "text": "Healthy" }]
   ],
-  "column_settings": [
-    { "align": "left" },
-    { "align": "center" },
-    { "align": "right" }
+  "column_settings": [{ "align": "left" }, { "align": "center" }]
+}
+```
+
+### data_table
+
+Interactive table: pagination, sorting, filtering, clickable cells. Same row shape as `table`, plus a **required** `caption` string. Rows: header + 1–100 data rows; all rows need equal cell counts; header cells cannot be `rich_text`. Optional `page_size` (1–100, default 5) and `row_header_column_index` (default 0). Numeric sorting when a column is all `raw_number` cells.
+
+```json
+{
+  "type": "data_table",
+  "caption": "Service health",
+  "rows": [
+    [{ "type": "raw_text", "text": "Service" }, { "type": "raw_text", "text": "Latency (ms)" }],
+    [{ "type": "raw_text", "text": "API" }, { "type": "raw_number", "value": 12, "text": "12" }]
   ]
 }
 ```
 
-Each row is an array of cell objects (NOT an object with a `cells` property). Cell types: `raw_text` or `rich_text`. There is no `columns` property — the first row is the header. Max 100 rows, 20 columns. Multiple tables trigger `invalid_attachments` error.
+### data_visualization
+
+Native pie, bar, area, or line charts. Required: `title` (≤50 chars) and `chart`. Pie: `segments` (1–12, labels ≤20 chars, values > 0). Bar/area/line: `series` (1–12; names ≤20 chars, unique) plus `axis_config.categories` — every data point label must exactly match a category, and no series may omit a category.
+
+```json
+{
+  "type": "data_visualization",
+  "title": "Weekly Sales",
+  "chart": {
+    "type": "bar",
+    "series": [
+      { "name": "Online", "data": [{ "label": "Week 1", "value": 32000 }, { "label": "Week 2", "value": 41000 }] }
+    ],
+    "axis_config": { "categories": ["Week 1", "Week 2"], "y_label": "USD" }
+  }
+}
+```
 
 ### markdown
 
@@ -270,15 +276,15 @@ Standard Markdown rendering for AI app output. Messages only.
 { "type": "markdown", "text": "**Bold**, *italic*, [link](https://example.com)\n\n## Heading\n\n- List item" }
 ```
 
-Supports: bold, italic, strikethrough, links, headers, ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, and character escaping. Images render as hyperlink text. Cumulative 12,000 char limit per payload. `block_id` is ignored. A single markdown block may translate into multiple Slack blocks.
+Supports bold, italic, strikethrough, links, headers (all levels render the same size), lists, code (inline and fenced with syntax highlighting), block quotes, dividers, tables, task lists, and escaping. Images render as hyperlink text. Cumulative 12,000-char limit across all markdown blocks per payload. `block_id` is ignored. One markdown block may translate into multiple Slack blocks.
 
 ### context_actions
 
-Feedback and icon buttons for message-level actions. Messages only. Max 5 elements. Compatible elements: `feedback_buttons`, `icon_button`.
+Feedback and icon buttons for message-level actions. Messages only. Max 5 elements. Compatible elements: `feedback_buttons`, `icon_button` (only icon: `trash`).
 
 ### video
 
-Embedded video player. Requires `links.embed:write` scope, publicly accessible URL in app's unfurl domains.
+Embedded video player. Requires `links.embed:write` scope and a publicly accessible URL in the app's unfurl domains.
 
 ### input
 
@@ -301,31 +307,32 @@ Container for sequential task cards, designed for AI agent output. Messages only
 
 Task status values: `pending`, `in_progress`, `complete`, `error`. Each task is a `task_card` block with optional `details`, `output` (rich_text), and `sources` (url elements).
 
-### streaming agent output
+### file
 
-Use `chat.startStream`, `chat.appendStream`, and `chat.stopStream` for live AI responses. Streamed messages should be replies to a user request (`thread_ts` required on start) and require `chat:write`.
+Remote file reference. Read-only — cannot be directly added to messages by apps.
 
-`chunks` can include:
-- `markdown_text` chunks for standard Markdown text
-- `task_update` chunks for timeline-style task progress
-- `plan_update` chunks for updating a plan title
-- `blocks` chunks for arrays of Block Kit blocks
+## Streaming Agent Output
+
+Use `chat.startStream`, `chat.appendStream`, and `chat.stopStream` for live AI responses (all require `chat:write`). Start requires `channel` and `thread_ts` — streamed messages should reply to a user request. When streaming to channels, `recipient_user_id` and `recipient_team_id` are also required.
+
+`chunks` (accepted by all three methods) can include:
+- `markdown_text` chunks — standard Markdown text
+- `task_update` chunks — timeline-style task progress (same shape as task_card; `id` not `task_id`)
+- `plan_update` chunks — update a plan title
+- `blocks` chunks — arrays of Block Kit blocks (max 50 per array; extras are dropped with a warning)
+
+`task_update` and `plan_update` chunk fields are limited to 256 characters.
 
 Set `task_display_mode` on `chat.startStream`:
 - `timeline` (default): tasks appear individually in sequence
-- `plan`: tasks appear grouped in one plan, with the first task placement determining the plan placement
+- `plan`: tasks grouped in one plan; first task placement determines plan placement
+- `dense`: consecutive tool calls collapse into a single summarized task card
 
-`chat.stopStream` can add final `blocks` rendered after streamed `chunks` or `markdown_text`. It has a separate 50-block limit from streamed `blocks` chunks, allowing up to 100 total finalized blocks.
-
-### file
-
-Remote file reference. Read-only. Cannot be directly added to messages by apps.
+`chat.stopStream` can add final `blocks` rendered after streamed content. Its 50-block limit is separate from streamed `blocks` chunks, allowing up to 100 total finalized blocks. Rate limits: start/stop Tier 2 (20+/min), append Tier 4 (100+/min).
 
 ## Composition Objects
 
-### Option Object
-
-Used in select menus, overflow, checkboxes, radio buttons:
+Option object (used in selects, overflow, checkboxes, radio buttons):
 
 ```json
 {
@@ -335,9 +342,9 @@ Used in select menus, overflow, checkboxes, radio buttons:
 }
 ```
 
-Text max 75 chars. `value` max 150 chars. `description` optional, max 75 chars.
+Text max 75 chars, `value` max 150 chars, `description` max 75 chars.
 
-### Confirmation Dialog
+Confirmation dialog (add to any interactive element via `confirm`):
 
 ```json
 {
@@ -349,15 +356,7 @@ Text max 75 chars. `value` max 150 chars. `description` optional, max 75 chars.
 }
 ```
 
-### Conversation Filter
-
-Filters conversation select menus. `include`: `im`, `mpim`, `private`, `public`.
-
-### Dispatch Action Configuration
-
-Controls when input elements trigger `block_actions`: `on_enter_pressed`, `on_character_entered`.
-
-See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tables.
+Others: conversation filter (`include`: `im`/`mpim`/`private`/`public`), dispatch action config (`on_enter_pressed`, `on_character_entered`), Slack file, Slack icon (card blocks), trigger/workflow (workflow buttons). Full property tables: [references/COMPOSITION.md](references/COMPOSITION.md).
 
 ## Limits
 
@@ -371,16 +370,21 @@ See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tab
 | Context elements | 10 |
 | Actions elements | 25 |
 | Context actions elements | 5 |
-| Alert levels | `default`, `info`, `warning`, `error`, `success` |
+| Alert text (modals only) | 200 chars |
 | Card title/subtitle | 150 chars |
-| Card body | 200 chars |
+| Card body/subtext | 200 chars |
+| Card action buttons | 3 |
 | Carousel cards | 1-10 |
-| Table rows | 100 |
-| Table columns | 20 |
-| Tables per message | 1 |
+| Container child blocks | 10 |
+| Container title/subtitle | 150 chars |
+| Table rows / columns | 100 / 20 |
+| Table chars (per table and per message) | 10,000 |
+| Data table rows | header + 100 data rows |
+| Data viz series/segments | 1-12 (labels/names 20 chars) |
+| Data points per series | 1-20 |
 | Markdown block text | 12,000 chars cumulative per payload |
-| Modal title | 24 chars |
-| Modal submit/close text | 24 chars |
+| Streaming chunk fields (task/plan update) | 256 chars |
+| Modal title / submit / close | 24 chars each |
 | Modal views in stack | 3 |
 | Modal private_metadata | 3000 chars |
 | Button text | 75 chars (displays ~30) |
@@ -397,28 +401,23 @@ See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tab
 | Anti-Pattern | Problem | Fix |
 |--------------|---------|-----|
 | Blocks without `text` fallback | Empty notifications, no accessibility fallback | Always provide `text` in `chat.postMessage` |
-| `text` and `blocks` diverge | Confusing: notification says one thing, chat shows another | Keep semantically aligned |
+| `text` and `blocks` diverge | Notification says one thing, chat shows another | Keep semantically aligned |
 | Blocks for simple replies | Visual noise for short responses | Use `text` only for simple replies |
-| 2+ tables in one message | `invalid_attachments` error | One table per message |
-| Using blog-nested `card`/`alert` payloads | Invalid against current reference docs | Put `title`, `body`, `text`, and `level` directly on the block |
+| `alert` block in a message | Alerts are modal-only; payload rejected | Use section + emoji or card in messages |
+| Huge tables in one message | 10,000-char cell limit exceeded | Split across multiple messages |
+| Rows as `{ "cells": [...] }` objects | Invalid — rows are flat arrays of cells | Each row = array of cell objects |
+| `columns` property on table | No such property | First row of `rows` is the header |
+| Chart labels not matching categories | Runtime validation failure | Every data point label must match `axis_config.categories` |
 | `mrkdwn` in header text | Ignored — headers only accept `plain_text` | Use `plain_text` type |
+| Standard Markdown in mrkdwn fields | `**bold**` and `[links](url)` render literally | Use `*bold*` and `<url\|text>`, or a markdown block |
 | Long header text | Silently truncated at 150 chars | Keep under 150 |
 | Missing `alt_text` on images | Accessibility failure, API may reject | Always include alt_text |
 
 ## Best Practices
 
-**Use blocks when:**
-- The response has multiple distinct sections (summaries, reports, dashboards)
-- Two-column key-value layouts improve readability (metadata, config summaries)
-- A table presents data more clearly than prose
-- Visual separation between topics helps comprehension
-- Code needs a header or surrounding context
-- Interactive elements (buttons, menus, feedback) are needed
+**Use blocks when:** the response has multiple distinct sections; two-column key-value layouts improve readability; a table or chart presents data more clearly than prose; visual separation helps; code needs surrounding context; interactive elements are needed.
 
-**Don't use blocks when:**
-- The response is conversational ("sure, done", "hey, good morning")
-- The response is under ~3 lines of text
-- The content is a simple answer to a direct question
+**Don't use blocks when:** the response is conversational ("sure, done"), under ~3 lines, or a simple answer to a direct question.
 
 **Always:**
 - Provide a complete `text` field as the accessible fallback (notifications, threads, search, screen readers)
@@ -437,13 +436,11 @@ See [references/COMPOSITION.md](references/COMPOSITION.md) for full property tab
 | Lists | N/A | `lists.*` API methods | Task tracking and project management |
 | Split View | N/A | Agents & AI Apps config | AI chat surface with Chat + History tabs |
 
-Modals collect input via `input` blocks, return `view_submission` payloads. They chain up to 3 views with push/update/clear response actions. `private_metadata` (3000 chars) persists context between views.
+Modals collect input via `input` blocks and return `view_submission` payloads. `private_metadata` (3000 chars) persists context between views. Read [references/SURFACES.md](references/SURFACES.md) before building modal flows or App Home views — it covers the view object schema, response actions, and `view.state.values` extraction paths.
 
 ## Work Objects
 
 Work Objects render rich entity previews when links are shared in Slack. They extend link unfurling with structured data, flexpane details, editable fields, and actions.
-
-### Entity Types
 
 | Type | Entity ID | Purpose |
 |------|-----------|---------|
@@ -453,35 +450,30 @@ Work Objects render rich entity previews when links are shared in Slack. They ex
 | Content Item | `slack#/entities/content_item` | Articles, pages, wiki entries |
 | Item | `slack#/entities/item` | General-purpose entity |
 
-Work Objects use `chat.unfurl` with a `metadata` parameter containing entity type, external reference, and entity payload. See [references/WORK-OBJECTS.md](references/WORK-OBJECTS.md) for full implementation details.
+Work Objects use `chat.unfurl` with a `metadata` parameter containing entity type, external reference, and entity payload. Read [references/WORK-OBJECTS.md](references/WORK-OBJECTS.md) before implementing — Slack silently drops the whole payload if any required field is missing.
 
 ## Reference Documentation
 
-| File | Purpose |
-|------|---------|
-| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick reference: all blocks, elements, limits at a glance |
-| [references/BLOCKS.md](references/BLOCKS.md) | All 18 block types with full property tables and constraints |
-| [references/ELEMENTS.md](references/ELEMENTS.md) | All 20 interactive elements with properties and constraints |
-| [references/COMPOSITION.md](references/COMPOSITION.md) | Composition objects: text, option, confirmation, filters |
-| [references/RICH-TEXT.md](references/RICH-TEXT.md) | Rich text block deep dive: sub-elements, inline types, styles |
-| [references/SURFACES.md](references/SURFACES.md) | Modals, App Home, canvases, lists, split view |
-| [references/WORK-OBJECTS.md](references/WORK-OBJECTS.md) | Entity types, chat.unfurl, flexpane, editable fields, actions |
+| Read this | Before doing this |
+|-----------|-------------------|
+| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick lookup of any block/element/limit at a glance |
+| [references/BLOCKS.md](references/BLOCKS.md) | Building any block payload — all 21 blocks with full property tables |
+| [references/ELEMENTS.md](references/ELEMENTS.md) | Adding buttons, selects, inputs, or pickers — all 20 elements |
+| [references/COMPOSITION.md](references/COMPOSITION.md) | Writing text objects, options, confirm dialogs, filters, Slack icons |
+| [references/RICH-TEXT.md](references/RICH-TEXT.md) | Writing rich_text blocks — nesting, inline types, styles |
+| [references/SURFACES.md](references/SURFACES.md) | Building modals, App Home, canvases, or split view flows |
+| [references/WORK-OBJECTS.md](references/WORK-OBJECTS.md) | Implementing link unfurls, flexpanes, editable fields |
 
 ## Sources
 
 - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
 - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
-- [Alert Block](https://docs.slack.dev/reference/block-kit/blocks/alert-block) — Slack
-- [Card Block](https://docs.slack.dev/reference/block-kit/blocks/card-block) — Slack
-- [Carousel Block](https://docs.slack.dev/reference/block-kit/blocks/carousel-block) — Slack
 - [Block Kit Elements](https://docs.slack.dev/reference/block-kit/block-elements) — Slack
-- [Block Kit Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
-- [Streaming Messages](https://docs.slack.dev/reference/methods/chat.startStream/) — Slack
+- [Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
+- [chat.startStream](https://docs.slack.dev/reference/methods/chat.startStream/) — Slack
+- [chat.appendStream](https://docs.slack.dev/reference/methods/chat.appendStream/) — Slack
+- [chat.stopStream](https://docs.slack.dev/reference/methods/chat.stopStream/) — Slack
 - [Work Objects](https://docs.slack.dev/messaging/work-objects) — Slack
 - [Surfaces](https://docs.slack.dev/surfaces) — Slack
-- [Modals](https://docs.slack.dev/surfaces/modals) — Slack
+- [Modal views](https://docs.slack.dev/reference/views/modal-views) — Slack
 - [App Home](https://docs.slack.dev/surfaces/app-home) — Slack
-- [Canvases](https://docs.slack.dev/surfaces/canvases) — Slack
-- [Lists](https://docs.slack.dev/surfaces/lists) — Slack
-- [Split View](https://docs.slack.dev/surfaces/split-view) — Slack
-- [App Design](https://docs.slack.dev/surfaces/app-design) — Slack

@@ -8,6 +8,17 @@
 > - [CSS Display Level 4](https://www.w3.org/TR/css-display-4/) — W3C (`reading-flow`)
 > - [MDN: CSS Cascade](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascade) — Mozilla
 
+## Contents
+
+- [How the Cascade Resolves Styles](#how-the-cascade-resolves-styles)
+- [1. Native CSS Nesting](#1-native-css-nesting)
+- [2. Cascade Layers (`@layer`)](#2-cascade-layers-layer)
+- [3. `@scope` — Proximity-Based Scoping](#3-scope--proximity-based-scoping)
+- [4. `@supports` — Feature Queries](#4-supports--feature-queries)
+- [5. `@media` Range Syntax](#5-media-range-syntax)
+- [6. `reading-flow` — Tab Order Matching Visual Layout](#6-reading-flow--tab-order-matching-visual-layout)
+- [Putting It All Together](#putting-it-all-together)
+
 ## How the Cascade Resolves Styles
 
 Every style conflict resolves through this hierarchy. The first decisive step wins:
@@ -235,6 +246,8 @@ Avoid `!important` in layered architectures. The layer order should handle prior
 
 Use `@scope` to limit where styles apply and to resolve conflicts by DOM proximity. Use it when component styles should not leak into nested sub-components.
 
+**Support:** Baseline Newly Available since December 2025 (Chrome 118+, Safari 17.4+, Firefox 146+). Older browsers ignore the whole `@scope` block, so keep a plain-selector fallback for anything essential.
+
 ### Basic Scoping
 
 ```css
@@ -357,11 +370,15 @@ Use `@supports` for features not yet Baseline. Do not wrap Baseline features in 
 ### Detecting Modern Features
 
 ```css
-@supports (selector(:has(a)))       { /* :has() available */ }
+@supports selector(:has(a))         { /* :has() available */ }
 @supports (container-type: inline-size) { /* container queries */ }
 @supports (anchor-name: --tip)      { /* anchor positioning */ }
 @supports (reading-flow: grid-rows) { /* reading-flow */ }
 ```
+
+`@supports` can only test declarations (`property: value`) and selectors (`selector(...)`). There is no cross-browser test for at-rules like `@scope` or `@starting-style` — the `at-rule()` function exists in the spec but only Chromium ships it. At-rules degrade safely anyway: unsupported browsers skip the whole block.
+
+Also note: `@supports (--x: anything)` is always true — custom properties accept any value, so they cannot be used to detect new value syntax. Test the new syntax in a real property instead (e.g. `@supports (transition-delay: calc(sibling-index() * 1ms))`).
 
 ### Negation and Combination
 
@@ -382,8 +399,9 @@ Structure as enhancement layers — base works everywhere, enhancements add capa
   .card { background: oklch(0.98 0.01 200); }
 }
 
-@supports (selector(@scope (.a))) {
-  @scope (.card) to (.card) { p { margin-block: 0.5em; } }
+/* At-rules need no @supports wrapper — unsupported browsers skip the block */
+@scope (.card) to (.card) {
+  p { margin-block: 0.5em; }
 }
 ```
 
@@ -431,6 +449,8 @@ Combine with nesting to co-locate responsive rules:
 ## 6. `reading-flow` — Tab Order Matching Visual Layout
 
 When CSS reorders content visually (`order`, `grid-row`, `flex-direction: row-reverse`), keyboard tab order still follows DOM order. `reading-flow` fixes this accessibility gap.
+
+**Support:** Chromium-only (Chrome/Edge 137+) as of mid-2026 — always feature-detect. In other browsers, prefer fixing the DOM order instead of relying on this property.
 
 ```css
 /* ❌ Visual order differs from tab order */

@@ -1,6 +1,22 @@
 # Quick Reference Cheatsheet
 > See [SKILL.md](../SKILL.md#sources) for full source list.
 
+## Contents
+
+- [Cascade Resolution Hierarchy](#cascade-resolution-hierarchy)
+- [Layout Decision Flow](#layout-decision-flow)
+- [Legacy to Modern Quick Upgrades](#legacy-to-modern-quick-upgrades)
+- [CSS Replaces JavaScript](#css-replaces-javascript)
+- [Property Quick Reference by Category](#property-quick-reference-by-category)
+- [Color Function Syntax](#color-function-syntax)
+- [Unit Reference](#unit-reference)
+- [Logical Properties Mapping](#logical-properties-mapping)
+- [Grid Pattern Recipes](#grid-pattern-recipes)
+- [@supports Feature Detection](#supports-feature-detection)
+- [Common Patterns](#common-patterns)
+- [Progressive Enhancement Template](#progressive-enhancement-template)
+- [Anti-Patterns Recap](#anti-patterns-recap)
+
 ---
 
 ## Cascade Resolution Hierarchy
@@ -21,8 +37,8 @@ flowchart TB
 
     subgraph LAYERS["Cascade Layers"]
         style LAYERS fill:#1a4a6e,color:#fff
-        L1["3. @layer order<br/>(last declared layer wins)"]
-        L2["4. Unlayered styles<br/>(beat ALL layers)"]
+        L1["3. Unlayered styles<br/>(beat ALL layers)"]
+        L2["4. @layer order<br/>(last declared layer wins)"]
     end
 
     subgraph SPECIFICITY["Specificity & Proximity"]
@@ -146,7 +162,7 @@ flowchart TB
 ### 8. JS tooltip position to anchor positioning
 ```css
 /* ❌ */ /* JS: Floating UI / Popper.js for tooltip placement */
-/* ✅ */ .tooltip { position: fixed; position-anchor: --trigger; inset-area: block-start; }
+/* ✅ */ .tooltip { position: fixed; position-anchor: --trigger; position-area: block-start; }
 ```
 
 ### 9. Max-height hack to interpolate-size
@@ -201,7 +217,7 @@ flowchart TB
 | Scroll position listeners | `animation-timeline: scroll()` |
 | IntersectionObserver for reveal | `animation-timeline: view()` |
 | Sticky header shadow toggle | `scroll-state(stuck: top)` |
-| Floating UI / Popper.js | Anchor positioning (`position-anchor`, `inset-area`) |
+| Floating UI / Popper.js | Anchor positioning (`position-anchor`, `position-area`) |
 | Carousel prev/next/dots | `::scroll-button()`, `::scroll-marker` |
 | Auto-expanding textarea | `field-sizing: content` |
 | Staggered animation delays | `sibling-index()` in `calc()` |
@@ -238,8 +254,8 @@ flowchart TB
 | `@layer reset, base, components;` | Declare layer order | First = lowest priority |
 | `@layer base { ... }` | Add rules to a layer | Unlayered beats all layers |
 | `@scope (.card) to (.card-footer)` | Limit style reach | Proximity wins over specificity |
-| `.parent { .child { } }` | Native nesting | `&` optional before classes |
-| `.parent { & .child { } }` | Explicit nesting | `&` required before element selectors |
+| `.parent { .child { } }` | Native nesting | `&` optional — bare element selectors also work (`div { }`) |
+| `.parent { & .child { } }` | Explicit nesting | Use `&` to reposition parent: `a&`, `.wrap &` |
 | `.parent { @media (...) { } }` | Nested media query | Scoped to parent context |
 | `@import url() layer(name)` | Import into a layer | Third-party CSS isolation |
 
@@ -438,17 +454,21 @@ body {
 | Container queries | `(container-type: inline-size)` |
 | `:has()` | `selector(:has(*))` |
 | Nesting | `selector(&)` |
-| `@layer` | `at-rule(@layer)` |
 | Anchor positioning | `(anchor-name: --a)` |
+| Scroll-driven animations | `(animation-timeline: scroll())` |
 | `interpolate-size` | `(interpolate-size: allow-keywords)` |
 | `field-sizing` | `(field-sizing: content)` |
 | Customizable select | `(appearance: base-select)` |
 | Scroll-state queries | `(container-type: scroll-state)` |
 | View transitions | `(view-transition-name: a)` |
+| `sibling-index()` | `(transition-delay: calc(sibling-index() * 1ms))` |
+| Typed `attr()` | `(width: attr(data-x type(<length>), 0px))` |
 | `oklch()` | `(color: oklch(0 0 0))` |
 | `light-dark()` | `(color: light-dark(#000, #fff))` |
 | Subgrid | `(grid-template-rows: subgrid)` |
-| `@starting-style` | _no direct test; wrap in `@supports` block_ |
+| At-rules (`@layer`, `@scope`, `@starting-style`) | _No cross-browser test (`at-rule()` is Chromium-only). Unsupported browsers skip the block — usually no test needed._ |
+
+Never test new value syntax through a custom property (`@supports (--x: if(...))`) — custom properties accept any value, so the test is always true.
 
 ---
 
@@ -494,7 +514,7 @@ body {
 .tooltip {
   position: fixed;
   position-anchor: --trigger;
-  inset-area: block-start;
+  position-area: block-start;
   margin-block-end: 0.5rem;
   position-try-fallbacks: flip-block, flip-inline;
 }
@@ -562,17 +582,17 @@ body {
   .card:has(img) { grid-template-rows: 200px 1fr; }
 }
 
-/* Enhancement: anchor positioning */
+/* Enhancement: anchor positioning (newly Baseline Jan 2026) */
 @supports (anchor-name: --a) {
   .trigger { anchor-name: --trigger; }
   .tooltip {
     position: fixed;
     position-anchor: --trigger;
-    inset-area: block-start;
+    position-area: block-start;
   }
 }
 
-/* Enhancement: Chrome-only features */
+/* Enhancement: Chromium-only features (as of mid-2026) */
 @supports (interpolate-size: allow-keywords) {
   :root { interpolate-size: allow-keywords; }
 }
@@ -581,6 +601,7 @@ body {
   select { appearance: base-select; }
 }
 
+/* Enhancement: newly Baseline Jun 2026 — older browsers keep fixed sizing */
 @supports (field-sizing: content) {
   textarea { field-sizing: content; }
 }

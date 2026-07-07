@@ -9,20 +9,25 @@ Pure native CSS for building interfaces — no preprocessors, no frameworks.
 
 ## When to Use (and When NOT to)
 
-| Use Freely (Baseline) | Feature-Detect First |
+Support statuses below are as of mid-2026. "Newly Baseline (date)" means all three engines ship it, but users on older browsers won't have it — keep graceful degradation. Verify anything critical on [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS) or [webstatus.dev](https://webstatus.dev/).
+
+| Use Freely (Baseline) | Feature-Detect / Progressive Enhancement |
 |---|---|
-| CSS Grid, Subgrid, Flexbox | `@function`, `if()` (Chrome-only) |
-| Container Queries (size + style) | Customizable `<select>` (Chrome-only) |
-| `:has()`, `:is()`, `:where()` | Scroll-state queries (Chrome-only) |
-| CSS Nesting, `@layer`, `@scope` | `sibling-index()`, `sibling-count()` |
-| `@property` (typed custom props) | `::scroll-button()`, `::scroll-marker` |
-| `oklch()`, `color-mix()`, `light-dark()` | Typed `attr()` beyond `content` |
-| Relative color syntax | `field-sizing: content` |
-| `@starting-style`, `transition-behavior` | `interpolate-size` (Chrome-only) |
-| Scroll-driven animations | Grid Lanes / masonry (experimental) |
-| Anchor positioning, Popover API | `random()` (Safari TP only) |
-| `text-wrap: balance`, `linear()` easing | `@mixin` / `@apply` (no browser yet) |
-| View Transitions, logical properties | |
+| CSS Grid, Subgrid, Flexbox | Scroll-driven animations (Firefox: behind flag) |
+| Container queries — size; style (newly Baseline May 2026) | Scroll-state queries (Chromium-only) |
+| `:has()`, `:is()`, `:where()` | `::scroll-button()`, `::scroll-marker` (Chromium-only) |
+| CSS Nesting, `@layer` | Customizable `<select>` (Chromium; Safari 27 announced) |
+| `@scope` (newly Baseline Dec 2025) | `@function`, `if()` (Chromium-only) |
+| `@property` (typed custom props) | `sibling-index()`, `sibling-count()` (no Firefox) |
+| `oklch()`, `color-mix()`, `light-dark()`, relative color | Typed `attr()` beyond `content` (Chromium-only) |
+| `@starting-style`, `transition-behavior: allow-discrete` | Cross-document view transitions (no Firefox) |
+| View transitions — same-document (newly Baseline Oct 2025) | `interpolate-size`, `calc-size()` (Chromium-only) |
+| Anchor positioning (newly Baseline Jan 2026) | `popover="hint"`, `interestfor` (Chromium-only) |
+| Popover API, `<dialog>`, invoker commands (newly Baseline Dec 2025) | `text-wrap: pretty`, `text-box` (no Firefox) |
+| `field-sizing: content` (newly Baseline Jun 2026) | `reading-flow` (Chromium-only) |
+| `text-wrap: balance`, `linear()` easing | `closedby` on `<dialog>` (no Safari) |
+| Logical properties, `::details-content` | Grid Lanes / masonry (Safari 26.4 only; flags elsewhere) |
+| | `random()` (Safari 26.2+ only), `@mixin` (no browser yet) |
 
 ## CRITICAL: The Modern Cascade
 
@@ -32,11 +37,12 @@ Understanding how styles resolve is the single most important concept in CSS. Th
 Style Resolution Order (highest priority wins):
 ┌─────────────────────────────────────────────────┐
 │ 1. Transitions (active transition wins)         │
-│ 2. !important (user-agent > user > author)      │
-│ 3. @layer order (later layer > earlier layer)   │
-│ 4. Unlayered styles (beat ALL layers)           │
+│ 2. !important (user-agent > user > author;      │
+│    layer order INVERTS under !important)        │
+│ 3. Unlayered author styles (beat ALL layers)    │
+│ 4. @layer order (later layer > earlier layer)   │
 │ 5. Specificity (ID > class > element)           │
-│ 6. @scope proximity (closer root wins)      NEW │
+│ 6. @scope proximity (closer root wins)          │
 │ 7. Source order (later > earlier)               │
 └─────────────────────────────────────────────────┘
 
@@ -54,7 +60,7 @@ Cascade layers (`@layer`) and scope proximity (`@scope`) are now more powerful t
 Layout approach?
 ├─ 2D grid (rows + columns)         → CSS Grid
 │  ├─ Children must align across    → Grid + Subgrid
-│  └─ Waterfall / masonry           → grid-lanes (experimental)
+│  └─ Waterfall / masonry           → display: grid-lanes (not yet cross-browser)
 ├─ 1D row OR column                 → Flexbox
 ├─ Component adapts to container    → Container Query + Grid/Flex
 ├─ Viewport-based responsiveness    → @media range syntax
@@ -132,18 +138,20 @@ Animation type?
 
 ## Reference Documentation
 
-| File | Purpose |
+Open the reference file BEFORE writing code in its area — each contains the sharp edges and support caveats that are easy to get wrong.
+
+| Read this | Before doing |
 |------|---------|
-| [references/CASCADE.md](references/CASCADE.md) | Nesting, `@layer`, `@scope`, cascade control, and CSS architecture |
-| [references/LAYOUT.md](references/LAYOUT.md) | Grid, Subgrid, Flexbox, Container Queries, and intrinsic sizing |
-| [references/SELECTORS.md](references/SELECTORS.md) | `:has()`, `:is()`, `:where()`, pseudo-elements, and state-based selection |
-| [references/COLOR.md](references/COLOR.md) | OKLCH, `color-mix()`, relative colors, `light-dark()`, and theming |
-| [references/TOKENS.md](references/TOKENS.md) | `@property`, `@function`, `if()`, math functions, and design tokens |
-| [references/ANIMATION.md](references/ANIMATION.md) | `@starting-style`, `interpolate-size`, `linear()`, view transitions |
-| [references/SCROLL.md](references/SCROLL.md) | Scroll-driven animations, scroll-state queries, native carousels |
-| [references/COMPONENTS.md](references/COMPONENTS.md) | Customizable `<select>`, popover, anchor positioning, `field-sizing` |
-| [references/PERFORMANCE.md](references/PERFORMANCE.md) | `content-visibility`, typography, logical properties, accessibility |
-| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick reference: browser support, legacy→modern patterns, units |
+| [references/CASCADE.md](references/CASCADE.md) | Setting up stylesheet architecture, `@layer` ordering, `@scope`, nesting, resolving specificity conflicts |
+| [references/LAYOUT.md](references/LAYOUT.md) | Any Grid/Subgrid/Flexbox layout, container queries, masonry, intrinsic sizing |
+| [references/SELECTORS.md](references/SELECTORS.md) | Using `:has()`, `:is()`/`:where()`, `:focus-visible`, or modern pseudo-elements |
+| [references/COLOR.md](references/COLOR.md) | Defining palettes, dark mode with `light-dark()`, `color-mix()`, relative color, OKLCH |
+| [references/TOKENS.md](references/TOKENS.md) | Building design tokens, animating custom properties (`@property`), `@function`, `if()`, math functions |
+| [references/ANIMATION.md](references/ANIMATION.md) | Entry/exit animations, `@starting-style`, animating to `auto`, view transitions, custom easing |
+| [references/SCROLL.md](references/SCROLL.md) | Scroll-linked effects, sticky-header states, carousels — anything replacing scroll listeners |
+| [references/COMPONENTS.md](references/COMPONENTS.md) | Tooltips, dropdowns, dialogs, popovers, anchor positioning, styled `<select>`, form field sizing |
+| [references/PERFORMANCE.md](references/PERFORMANCE.md) | `content-visibility`, typography tuning, logical properties, accessibility media queries, viewport units |
+| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick lookups: legacy→modern upgrades, `@supports` tests, units, syntax tables |
 
 ## Sources
 
@@ -157,11 +165,10 @@ Animation type?
 
 ### Browser Vendor Blogs
 - [CSS Wrapped 2025](https://chrome.dev/css-wrapped-2025/) — Chrome DevRel
-- [Interop 2025](https://webkit.org/blog/17808/interop-2025-review/) — WebKit
+- [Interop 2025 Review](https://webkit.org/blog/17808/interop-2025-review/) — WebKit
 - [What's New in Web UI (I/O 2025)](https://developer.chrome.com/blog/new-in-web-ui-io-2025-recap)
 
-### Reference
+### Support Status (check these — support claims go stale fast)
 - [MDN Web Docs: CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
-- [State of CSS 2025](https://2025.stateofcss.com/en-US/features/)
-- [What You Need to Know About Modern CSS (2025)](https://frontendmasters.com/blog/what-you-need-to-know-about-modern-css-2025-edition/)
-- [CSS in 2026](https://blog.logrocket.com/css-in-2026/)
+- [Baseline / webstatus.dev](https://webstatus.dev/)
+- [Can I use](https://caniuse.com/)

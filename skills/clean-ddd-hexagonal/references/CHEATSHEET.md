@@ -4,6 +4,20 @@
 
 This cheatsheet summarizes an opinionated synthesis, not a single canonical architecture. Use DDD, Hexagonal, Clean Architecture, Onion Architecture, CQRS, and Event Sourcing independently when only one pattern fits the problem.
 
+## Contents
+
+- [Layer Summary](#layer-summary)
+- [Pattern Boundaries](#pattern-boundaries)
+- [Quick Decision Trees](#quick-decision-trees)
+- [Common Patterns Quick Reference](#common-patterns-quick-reference) — TypeScript templates
+- [Port Naming Conventions](#port-naming-conventions)
+- [Common Anti-Patterns](#common-anti-patterns)
+- [Dependency Rules Matrix](#dependency-rules-matrix)
+- [Hexagonal Quick Reference](#hexagonal-quick-reference)
+- [When to Use / Skip](#when-to-use--skip)
+- [File Naming Conventions](#file-naming-conventions)
+- [Resources](#resources)
+
 ## Layer Summary
 
 ```mermaid
@@ -157,13 +171,18 @@ export class Money {
 export class OrderItem extends Entity<OrderItemId> {
   private _quantity: Quantity;
 
-  private constructor(id: OrderItemId, private readonly _productId: ProductId, quantity: Quantity) {
+  private constructor(
+    id: OrderItemId,
+    private readonly _productId: ProductId,
+    quantity: Quantity,
+    private readonly _unitPrice: Money,
+  ) {
     super(id);
     this._quantity = quantity;
   }
 
-  static create(productId: ProductId, quantity: Quantity): OrderItem {
-    return new OrderItem(OrderItemId.generate(), productId, quantity);
+  static create(productId: ProductId, quantity: Quantity, unitPrice: Money): OrderItem {
+    return new OrderItem(OrderItemId.generate(), productId, quantity, unitPrice);
   }
 
   increaseQuantity(amount: number): void {
@@ -172,6 +191,7 @@ export class OrderItem extends Entity<OrderItemId> {
 
   get productId(): ProductId { return this._productId; }
   get quantity(): Quantity { return this._quantity; }
+  get subtotal(): Money { return this._unitPrice.multiply(this._quantity.value); }
 }
 ```
 
@@ -179,6 +199,7 @@ export class OrderItem extends Entity<OrderItemId> {
 
 ```typescript
 export class Order extends AggregateRoot<OrderId> {
+  private readonly _customerId: CustomerId;
   private _items: OrderItem[] = [];
   private _status: OrderStatus;
 
@@ -212,7 +233,9 @@ export class Order extends AggregateRoot<OrderId> {
     }
   }
 
-  get total(): Money { /* ... */ }
+  get total(): Money {
+    return this._items.reduce((sum, item) => sum.add(item.subtotal), Money.create(0, 'USD'));
+  }
 }
 ```
 
@@ -241,6 +264,7 @@ export class PlaceOrderHandler {
 
     for (const item of command.items) {
       const product = await this.productRepo.findById(item.productId);
+      if (!product) throw new ProductNotFoundError(item.productId);
       order.addItem(product.id, Quantity.create(item.quantity), product.price);
     }
 

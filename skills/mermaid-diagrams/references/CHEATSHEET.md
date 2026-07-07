@@ -1,34 +1,50 @@
 # Mermaid Quick Reference Cheatsheet
 
+Verified against Mermaid v11.16 (2026).
+
+## Contents
+
+- [Diagram Declarations](#diagram-declarations)
+- [Flowchart](#flowchart) · [Sequence Diagram](#sequence-diagram) · [Class Diagram](#class-diagram) · [ER Diagram](#er-diagram) · [State Diagram](#state-diagram)
+- [Gantt Chart](#gantt-chart) · [Pie Chart](#pie-chart) · [Timeline](#timeline)
+- [C4 Diagrams](#c4-diagrams) · [Architecture Diagram](#architecture-diagram)
+- [Styling](#styling)
+- [Special Characters & Reserved Words](#special-characters--reserved-words)
+- [Markdown in Labels](#markdown-in-labels) · [Configuration](#configuration)
+- [Quick Decision Guide](#quick-decision-guide)
+- [Platform Support](#platform-support)
+
 ---
 
 ## Diagram Declarations
 
-| Diagram | Declaration |
-|---------|-------------|
-| Flowchart | `flowchart LR` / `flowchart TB` |
-| Sequence | `sequenceDiagram` |
-| Class | `classDiagram` |
-| ER | `erDiagram` |
-| State | `stateDiagram-v2` |
-| User Journey | `journey` |
-| Gantt | `gantt` |
-| Pie | `pie` / `pie showData` |
-| Mindmap | `mindmap` |
-| Timeline | `timeline` |
-| Git Graph | `gitGraph` |
-| C4 Context | `C4Context` |
-| C4 Container | `C4Container` |
-| C4 Component | `C4Component` |
-| Architecture | `architecture-beta` |
-| Block | `block-beta` |
-| Quadrant | `quadrantChart` |
-| XY Chart | `xychart-beta` |
-| Sankey | `sankey-beta` |
-| Kanban | `kanban` |
-| Packet | `packet-beta` |
-| Requirement | `requirementDiagram` |
-| Treemap | `treemap-beta` |
+| Diagram | Declaration | Status |
+|---------|-------------|--------|
+| Flowchart | `flowchart LR` / `flowchart TB` | Stable |
+| Sequence | `sequenceDiagram` | Stable |
+| Class | `classDiagram` | Stable |
+| ER | `erDiagram` | Stable |
+| State | `stateDiagram-v2` | Stable |
+| User Journey | `journey` | Stable |
+| Gantt | `gantt` | Stable |
+| Pie | `pie` / `pie showData` | Stable |
+| Mindmap | `mindmap` | Stable |
+| Timeline | `timeline` | Stable |
+| Git Graph | `gitGraph` | Stable |
+| C4 Context | `C4Context` | Experimental |
+| C4 Container | `C4Container` | Experimental |
+| C4 Component | `C4Component` | Experimental |
+| Architecture | `architecture-beta` | Beta |
+| Block | `block` (legacy: `block-beta`) | Stable |
+| Quadrant | `quadrantChart` | Stable |
+| XY Chart | `xychart` (legacy: `xychart-beta`) | Stable |
+| Sankey | `sankey` (legacy: `sankey-beta`) | Experimental |
+| Kanban | `kanban` | Stable |
+| Packet | `packet` (legacy: `packet-beta`) | Stable |
+| Requirement | `requirementDiagram` | Stable |
+| Treemap | `treemap-beta` | Beta |
+
+Legacy `-beta` aliases still parse in v11; use them only when targeting platforms bundling older Mermaid versions.
 
 ---
 
@@ -330,8 +346,13 @@ a:T --> B:b     Top to bottom
 ## Styling
 
 ### Theme
+
+The init directive must be followed by a diagram — it never stands alone:
+
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
+flowchart LR
+    A --> B
 ```
 Themes: `default`, `dark`, `forest`, `neutral`, `base`
 
@@ -359,7 +380,9 @@ flowchart LR
 
 ---
 
-## Special Characters
+## Special Characters & Reserved Words
+
+Wrap labels containing `( ) [ ] { } : ;` or leading digits in double quotes: `A["Fetch (retry)"]`. Inside quoted labels, escape with entity codes:
 
 | Char | Escape |
 |------|--------|
@@ -369,6 +392,13 @@ flowchart LR
 | `>` | `#gt;` |
 | `{` | `#123;` |
 | `}` | `#125;` |
+
+Reserved-word traps:
+
+- Flowchart node named `end` (lowercase) breaks parsing — use `End` or `e[end]`
+- Flowchart node ID equal to a subgraph ID throws a cycle error — rename the node
+- `o`/`x` directly after `---` become circle/cross arrowheads — add a space or capitalize
+- Comments: `%%` on its own line (not `//` or `#`)
 
 ---
 
@@ -393,6 +423,8 @@ flowchart LR
     'lineColor': '#64748b'
   }
 }}%%
+flowchart LR
+    A --> B
 ```
 
 ---
@@ -419,6 +451,8 @@ flowchart LR
 | Task board | Kanban |
 | Protocol structure | Packet |
 | Requirements | Requirement |
+| Hierarchical proportions | Treemap |
+| Grid component layout | Block |
 
 ---
 
@@ -426,13 +460,15 @@ flowchart LR
 
 | Platform | Status |
 |----------|--------|
-| GitHub | Native |
+| GitHub | Native (markdown, issues, PRs, gists) |
 | GitLab | Native |
-| VS Code | Extension |
+| VS Code | Built-in preview needs an extension (e.g. Markdown Preview Mermaid Support) |
 | Obsidian | Native |
 | Notion | Native |
 | Confluence | Plugin |
-| Docusaurus | Plugin |
+| Docusaurus | Plugin (`@docusaurus/theme-mermaid`) |
+
+Platforms bundle their own Mermaid version, which lags official releases. Core types (flowchart, sequence, class, state, ER, gantt, pie, gitGraph, mindmap, timeline, journey) render everywhere; the newest types (architecture-beta, kanban, packet, treemap, xychart, sankey, block) may not render on a given platform, or may only work under their legacy `-beta` names. Check the bundled version by rendering a code block containing just `info`, or test in the target platform before committing. Export to SVG/PNG (https://mermaid.live) when the platform can't render a needed type.
 
 ---
 

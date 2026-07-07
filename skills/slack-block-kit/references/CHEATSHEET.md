@@ -14,12 +14,15 @@
 | Divider | `divider` | Msg, Modal, Home | No fields |
 | Context | `context` | Msg, Modal, Home | 10 elements (text + image) |
 | Actions | `actions` | Msg, Modal, Home | 25 elements |
-| Alert | `alert` | Msg | Status/risk callout. Levels: default/info/warning/error/success |
-| Card | `card` | Msg | Compact preview. Title/subtitle 150 chars, body 200 chars |
+| Alert | `alert` | Modal only | 200 chars. Levels: default/info/warning/error/success |
+| Card | `card` | Msg | Title/subtitle 150, body/subtext 200 chars, max 3 buttons |
 | Carousel | `carousel` | Msg | 1-10 card elements |
+| Container | `container` | Msg | Title 150 chars (plain_text), max 10 child blocks, collapsible |
 | Image | `image` | Msg, Modal, Home | alt_text required, png/jpg/gif |
 | Rich Text | `rich_text` | Msg, Modal, Home | Nested sub-elements |
-| Table | `table` | Msg only | 100 rows, 20 cols, 1/msg. First row = header. Rows are arrays of `raw_text`/`rich_text` cells. No `columns` prop |
+| Table | `table` | Msg only | 100 rows, 20 cols. 10K chars/table and per msg. First row = header. Rows are flat cell arrays. No `columns` prop |
+| Data Table | `data_table` | Msg only | `caption` required. Header + 1-100 rows, 20 cols, page_size 1-100 (default 5). Sortable/paginated |
+| Data Visualization | `data_visualization` | Msg only | Title ≤50. pie/bar/area/line. 1-12 series/segments, 1-20 points, labels ≤20 |
 | Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD incl. tables, task lists, dividers, syntax-highlighted code |
 | Context Actions | `context_actions` | Msg only | 5 elements |
 | Input | `input` | Modal, Msg, Home | label required, many element types |
@@ -68,6 +71,7 @@
 | Conversation Filter | Conversation select menus (via `filter`) |
 | Dispatch Action Config | plain_text_input, rich_text_input |
 | Slack File | Image block/element (via `slack_file`) |
+| Slack Icon | Card block (via `slack_icon`) |
 | Trigger | Workflow button (via `workflow.trigger`) |
 | Workflow | Workflow button (wraps trigger object) |
 
@@ -119,10 +123,15 @@
 | Header text | 150 chars |
 | Context elements | 10 |
 | Actions elements | 25 |
-| Card title / subtitle / body | 150 / 150 / 200 chars |
+| Alert text | 200 chars (modals only) |
+| Card title / subtitle / body / subtext | 150 / 150 / 200 / 200 chars |
+| Card action buttons | 3 |
 | Carousel cards | 1-10 |
+| Container child blocks / title | 10 / 150 chars |
 | Table rows / cols | 100 / 20 |
-| Tables per message | 1 |
+| Table cell chars (per table & per msg) | 10,000 |
+| Data table rows | header + 100 |
+| Data viz series/segments / points | 1-12 / 1-20 |
 | Modal title | 24 chars |
 | Modal views stack | 3 |
 | Button text | 75 chars |
@@ -131,6 +140,21 @@
 | Overflow options | 5 |
 | Placeholder text | 150 chars |
 | File input max size | 10MB per file |
+| Streaming chunk fields (task/plan update) | 256 chars |
+
+---
+
+## Streaming (chat.startStream / appendStream / stopStream)
+
+| What | Detail |
+|------|--------|
+| Scope | `chat:write` |
+| Start requires | `channel`, `thread_ts` (+ `recipient_user_id`, `recipient_team_id` for channels) |
+| Chunk types | `markdown_text`, `task_update`, `plan_update`, `blocks` |
+| `task_display_mode` | `timeline` (default), `plan`, `dense` |
+| Blocks per chunk array | 50 (extras dropped with warning) |
+| stopStream final `blocks` | Separate 50-block limit → 100 total |
+| Rate limits | start/stop Tier 2 (20+/min), append Tier 4 (100+/min) |
 
 ---
 

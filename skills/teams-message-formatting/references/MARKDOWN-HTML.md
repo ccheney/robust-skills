@@ -1,31 +1,38 @@
 # Teams Markdown And HTML Reference
 
-Teams formatting depends on the message surface. This file details the text systems that are most often confused.
+Teams formatting depends on the message surface. This file details the text systems that are most often confused. For mention markup see [MENTIONS.md](MENTIONS.md); for Graph HTML see [GRAPH-CHATMESSAGE.md](GRAPH-CHATMESSAGE.md).
 
 ## Bot Activity Text
 
-Bot Framework activities can set `textFormat`:
+Bot Framework activities can set `textFormat` (defaults to `markdown`):
 
 | `textFormat` | Meaning | Use |
 |--------------|---------|-----|
-| `plain` | Raw text | Untrusted or literal text |
+| `plain` | Raw text, no formatting applied | Untrusted or literal text |
 | `markdown` | Teams-supported Markdown subset | Normal bot replies |
 | `xml` | Simple XML/HTML markup | Specific rich text requirements |
 
-### Bot Markdown
+### Bot Markdown Per-Platform Support
 
-Supported style varies by client. Stay conservative:
+Support differs by platform, so a message that looks fine on desktop can degrade on mobile:
 
-| Style | Syntax | Notes |
-|-------|--------|-------|
-| Bold | `**bold**` | Supported in text-only bot messages |
-| Italic | `_italic_` or `*italic*` | Prefer underscore when adjacent to words |
-| Strikethrough | `~~text~~` | Not reliable on every client |
-| Link | `[text](https://example.com)` | Prefer explicit links |
-| Preformatted | Indented or fenced text | Use short snippets |
-| Blockquote | `> quote` | Supported for simple quotes |
+| Style | Syntax | Desktop | iOS | Android |
+|-------|--------|---------|-----|---------|
+| Bold | `**bold**` | Yes | Yes | Yes |
+| Italic | `_italic_` or `*italic*` | Yes | Yes | Yes |
+| Strikethrough | `~~text~~` | Yes | Yes | No |
+| Link | `[text](https://example.com)` | Yes | Yes | Yes |
+| Preformatted text | Indented/fenced text | Yes | Yes | Yes |
+| Blockquote | `> quote` | Yes | Yes | Yes |
+| Unordered list | `- item` | Yes | No | No |
+| Ordered list | `1. item` | Yes | No | No |
+| Heading (1-3) | `# Heading` | No | No | No |
+| Horizontal rule | `---` | No | No | No |
+| Image link | `![alt](url)` | No | No | No |
 
-Avoid Markdown tables, images, headings, and horizontal rules in bot text. Use an Adaptive Card for layout.
+Text-only bot messages don't support table formatting on any platform. When you need lists on mobile, headings, or tables, send an Adaptive Card instead.
+
+Bot messages have an approximate 100 KB limit including mentions and reactions; keep the message itself under 80 KB or the send fails with `413` / `MessageSizeTooBig`.
 
 ### Bot XML / HTML Subset
 
@@ -33,9 +40,9 @@ Use XML/HTML for surfaces that accept simple markup:
 
 | Style | XML/HTML |
 |-------|----------|
-| Bold | `<strong>text</strong>` |
+| Bold | `<strong>text</strong>` (unreliable in hero/thumbnail cards; see below) |
 | Italic | `<em>text</em>` |
-| Header | `<h1>Title</h1>`, `<h2>Title</h2>`, `<h3>Title</h3>` |
+| Header (levels 1-3) | `<h1>Title</h1>`, `<h2>Title</h2>`, `<h3>Title</h3>` |
 | Strikethrough | `<strike>text</strike>` |
 | Unordered list | `<ul><li>One</li><li>Two</li></ul>` |
 | Ordered list | `<ol><li>One</li><li>Two</li></ol>` |
@@ -43,17 +50,17 @@ Use XML/HTML for surfaces that accept simple markup:
 | Blockquote | `<blockquote>text</blockquote>` |
 | Link | `<a href="https://example.com">text</a>` |
 
-Do not put unescaped user text inside tags. HTML support differs between Teams desktop, browser, iOS, and Android.
+Do not put unescaped user text inside tags. HTML rendering differs between Teams desktop, browser, iOS, and Android.
 
 ## Adaptive Card Markdown
 
-Adaptive Cards do not use full Markdown. Teams supports Markdown in:
+Adaptive Cards do not use full Markdown. Teams supports Markdown only in:
 
 - `TextBlock.text`
 - `Fact.title`
 - `Fact.value`
 
-HTML is not supported in Adaptive Cards.
+HTML is never supported in Adaptive Cards.
 
 ### Supported
 
@@ -65,49 +72,53 @@ HTML is not supported in Adaptive Cards.
 | Ordered list | `1. Green\r2. Orange\r3. Blue` |
 | Link | `[Title](https://example.com)` |
 
-Use `\r` or `\n` for newlines in lists. Outside lists, use `\n\n` for paragraph breaks.
+Newlines: use `\r` or `\n` between list items. Outside lists, use `\n\n` for breaks. Inside a list, `\n\n` indents the next item instead of breaking — stick to `\r` there.
 
-### Unsupported
+### Unsupported (use elements instead)
 
 | Need | Use instead |
 |------|-------------|
-| Heading | `TextBlock` with `size`, `weight`, and optional `style: "heading"` |
+| Heading | `TextBlock` with `size`, `weight`, and `style: "heading"` |
 | Table | Adaptive Card `Table` element |
 | Image | Adaptive Card `Image` element |
-| Code block | Adaptive Card `CodeBlock` element when available |
+| Code block | Adaptive Card `CodeBlock` element |
 | Blockquote | `Container` with subtle styling or plain text |
 | HTML | Adaptive Card properties and Markdown only |
+
+Markdown is also not supported in bot OAuth sign-in cards.
 
 ### Example
 
 ```json
 {
   "type": "TextBlock",
-  "text": "**Build failed**\n\n- API timeout\r- Database migration pending\r\n\n[Open run](https://example.com/run/123)",
+  "text": "**Build failed**\n\n- API timeout\r- Database migration pending\n\n[Open run](https://example.com/run/123)",
   "wrap": true
 }
 ```
 
-## Connector MessageCard Text
+## Legacy Connector MessageCard Text
 
-MessageCard is a legacy connector/actionable message format. It supports basic Markdown in text fields and limited HTML in some contexts. Use it only when maintaining an existing connector or when the target workflow explicitly requires MessageCard.
+MessageCard was the legacy O365 connector/actionable-message format. The connector retirement completed in May 2026: `webhook.office.com` connector webhooks no longer accept posts. Workflows webhooks still accept MessageCard-formatted payloads for migration continuity, but action buttons don't render — only the text content.
 
-For new Teams integrations, prefer:
+Touch MessageCard syntax only when reading or migrating an existing payload. It supported basic Markdown (`**bold**`, `*italic*`, `### headings`, `~~strikethrough~~`, lists, `>` blockquotes, links, image links) and a limited HTML equivalent, with `\n\n` for newlines.
 
-- Notification bot plus Adaptive Card
+For anything new, use:
+
 - Workflows webhook that posts an Adaptive Card
+- Notification bot plus Adaptive Card
 - Bot Framework/Teams SDK message with Adaptive Card attachment
 
-## Simple Cards
+## Simple Cards (Hero/Thumbnail)
 
-Hero and thumbnail card text can support limited XML/HTML in the `text` property. Formatting is not supported in `title` or `subtitle`. Rich cards do not support Markdown or table formatting.
+Hero and thumbnail card `text` supports the XML/HTML subset above. No formatting is supported in `title` or `subtitle`, and rich cards do not support Markdown or table formatting.
 
-Use simple cards sparingly; Adaptive Cards are the preferred structured surface for new Teams work.
+Cross-platform caveats for rich-card XML: bold is not reliably rendered, and iOS drops bold and italic entirely. Prefer Adaptive Cards for any new structured content.
 
 ## Rendering Checklist
 
 - Keep message text short enough to be useful in notifications.
-- Test Adaptive Cards on desktop and mobile when layout matters.
-- Prefer explicit elements over formatting syntax for layout.
-- Keep URLs valid and encoded.
+- Test on desktop and mobile when layout matters; the platform tables above are the reason.
+- Prefer explicit card elements over formatting syntax for layout.
+- Keep URLs absolute, valid, and encoded.
 - Do not use Slack mrkdwn syntax anywhere in Teams payloads.

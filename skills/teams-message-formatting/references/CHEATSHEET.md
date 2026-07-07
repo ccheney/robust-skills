@@ -1,31 +1,35 @@
 # Teams Message Formatting Cheatsheet
 
-Use this when you need exact syntax quickly. For edge cases, read the surface-specific reference.
+Use this when you need exact syntax quickly. For edge cases, read the surface-specific reference: [MARKDOWN-HTML.md](MARKDOWN-HTML.md), [MENTIONS.md](MENTIONS.md), [GRAPH-CHATMESSAGE.md](GRAPH-CHATMESSAGE.md).
 
 ## Surface Matrix
 
 | Surface | Payload field | Markup | Good for | Avoid |
 |---------|---------------|--------|----------|-------|
-| Bot activity text | `text`, optional `textFormat` | `plain`, `markdown`, or `xml` | Conversational replies, links, simple emphasis, mentions | Tables, complex layout |
+| Bot activity text | `text`, optional `textFormat` | `plain`, `markdown` (default), or `xml` | Conversational replies, links, simple emphasis, mentions | Tables, headings, layout; lists on mobile |
 | Adaptive Card text | `TextBlock.text`, `Fact.title`, `Fact.value` | Limited Markdown | Rich notifications, facts, short summaries | HTML, full Markdown |
-| Graph chatMessage | `body.content`, `body.contentType` | `text` or Teams-restricted `html` | User-delegated Teams messages, mentions, attachment placeholders | App-only notification bots |
-| Incoming Webhook / Workflows | Message wrapper containing card | Adaptive Card or MessageCard depending flow | External notifications | Connector-only legacy assumptions |
-| Hero/thumbnail cards | `text` property | XML/HTML subset | Simple cards | Markdown in title/subtitle |
+| Graph chatMessage | `body.content` with `body.contentType` | `text` or Teams-restricted `html` | Delegated user sends, mentions, emoji, code blocks, attachments | App-only notification sending |
+| Workflows webhook | `attachments` array wrapping a card | Adaptive Card JSON | External service notifications into a channel/chat | MessageCard except legacy payloads (buttons don't render) |
+| Hero/thumbnail cards | `text` property | XML/HTML subset | Simple cards | Markdown; any formatting in `title`/`subtitle` |
+
+Legacy O365 connector Incoming Webhooks (`webhook.office.com` URLs) stopped working with the May 2026 retirement. Anything new goes through a Workflows webhook or a bot.
 
 ## Adaptive Card Markdown
 
 | Need | Use | Not |
 |------|-----|-----|
-| Bold | `**bold**` | `*bold*` |
+| Bold | `**bold**` | `<b>`, `<strong>` |
 | Italic | `_italic_` | HTML tags |
-| Link | `[text](https://example.com)` | `<https://example.com|text>` |
+| Link | `[text](https://example.com)` | `<https://example.com\|text>` |
 | Bullet list | `- Item 1\r- Item 2` | HTML lists |
 | Ordered list | `1. First\r2. Second` | Markdown tables |
-| Heading | `TextBlock` with `size`/`weight` | `# Heading` |
-| Code | `CodeBlock` element where supported | Triple backticks in `TextBlock` |
-| Table | `Table` element where supported | Markdown table |
+| Heading | `TextBlock` with `size`/`weight`/`style: "heading"` | `# Heading` |
+| Code | `CodeBlock` element | Triple backticks in `TextBlock` |
+| Table | `Table` element | Markdown table |
 
-Unsupported in Adaptive Card Markdown: headings, tables, images, preformatted text, and blockquotes.
+Unsupported in Adaptive Card Markdown: headings, tables, images, preformatted text, blockquotes, and all HTML.
+
+Newlines: `\r` or `\n` between list items; `\n\n` for breaks outside lists. `\n\n` inside a list indents the next item instead of breaking.
 
 ## Bot Text Markdown
 
@@ -37,7 +41,7 @@ Unsupported in Adaptive Card Markdown: headings, tables, images, preformatted te
 }
 ```
 
-Keep bot text Markdown simple. Support varies by client and message type; use Adaptive Cards for structured layout.
+Safe everywhere: bold, italic, links, preformatted text, blockquotes. Lists render on desktop only; strikethrough is missing on Android; headings, horizontal rules, tables, and image links never render. Use an Adaptive Card for structured layout.
 
 ## Bot XML / HTML Subset
 
@@ -49,7 +53,7 @@ Keep bot text Markdown simple. Support varies by client and message type; use Ad
 }
 ```
 
-Use XML/HTML mainly when required by a card type or SDK path. Escape user content before insertion.
+Use XML only when a card type or existing integration requires it. Escape user content before insertion.
 
 ## Graph chatMessage HTML
 
@@ -62,7 +66,20 @@ Use XML/HTML mainly when required by a card type or SDK path. Escape user conten
 }
 ```
 
-Graph body HTML is Teams-restricted. Use semantic inline tags and paragraphs; avoid CSS layout, scripts, and arbitrary web HTML.
+Graph body HTML is Teams-restricted. Use paragraphs, line breaks, semantic inline tags, links, and the Teams-specific tags (`<at>`, `<attachment>`, `<emoji>`, `<codeblock>`); avoid `<div>`, inline styles, scripts, and layout CSS.
+
+Code block:
+
+```json
+{
+  "body": {
+    "contentType": "html",
+    "content": "<codeblock class=\"json\"><code>{ \"status\": \"passed\" }</code></codeblock>"
+  }
+}
+```
+
+Empty or missing `class` means plaintext; a language name (`json`, `python`, `bash`, ...) enables highlighting on render.
 
 ## Mentions
 
@@ -70,9 +87,9 @@ Graph body HTML is Teams-restricted. Use semantic inline tags and paragraphs; av
 |---------|--------------|----------|
 | Bot text | `<at>Ada Lovelace</at>` | Activity `entities` item with `type: "mention"` |
 | Adaptive Card | `<at>Ada Lovelace</at>` inside `TextBlock`/`FactSet` | Root `msteams.entities` mention |
-| Graph chatMessage | `<at id="0">Ada Lovelace</at>` | `mentions[0]` with matching `id` |
+| Graph chatMessage | `<at id="0">Ada Lovelace</at>` | `mentions[0]` with matching numeric `id` |
 
-The visible mention text and metadata must match exactly. Prefer stable IDs over display names.
+The visible mention text and metadata `text`/`mentionText` must match exactly. IDs can be a Teams user ID (`29:...`), Entra Object ID, or UPN. Details and tag/team/channel mentions: [MENTIONS.md](MENTIONS.md).
 
 ## Graph Adaptive Card Attachment Placeholder
 
@@ -87,13 +104,35 @@ The visible mention text and metadata must match exactly. Prefer stable IDs over
       "id": "card-1",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
-      "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Hello\",\"wrap\":true}]}"
+      "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.5\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Hello\",\"wrap\":true}]}"
     }
   ]
 }
 ```
 
-Graph card `content` is commonly a JSON string. The body must contain a matching `<attachment id="..."></attachment>` placeholder.
+Graph card `content` is a JSON *string*, not an object. The body must contain a matching `<attachment id="..."></attachment>` placeholder.
+
+## Workflows Webhook Payload
+
+```json
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "content": {
+        "type": "AdaptiveCard",
+        "version": "1.5",
+        "body": [
+          { "type": "TextBlock", "text": "**Deploy complete**", "wrap": true }
+        ]
+      }
+    }
+  ]
+}
+```
+
+Unlike Graph, the Workflows `content` is a JSON object. Messages post as the Flow bot; sender name/icon customization isn't available.
 
 ## Escaping
 
@@ -111,5 +150,5 @@ When uncertain:
 1. Use Adaptive Cards for structured notifications.
 2. Use bot text Markdown for short conversational replies.
 3. Use Graph HTML only when the integration is explicitly Microsoft Graph and delegated send is acceptable.
-4. Use Workflows or notification bots for service notifications.
-5. Avoid new MessageCard/connector designs unless maintaining existing legacy payloads.
+4. Use Workflows webhooks or notification bots for service notifications.
+5. Never start a new MessageCard/connector design; those endpoints are retired.

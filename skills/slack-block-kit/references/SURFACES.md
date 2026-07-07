@@ -8,6 +8,18 @@
 > - [Lists](https://docs.slack.dev/surfaces/lists) — Slack
 > - [Split View](https://docs.slack.dev/surfaces/split-view) — Slack
 > - [App Design](https://docs.slack.dev/surfaces/app-design) — Slack
+> - [Modal views](https://docs.slack.dev/reference/views/modal-views) — Slack
+
+## Table of Contents
+
+- [Overview](#overview)
+- [1. Messages](#1-messages)
+- [2. Modals](#2-modals) — view object, response actions, `view.state.values` paths
+- [3. App Home](#3-app-home)
+- [4. Canvases](#4-canvases)
+- [5. Lists](#5-lists)
+- [6. Split View](#6-split-view)
+- [App Design Best Practices](#app-design-best-practices)
 
 ---
 
@@ -51,7 +63,9 @@ The primary output surface. Apps send messages via:
 {
   "channel": "C0123ABC",
   "text": "Fallback text for notifications",
-  "blocks": [ /* Block Kit blocks */ ],
+  "blocks": [
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*Deploy complete* — all checks passed." } }
+  ],
   "thread_ts": "1234567890.123456",
   "mrkdwn": true
 }
@@ -165,7 +179,10 @@ Published via `views.publish`. Supports full Block Kit (100 blocks).
 ```json
 {
   "type": "home",
-  "blocks": [ /* Block Kit blocks */ ],
+  "blocks": [
+    { "type": "header", "text": { "type": "plain_text", "text": "Welcome back!" } },
+    { "type": "section", "text": { "type": "mrkdwn", "text": "You have *3 open tasks*." } }
+  ],
   "private_metadata": "optional context string",
   "callback_id": "home_view",
   "external_id": "unique_per_team"

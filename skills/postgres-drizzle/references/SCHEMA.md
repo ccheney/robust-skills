@@ -1,6 +1,28 @@
 # Drizzle Schema Definition
 
-Comprehensive reference for defining PostgreSQL schemas with Drizzle ORM.
+Comprehensive reference for defining PostgreSQL schemas with Drizzle ORM
+(stable 0.x syntax — see [RELATIONS.md](RELATIONS.md) for the v1.0 changes,
+which affect relations/queries but not the column/constraint syntax below).
+
+## Contents
+
+- [Column Types](#column-types)
+- [Primary Keys](#primary-keys)
+- [String Types](#string-types)
+- [Numeric Types](#numeric-types)
+- [Date/Time Types](#datetime-types)
+- [JSON/JSONB](#jsonjsonb)
+- [Enums](#enums)
+- [Arrays](#arrays)
+- [Constraints](#constraints)
+- [Foreign Keys](#foreign-keys)
+- [Indexes](#indexes)
+- [Composite Primary Key](#composite-primary-key)
+- [Timestamps Pattern](#timestamps-pattern)
+- [Soft Delete Pattern](#soft-delete-pattern)
+- [Multi-Tenant Pattern](#multi-tenant-pattern)
+- [Generated Columns](#generated-columns)
+- [Schema Organization](#schema-organization)
 
 ---
 
@@ -56,7 +78,11 @@ id: uuid('id').primaryKey().defaultRandom(),
 id: uuid('id').primaryKey().default(sql`uuidv7()`),
 ```
 
-### Identity (PostgreSQL Preferred over Serial)
+### Identity (Preferred over Serial for Integer PKs)
+
+PostgreSQL recommends identity columns over `serial`: they are SQL-standard,
+own their sequence (dropped with the column), and `GENERATED ALWAYS` prevents
+accidental manual inserts into the ID column.
 
 ```typescript
 // GENERATED ALWAYS AS IDENTITY
@@ -75,7 +101,7 @@ id: integer('id').primaryKey().generatedAlwaysAsIdentity({
 }),
 ```
 
-### Serial (Legacy)
+### Serial (Legacy — avoid in new schemas)
 
 ```typescript
 id: serial('id').primaryKey(),        // 4 bytes, 1 to 2,147,483,647
@@ -86,6 +112,9 @@ id: smallserial('id').primaryKey(),   // 2 bytes, 1 to 32,767
 ---
 
 ## String Types
+
+In PostgreSQL, `text` and `varchar` have identical performance — use `text`
+unless you want the database to enforce a maximum length.
 
 ```typescript
 // Unlimited length (most common)
@@ -386,18 +415,27 @@ export const orderItems = pgTable('order_items', {
 
 ### Index Types
 
+Non-btree methods use `.using(method, ...columns)` — the method comes first,
+columns/expressions after (there is no `.on(col).using(method)` chaining).
+
 ```typescript
 // B-tree (default)
 index('idx').on(table.column),
 
 // Hash (equality only)
-index('idx').on(table.column).using('hash'),
+index('idx').using('hash', table.column),
 
 // GIN (arrays, JSONB, full-text)
-index('idx').on(table.data).using('gin'),
+index('idx').using('gin', table.data),
 
-// GiST (geometric, full-text, range)
-index('idx').on(table.location).using('gist'),
+// GIN with operator class (smaller/faster for JSONB containment-only)
+index('idx').using('gin', table.data.op('jsonb_path_ops')),
+
+// GiST (geometric, range, exclusion)
+index('idx').using('gist', table.location),
+
+// GIN over an expression (full-text without a stored tsvector column)
+index('idx').using('gin', sql`to_tsvector('english', ${table.title})`),
 ```
 
 ---
@@ -500,22 +538,35 @@ export const users = pgTable('users', {
 
 ### Stored (Computed at Write)
 
+Drizzle's `generatedAlwaysAs()` emits `GENERATED ALWAYS AS (...) STORED` for
+PostgreSQL. Reference sibling columns via a `(): SQL =>` thunk so the table can
+refer to itself:
+
 ```typescript
+import { SQL, sql } from 'drizzle-orm';
+
 export const products = pgTable('products', {
   id: uuid('id').primaryKey().defaultRandom(),
   price: numeric('price', { precision: 10, scale: 2 }).notNull(),
   taxRate: numeric('tax_rate', { precision: 5, scale: 4 }).notNull(),
   totalPrice: numeric('total_price', { precision: 10, scale: 2 })
-    .generatedAlwaysAs(sql`price * (1 + tax_rate)`),
+    .generatedAlwaysAs((): SQL => sql`${products.price} * (1 + ${products.taxRate})`),
 });
 ```
 
+A common use is a `tsvector` column for full-text search — see
+[POSTGRES.md](POSTGRES.md#full-text-search).
+
 ### Virtual (PostgreSQL 18+, Computed at Read)
 
-```typescript
-// Virtual columns are not stored on disk
-displayPrice: text('display_price')
-  .generatedAlwaysAs(sql`price::text || ' USD'`),
+PostgreSQL 18 adds `VIRTUAL` generated columns (computed at read, not stored,
+cannot be indexed). Drizzle's pg-core only generates the `STORED` form — to use
+virtual columns, write the DDL in a custom migration
+(`drizzle-kit generate --custom`):
+
+```sql
+ALTER TABLE products
+  ADD COLUMN display_price text GENERATED ALWAYS AS (price::text || ' USD') VIRTUAL;
 ```
 
 ---

@@ -30,7 +30,9 @@
 }
 ```
 
-### Incoming Webhook / Workflows Webhook
+### Workflows Webhook
+
+Same wrapper the retired Incoming Webhook connectors used (O365 connectors stopped working May 2026 — see [WEBHOOKS-WORKFLOWS.md](WEBHOOKS-WORKFLOWS.md)):
 
 ```json
 {
@@ -47,15 +49,17 @@
 
 ### Microsoft Graph chatMessage
 
+Card content is a JSON **string**; attachment `id` (GUID by convention) must match the body placeholder:
+
 ```json
 {
   "body": {
     "contentType": "html",
-    "content": "<attachment id=\"card-1\"></attachment>"
+    "content": "<attachment id=\"74d20c7f-34aa-4a7f-b74e-2b30004247c5\"></attachment>"
   },
   "attachments": [
     {
-      "id": "card-1",
+      "id": "74d20c7f-34aa-4a7f-b74e-2b30004247c5",
       "contentType": "application/vnd.microsoft.card.adaptive",
       "contentUrl": null,
       "content": "{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"body\":[]}"
@@ -68,13 +72,13 @@
 
 | Version | Use When | Teams Risk |
 |---------|----------|------------|
-| `1.0` | Very old compatibility | Lacks modern accessibility/input features |
-| `1.2` | Default broad Teams/mobile compatibility | Safest default |
-| `1.3` | Need input `label`, associated inputs, better accessibility | Test clients |
-| `1.4` | Need `Action.Execute`, refresh, authentication | Bot-backed only |
-| `1.5` | Need Table, CodeBlock, tooltip, newer behavior | Verify Teams clients/mobile |
+| `1.2` | Default broad Teams/mobile compatibility | Safest default; Teams mobile reliably supports up to 1.2 |
+| `1.3` | Need input `label`, `isRequired`/`errorMessage` | Test clients |
+| `1.4` | Need `Action.Execute`, `refresh`, `authentication` | Bot-backed only |
+| `1.5` | Need Table, CodeBlock, charts, Icon, `targetWidth`, dynamic typeahead | Verify Teams clients/mobile; add `fallback` |
+| `1.6` | Never for Teams | Not supported by Teams (mobile SDK-only release) |
 
-Default to `1.2` unless a feature requires a later version.
+Default to `1.2` unless a feature requires a later version. Newer Teams elements (charts, Icon, CompoundButton, CodeBlock) ship as `"version": "1.5"` payloads gated by host capability.
 
 ## Common Elements
 
@@ -82,16 +86,19 @@ Default to `1.2` unless a feature requires a later version.
 |---------|---------|-------|
 | `TextBlock` | Text, headings, short prose | Use `wrap: true` |
 | `RichTextBlock` | Inline text runs with styles | More predictable than Markdown for mixed styling |
-| `FactSet` | Compact key-value facts | Good for metadata |
-| `Image` | Public image URL or supported data URI path | Always include `altText` |
+| `FactSet` | Compact key-value facts | Markdown works in title/value |
+| `Image` | Public image URL | Always include `altText`; max 1024x1024, 1 MB; no animated GIF/SVG |
 | `ImageSet` | Multiple related images | Keep small |
 | `Container` | Group content with spacing/style/selectAction | Avoid nested visual clutter |
-| `ColumnSet` | Horizontal layout | Keep mobile narrow; avoid many columns |
-| `Table` | Structured rows/columns | Requires newer support; consider FactSet first |
+| `ColumnSet` | Horizontal layout | Keep mobile narrow; max ~3 columns |
+| `Table` | Structured rows/columns | v1.5; consider FactSet first |
 | `ActionSet` | Inline action group | Use sparingly inside body |
-| `CodeBlock` | Code snippets | Requires newer support; include language |
+| `CodeBlock` | Code snippets | v1.5; Teams web/desktop only; include `language` |
+| `Chart.*` | Donut, pie, gauge, bar, line charts | v1.5; provide `fallback` |
+| `Icon` | Fluent icon by name | v1.5 |
+| `CompoundButton` | Icon + title + description button | v1.5 |
 | `Input.Text` | Text entry | Requires submit/execute action |
-| `Input.ChoiceSet` | Dropdown/radio/multi-select | Use compact for long lists |
+| `Input.ChoiceSet` | Dropdown/radio/multi-select/people picker | `choices.data` `Data.Query` for people picker |
 | `Input.Date` / `Input.Time` | Date/time entry | Values are local/input-specific |
 | `Input.Toggle` | Boolean | Use clear title |
 
@@ -105,15 +112,15 @@ Adaptive Card Markdown supports only:
 - `1. ordered` with `\r` or `\n`
 - `[link](url)`
 
-Unsupported in `TextBlock`: headings, tables, images, preformatted text, and blockquotes.
+Unsupported in `TextBlock`: headings, tables, images, preformatted text, blockquotes, and HTML.
 
 ## Actions
 
 | Action | Best Surface | Notes |
 |--------|--------------|-------|
 | `Action.OpenUrl` | All notification surfaces | Safest, no backend invoke |
-| `Action.Submit` | Bot-backed cards | Sends input to bot; no webhook backend |
-| `Action.Execute` | Universal Actions | Requires bot invoke handling |
+| `Action.Submit` | Bot-backed cards | Explicitly unsupported in webhook cards; `isEnabled` unsupported in Teams |
+| `Action.Execute` | Universal Actions (v1.4+) | Requires bot `adaptiveCard/action` invoke handling |
 | `Action.ToggleVisibility` | Local details | No backend call |
 | `Action.ShowCard` | Small secondary input/details | Test mobile |
 
@@ -129,7 +136,7 @@ Teams ignores positive/destructive action styling. Do not rely on action color f
 }
 ```
 
-Root metadata:
+Root metadata (`mentioned.id` accepts the Teams user MRI, Entra object ID, or UPN):
 
 ```json
 {
@@ -138,12 +145,14 @@ Root metadata:
       {
         "type": "mention",
         "text": "<at>Ada Lovelace</at>",
-        "mentioned": { "id": "29:user-id", "name": "Ada Lovelace" }
+        "mentioned": { "id": "ada.lovelace@contoso.com", "name": "Ada Lovelace" }
       }
     ]
   }
 }
 ```
+
+Mentions work in `TextBlock` and `FactSet` title/value. Channel and team mentions are not supported inside bot Adaptive Cards; webhook cards support user mentions only.
 
 ## Root `msteams` Properties
 
@@ -152,21 +161,33 @@ Root metadata:
 | `msteams.width: "Full"` | Request full-width desktop rendering |
 | `msteams.entities` | Mentions |
 
-Full width does not remove the need to design for mobile, meeting panels, and narrow chat views.
+Full width does not remove the need to design for mobile, meeting panels, and narrow chat views. For per-width layouts, use element-level `targetWidth` (see [RESPONSIVE-DESIGN.md](RESPONSIVE-DESIGN.md)).
+
+## Limits
+
+| Limit | Value |
+|-------|-------|
+| Webhook message size | 28 KB |
+| Bot message size | ~100 KB |
+| `refresh.userIds` (user-specific views) | 60 users |
+| Cards per carousel/list collection | 10 |
+| Inline images | 1024x1024 px, 1 MB, PNG/JPEG/GIF (no animation) |
 
 ## Validate
 
+Run from the skill directory; exit 0 = clean/warnings only, 1 = errors, 2 = usage error:
+
 ```bash
-node skills/teams-adaptive-cards/scripts/check-teams-card.mjs --target card card.json
-node skills/teams-adaptive-cards/scripts/check-teams-card.mjs --target webhook payload.json
-node skills/teams-adaptive-cards/scripts/check-teams-card.mjs --target graph chat-message.json
-node skills/teams-adaptive-cards/scripts/check-teams-card.mjs --target bot activity.json
+node scripts/check-teams-card.mjs --target card card.json
+node scripts/check-teams-card.mjs --target webhook payload.json
+node scripts/check-teams-card.mjs --target graph chat-message.json
+node scripts/check-teams-card.mjs --target bot activity.json
 ```
 
 ## Required Final Checks
 
 - Card has `type: "AdaptiveCard"`.
-- Card has a version appropriate for the needed features.
+- Card version matches the needed features (never above 1.5).
 - Meaningful text has `wrap: true`.
 - Images have `altText`.
 - Interactions have an actual backend.

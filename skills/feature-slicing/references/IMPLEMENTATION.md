@@ -2,7 +2,17 @@
 
 > **Sources:** [Tutorial](https://feature-sliced.design/docs/get-started/tutorial) | [Examples](https://github.com/feature-sliced/examples) | [Awesome FSD](https://github.com/feature-sliced/awesome)
 
-Code patterns for Feature-Sliced Design architecture.
+Complete, working code patterns for a React SPA (Vite + React Router v7 + TanStack Query + Zustand + Zod 4). For Next.js-specific patterns see [NEXTJS.md](NEXTJS.md).
+
+## Table of Contents
+
+- [Entity Pattern](#entity-pattern)
+- [Feature Pattern](#feature-pattern)
+- [Widget Pattern](#widget-pattern)
+- [Page Pattern](#page-pattern)
+- [Shared Layer Pattern](#shared-layer-pattern)
+- [App Layer Pattern](#app-layer-pattern)
+- [TypeScript Configuration](#typescript-configuration)
 
 ---
 
@@ -10,7 +20,7 @@ Code patterns for Feature-Sliced Design architecture.
 
 ### Complete Entity: User
 
-**Model Layer** (`entities/user/model/`):
+**Model segment** (`entities/user/model/`):
 
 ```typescript
 // entities/user/model/types.ts
@@ -57,13 +67,13 @@ import { z } from 'zod';
 
 export const userSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
+  email: z.email('Invalid email address'), // Zod 4: z.email(), not z.string().email()
 });
 
 export type UserFormData = z.infer<typeof userSchema>;
 ```
 
-**API Layer** (`entities/user/api/`):
+**API segment** (`entities/user/api/`):
 
 ```typescript
 // entities/user/api/userApi.ts
@@ -84,8 +94,8 @@ export async function getUserById(id: string): Promise<User> {
 
 ```typescript
 // entities/user/api/queries.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getCurrentUser, getUserById, updateUser } from './userApi';
+import { useQuery } from '@tanstack/react-query';
+import { getCurrentUser, getUserById } from './userApi';
 
 export const userKeys = {
   all: ['users'] as const,
@@ -109,7 +119,7 @@ export function useUser(id: string) {
 }
 ```
 
-**UI Layer** (`entities/user/ui/`):
+**UI segment** (`entities/user/ui/`) — note: no `ui/index.ts`; the slice index is the only barrel:
 
 ```tsx
 // entities/user/ui/UserAvatar.tsx
@@ -144,7 +154,7 @@ export function UserAvatar({ user, size = 'md' }: UserAvatarProps) {
 ```tsx
 // entities/user/ui/UserCard.tsx
 import type { User } from '../model/types';
-import { UserAvatar } from './UserAvatar';
+import { UserAvatar } from './UserAvatar'; // relative import within the slice
 
 interface UserCardProps {
   user: User;
@@ -186,7 +196,7 @@ export { userSchema, type UserFormData } from './model/schema';
 
 ### Complete Feature: Authentication
 
-**Model Layer** (`features/auth/model/`):
+**Model segment** (`features/auth/model/`):
 
 ```typescript
 // features/auth/model/types.ts
@@ -209,7 +219,7 @@ export interface AuthTokens {
 // features/auth/model/store.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User } from '@/entities/user';
+import type { User } from '@/entities/user'; // feature → entity: allowed
 import type { AuthTokens } from './types';
 
 interface AuthState {
@@ -239,7 +249,7 @@ export const useAuthStore = create<AuthState>()(
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.email('Invalid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
@@ -251,7 +261,7 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 ```
 
-**API Layer** (`features/auth/api/`):
+**API segment** (`features/auth/api/`):
 
 ```typescript
 // features/auth/api/authApi.ts
@@ -286,13 +296,14 @@ export async function logout(): Promise<void> {
 }
 ```
 
-**UI Layer** (`features/auth/ui/`):
+**UI segment** (`features/auth/ui/`):
 
 ```tsx
 // features/auth/ui/LoginForm.tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input } from '@/shared/ui';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { loginSchema, type LoginFormData } from '../model/schema';
 import { login } from '../api/authApi';
 import { useAuthStore } from '../model/store';
@@ -336,7 +347,7 @@ export function LoginForm() {
 
 ```tsx
 // features/auth/ui/LogoutButton.tsx
-import { Button } from '@/shared/ui';
+import { Button } from '@/shared/ui/button';
 import { logout } from '../api/authApi';
 import { useAuthStore } from '../model/store';
 
@@ -374,13 +385,15 @@ export { loginSchema, registerSchema } from './model/schema';
 
 ### Header Widget
 
+Widgets compose entities and features — and since v2.1 they may own their own data fetching (e.g. a notification count query in `widgets/header/api/`).
+
 ```tsx
 // widgets/header/ui/Header.tsx
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { UserAvatar } from '@/entities/user';
 import { LogoutButton, useAuthStore } from '@/features/auth';
-import { SearchBox } from '@/features/search';
-import { Logo } from '@/shared/ui';
+import { SearchBox } from '@/features/search-products';
+import { Logo } from '@/shared/ui/logo';
 
 export function Header() {
   const { user, isAuthenticated } = useAuthStore();
@@ -404,7 +417,9 @@ export function Header() {
     </header>
   );
 }
+```
 
+```typescript
 // widgets/header/index.ts
 export { Header } from './ui/Header';
 ```
@@ -415,10 +430,12 @@ export { Header } from './ui/Header';
 
 ### Product Detail Page
 
+Page-local blocks (hero sections, forms used only here) stay in the page's `ui/` — don't extract them until a second page needs them.
+
 ```typescript
 // pages/product-detail/api/loader.ts
 import { getProductById } from '@/entities/product';
-import type { LoaderFunctionArgs } from 'react-router-dom';
+import type { LoaderFunctionArgs } from 'react-router';
 
 export async function productDetailLoader({ params }: LoaderFunctionArgs) {
   const product = await getProductById(params.id!);
@@ -428,9 +445,9 @@ export async function productDetailLoader({ params }: LoaderFunctionArgs) {
 
 ```tsx
 // pages/product-detail/ui/ProductDetailPage.tsx
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData } from 'react-router';
 import { ProductCard, type Product } from '@/entities/product';
-import { AddToCartButton } from '@/features/cart';
+import { AddToCartButton } from '@/features/add-to-cart';
 import { Header } from '@/widgets/header';
 
 export function ProductDetailPage() {
@@ -446,7 +463,9 @@ export function ProductDetailPage() {
     </>
   );
 }
+```
 
+```typescript
 // pages/product-detail/index.ts
 export { ProductDetailPage } from './ui/ProductDetailPage';
 export { productDetailLoader } from './api/loader';
@@ -488,69 +507,85 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+```
 
-// shared/api/index.ts
+```typescript
+// shared/api/index.ts — public API of the segment
 export { apiClient } from './client';
 ```
 
-### UI Components
+### UI Kit — one folder + index per component
+
+No root `shared/ui/index.ts`. Each component is imported directly (`@/shared/ui/button`) so unrelated components never end up in the same module graph.
+
+```
+shared/ui/
+├── button/
+│   ├── Button.tsx
+│   └── index.ts
+└── input/
+    ├── Input.tsx
+    └── index.ts
+```
 
 ```tsx
-// shared/ui/Button.tsx
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
+// shared/ui/button/Button.tsx
+import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
   loading?: boolean;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', loading, children, disabled, ...props }, ref) => {
-    const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
-      secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-      ghost: 'text-gray-600 hover:bg-gray-100',
-    };
+// React 19: ref is a regular prop — no forwardRef needed.
+// On React ≤18, wrap with forwardRef instead.
+export function Button({ variant = 'primary', loading, children, disabled, ...props }: ButtonProps) {
+  const variants = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+    ghost: 'text-gray-600 hover:bg-gray-100',
+  };
 
-    return (
-      <button
-        ref={ref}
-        disabled={disabled || loading}
-        className={`px-4 py-2 rounded-lg font-medium ${variants[variant]} disabled:opacity-50`}
-        {...props}
-      >
-        {loading ? 'Loading...' : children}
-      </button>
-    );
-  }
-);
+  return (
+    <button
+      disabled={disabled || loading}
+      className={`px-4 py-2 rounded-lg font-medium ${variants[variant]} disabled:opacity-50`}
+      {...props}
+    >
+      {loading ? 'Loading…' : children}
+    </button>
+  );
+}
 ```
 
 ```tsx
-// shared/ui/Input.tsx
-import { forwardRef, type InputHTMLAttributes } from 'react';
+// shared/ui/input/Input.tsx
+import type { InputHTMLAttributes } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ error, className, ...props }, ref) => (
+export function Input({ error, className, ...props }: InputProps) {
+  return (
     <div>
       <input
-        ref={ref}
         className={`w-full px-3 py-2 border rounded-lg ${
           error ? 'border-red-500' : 'border-gray-300'
-        } ${className}`}
+        } ${className ?? ''}`}
         {...props}
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
-  )
-);
+  );
+}
+```
 
-// shared/ui/index.ts
+```typescript
+// shared/ui/button/index.ts
 export { Button } from './Button';
+
+// shared/ui/input/index.ts
 export { Input } from './Input';
 ```
 
@@ -562,8 +597,6 @@ export { Input } from './Input';
 
 ```tsx
 // app/providers/index.tsx
-'use client';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './ThemeProvider';
 
@@ -582,11 +615,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### Router Configuration
+### Router Configuration (React Router v7)
 
 ```tsx
 // app/routes/router.tsx
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router';
 import { HomePage } from '@/pages/home';
 import { ProductDetailPage, productDetailLoader } from '@/pages/product-detail';
 import { LoginPage } from '@/pages/login';
@@ -602,6 +635,8 @@ export const router = createBrowserRouter([
 ]);
 ```
 
+React Router v7 merged `react-router-dom` into `react-router` — on v6, import from `react-router-dom` instead.
+
 ---
 
 ## TypeScript Configuration
@@ -616,4 +651,3 @@ export const router = createBrowserRouter([
   }
 }
 ```
-

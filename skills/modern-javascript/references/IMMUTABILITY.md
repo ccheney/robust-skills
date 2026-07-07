@@ -138,23 +138,25 @@ function saveUser(user) {
 ### Purifying Impure Functions
 
 ```javascript
-// Impure: Depends on Date
+// ❌ Impure: Depends on Date
 function isExpired(token) {
   return token.expiresAt < Date.now();  // Non-deterministic
 }
 
-// Pure: Inject current time
+// ❌ Impure: Random + mutates
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);  // Mutates!
+}
+```
+
+```javascript
+// ✅ Pure: Inject current time
 function isExpired(token, now) {
   return token.expiresAt < now;
 }
 isExpired(token, Date.now());
 
-// Impure: Random + mutates
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);  // Mutates!
-}
-
-// Pure: Inject randomness + non-mutating (ES2023)
+// ✅ Pure: Inject randomness + non-mutating (ES2023)
 function shuffle(array, random = Math.random) {
   return array.toSorted(() => random() - 0.5);
 }

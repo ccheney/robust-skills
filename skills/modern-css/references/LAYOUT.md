@@ -10,6 +10,18 @@
 
 Modern CSS provides four layout primitives: **Grid** for 2D structure, **Flexbox** for 1D alignment, **Container Queries** for component-level responsiveness, and **intrinsic sizing** for content-driven dimensions. Every layout decision starts by identifying which axis matters, whether the component owns its sizing or its container does, and whether children need cross-alignment.
 
+## Contents
+
+- [Layout Decision Flowchart](#layout-decision-flowchart)
+- [1. CSS Grid](#1-css-grid)
+- [2. Subgrid](#2-subgrid)
+- [3. Grid Lanes (Masonry)](#3-grid-lanes-masonry)
+- [4. Flexbox](#4-flexbox)
+- [5. Container Queries](#5-container-queries)
+- [6. Intrinsic Sizing](#6-intrinsic-sizing)
+- [7. Aspect Ratio](#7-aspect-ratio)
+- [Anti-Patterns](#anti-patterns)
+
 ---
 
 ## Layout Decision Flowchart
@@ -24,7 +36,7 @@ flowchart TD
     CHILD -->|"No"| GRIDTYPE{"Fixed row heights<br>or variable?"}
     GRIDTYPE -->|"Uniform rows"| STDGRID["Standard Grid<br>repeat(auto-fill, minmax())"]
     GRIDTYPE -->|"Variable heights,<br>waterfall style"| LANES{"Browser support<br>acceptable?"}
-    LANES -->|"Yes (Safari TP,<br>Firefox flag)"| GRIDLANES["display: grid-lanes"]
+    LANES -->|"Yes (Safari 26.4+;<br>flags elsewhere)"| GRIDLANES["display: grid-lanes"]
     LANES -->|"No — need production"| FALLBACK["Grid + JS library<br>or CSS columns fallback"]
     FLEX --> FLEXDIR{"Wrapping needed?"}
     FLEXDIR -->|"No — single line"| FLEXLINE["Flexbox<br>(nav, toolbar, centering)"]
@@ -121,7 +133,7 @@ Semantic anchors for item placement — no counting track numbers.
 
 Use Subgrid when **child elements inside grid items must align across sibling items**. The canonical example: a row of cards where every heading, body, and footer lines up, regardless of content length.
 
-**Browser support:** Baseline (Sep 2023). 97% global coverage. Production-ready.
+**Browser support:** Baseline since September 2023. Production-ready; keep the `@supports` fallback below only if you must support pre-2023 browsers.
 
 ```css
 /* ❌ Without subgrid: each card's rows are independent */
@@ -172,7 +184,7 @@ Subgrid can apply to one axis independently. Use `grid-template-rows: subgrid` w
 
 Use Grid Lanes when content has **variable heights and must pack tightly** — image galleries, Pinterest-style feeds, mixed-content cards.
 
-**Status: Experimental.** Behind flags in Safari TP, Firefox, and Chrome. Not production-ready.
+**Status (mid-2026): not yet cross-browser.** After a multi-year syntax debate (`display: masonry` vs `grid-template-rows: masonry`), the CSSWG settled on `display: grid-lanes` in CSS Grid Level 3. Safari 26.4 is the first stable browser to ship it; Chrome and Firefox have implementations behind flags and are expected to ship later in 2026. Always ship a fallback.
 
 Grid Lanes defines strict lanes (columns) via `grid-template-columns` but lets items flow freely in the stacking axis. Items pack into whichever lane gets them closest to the top.
 
@@ -184,7 +196,7 @@ Grid Lanes defines strict lanes (columns) via `grid-template-columns` but lets i
 }
 ```
 
-The `flow-tolerance` property relaxes strict shortest-lane placement — items can go into a slightly taller lane to stay closer to source order:
+The `flow-tolerance` property (renamed from `item-tolerance` by the CSSWG in January 2026) relaxes strict shortest-lane placement — items can go into a slightly taller lane to stay closer to source order:
 
 ```css
 .gallery {
@@ -239,7 +251,7 @@ CSS columns as an alternative fallback (closer visual approximation):
 | Axis control | 2D (rows + columns) | Lanes + free stacking | 1D + wrap |
 | Variable heights | Gaps between items | Tight packing | Uneven rows |
 | Named areas/lines | Yes | Yes (lane axis only) | No |
-| Browser support | Baseline | Experimental | Baseline |
+| Browser support | Baseline | Safari 26.4+ only | Baseline |
 
 ---
 
@@ -386,7 +398,7 @@ Respond to custom property values on the container — conditional styling based
 }
 ```
 
-**Browser support:** Feature-detect with `@supports`. Not yet cross-browser.
+**Browser support:** Style queries on custom properties became Baseline Newly Available in May 2026 (Chrome 111+, Safari 18+, Firefox 151+). Range syntax for style queries is newer still — verify on MDN. Unsupported browsers skip the `@container style()` block, so structure defaults outside it and treat the query as an enhancement.
 
 ### Container Query Units
 
@@ -454,10 +466,12 @@ Intrinsic sizing keywords let elements size themselves based on content or conta
 | `fit-content` | Grows with content up to available space, then wraps | Dialogs, tooltips, captions |
 | `stretch` | Fills available space (margin box). Replaces `-webkit-fill-available` | Full-width buttons, full-height apps |
 
+The `stretch` keyword is Chromium-only (Chrome 138+) as of mid-2026 — provide a fallback (`100%` or `-webkit-fill-available`) before it. The other three keywords are Baseline.
+
 ```css
 .dialog { width: fit-content; max-width: 90vw; min-width: 320px; }
 .tag    { width: max-content; padding-inline: 0.75em; }
-.app    { min-height: stretch; }
+.app    { min-height: 100%; min-height: stretch; }
 ```
 
 ### In Grid Tracks

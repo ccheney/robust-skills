@@ -2,6 +2,19 @@
 
 Class diagrams model object-oriented structures. ER diagrams model database schemas and data relationships.
 
+## Contents
+
+- [Class Diagrams](#class-diagrams)
+  - [Class Definition](#class-definition) — attributes, methods, visibility, return types
+  - [Relationships](#relationships) — inheritance, composition, aggregation, cardinality
+  - [Annotations](#annotations), [Generic Types](#generic-types), [Namespaces](#namespaces), [Notes](#notes), [Styling](#styling)
+  - [Example: Domain Model](#example-domain-model)
+- [Entity Relationship Diagrams](#entity-relationship-diagrams)
+  - [Relationship Notation (Crow's Foot)](#relationship-notation-crows-foot)
+  - [Entity Attributes](#entity-attributes) — PK/FK/UK, comments
+  - [Relationship Labels](#relationship-labels)
+  - [Examples: E-Commerce Schema, Multi-Tenant SaaS](#example-e-commerce-schema)
+
 ---
 
 # Class Diagrams
@@ -321,6 +334,8 @@ erDiagram
 | `FK` | Foreign Key |
 | `UK` | Unique Key |
 
+One attribute per line — semicolon-separated attributes on a single line fail to parse. Combine multiple key constraints with a comma: `uuid user_id FK, UK` (a space-separated `FK UK` fails).
+
 ```mermaid
 erDiagram
     USER {
@@ -443,7 +458,7 @@ erDiagram
 
     CART {
         uuid id PK
-        uuid user_id FK UK
+        uuid user_id FK, UK
         timestamp updated_at
     }
 
@@ -456,7 +471,7 @@ erDiagram
 
     SHIPPING {
         uuid id PK
-        uuid order_id FK UK
+        uuid order_id FK, UK
         string carrier
         string tracking_number
         string status

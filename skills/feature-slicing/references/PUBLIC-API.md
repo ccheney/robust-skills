@@ -4,17 +4,17 @@
 
 ## What is a Public API?
 
-A public API is a **contract** between a slice and consuming code. It controls which objects are accessible and how they can be imported.
+A public API is a **contract** between a slice and consuming code. It controls which objects are accessible and how they can be imported: modules outside a slice may reference only the public API, never the internal file structure.
 
-**Implementation:** An `index.ts` barrel file with explicit re-exports.
+**Implementation:** an `index.ts` file with explicit re-exports.
 
 ---
 
-## Three Goals of Quality Public APIs
+## Three Goals of a Quality Public API
 
-1. **Protection from structural changes** — Shield consumers from internal refactoring
-2. **Behavioral transparency** — Significant changes reflect in the API
-3. **Selective exposure** — Only necessary parts exposed
+1. **Protection from structural changes** — consumers are shielded from internal refactoring
+2. **Behavioral transparency** — significant changes to the slice show up as API changes
+3. **Selective exposure** — only the necessary parts are exposed
 
 ---
 
@@ -29,7 +29,6 @@ export type { User, UserRole } from './model/types';
 export { userSchema } from './model/schema';
 ```
 
-**Usage:**
 ```typescript
 import { UserCard, type User } from '@/entities/user';
 ```
@@ -38,51 +37,82 @@ import { UserCard, type User } from '@/entities/user';
 
 ## Avoid Wildcard Exports
 
-**Don't do this:**
 ```typescript
+// ❌ Don't
 export * from './ui';
-export * from './api';
 export * from './model';
 ```
 
-**Problems:**
-- Reduces discoverability
-- Accidentally exposes internals
-- Complicates refactoring
-- Harms tree-shaking
+Wildcards hide the contract (you can't see what the slice offers), accidentally expose internals, complicate refactoring, and harm tree-shaking. Always re-export by name.
 
 ---
 
-## Segment-Level Public APIs
+## One Index Per Slice — No Segment Indexes on Sliced Layers
 
-For large slices, define public APIs per segment:
+On layers that have slices (`pages`, `widgets`, `features`, `entities`), the slice index is the **only** barrel file. Official guidance: if `features/comments/index.ts` exists, do **not** also create `features/comments/ui/index.ts`.
+
+Why: extra barrels add work for the bundler and dev server, and they are the main source of accidental circular imports (a segment file importing a sibling through the segment index).
 
 ```
-entities/user/
+features/comments/
 ├── ui/
-│   ├── UserCard.tsx
-│   ├── UserAvatar.tsx
-│   └── index.ts
-├── api/
-│   ├── userApi.ts
-│   └── index.ts
+│   ├── CommentCard.tsx      # no ui/index.ts
+│   └── CommentForm.tsx
 ├── model/
-│   ├── types.ts
-│   ├── schema.ts
+│   └── types.ts             # no model/index.ts
+└── index.ts                 # the ONLY public API
+```
+
+---
+
+## The Shared Layer Is Different
+
+`shared/` has no slices, so the public API is defined **per segment** — and there is intentionally **no root `shared/index.ts`**:
+
+```typescript
+// shared/api/index.ts
+export { apiClient } from './client';
+```
+
+For `shared/ui` and `shared/lib` — big collections of unrelated things — go one level finer: an index **per component/library**, imported directly:
+
+```
+shared/ui/
+├── button/
+│   ├── Button.tsx
 │   └── index.ts
-└── index.ts
+├── date-picker/
+│   ├── DatePicker.tsx
+│   └── index.ts
 ```
 
 ```typescript
-// entities/user/ui/index.ts
-export { UserCard } from './UserCard';
-export { UserAvatar } from './UserAvatar';
+// ✅ Per-component import
+import { Button } from '@/shared/ui/button';
 
-// entities/user/index.ts
-export * from './ui';
-export * from './api';
-export * from './model';
+// ❌ Monolithic barrel: shared/ui/index.ts re-exporting everything
+import { Button } from '@/shared/ui';
 ```
+
+Why: one root barrel couples unrelated modules — importing `Button` pulls the date-picker's heavy dependency into the module graph, hurting tree-shaking in some bundlers and slowing dev-server cold starts.
+
+---
+
+## Avoiding Circular Imports
+
+**Problem:** a file inside a slice importing from its own slice's index.
+
+```typescript
+// features/comments/ui/CommentForm.tsx
+
+// ❌ Circular: index.ts re-exports CommentForm, which imports index.ts
+import { commentSchema } from '../index';
+
+// ✅ Relative import with the full path
+import { commentSchema } from '../model/schema';
+```
+
+**Rule:** within a slice, use relative imports to the concrete file. Between slices, use absolute aliased imports of the public API (`@/entities/user`). Never mix the two directions.
 
 ---
 
@@ -90,13 +120,13 @@ export * from './model';
 
 > [Official @x Documentation](https://feature-sliced.design/docs/reference/public-api#public-api-for-cross-imports)
 
-When entities legitimately reference each other:
+Slices on the same layer normally cannot import each other. When two business entities genuinely reference each other (a song has an artist), declare a dedicated public API for that one consumer: `entities/A/@x/B.ts` is importable by code in `entities/B/`.
 
 ```
 entities/
 ├── song/
 │   ├── @x/
-│   │   └── artist.ts
+│   │   └── artist.ts      # exports intended ONLY for the artist entity
 │   ├── model/
 │   │   └── types.ts
 │   └── index.ts
@@ -119,71 +149,24 @@ export interface Artist {
 }
 ```
 
-**Guidelines for @x:**
-- Keep cross-imports minimal
-- Document why the cross-reference exists
-- Consider merging entities if references are extensive
-- Use only on Entities layer
+**Guidelines:**
+- Use `@x` **only on the entities layer**, where eliminating cross-references is often unreasonable
+- Keep the `@x` file tiny — usually just type re-exports
+- The filename names the consumer, making the coupling impossible to miss
+- If two entities cross-reference extensively, merge them into one slice
 
 ---
 
-## Avoiding Circular Imports
+## Index File Trade-offs
 
-**Problem:** Importing from index within a slice causes circulars.
+Be aware of what barrels cost, and mitigate deliberately:
 
-```typescript
-// ❌
-import { UserCard } from '../index';
+1. **Circular imports** — internal files re-importing via the index → use relative imports inside slices
+2. **Tree-shaking failures** — unrelated code bundled together → per-component indexes in `shared/ui`/`shared/lib`
+3. **Weak enforcement** — nothing technically stops deep imports → lint with [Steiger](https://github.com/feature-sliced/steiger) (`fsd/public-api` rule) or `@feature-sliced/eslint-config`
+4. **Dev-server overhead** — thousands of index files slow cold starts → one index per slice, no segment indexes
 
-// ✅
-import { UserCard } from '../ui/UserCard';
-```
-
-**Rule:** Within a slice, use relative imports. External consumers use the public API.
-
----
-
-## Tree-Shaking Optimization
-
-For large shared UI libraries, split into component-level indices:
-
-```
-shared/ui/
-├── Button/
-│   ├── Button.tsx
-│   └── index.ts
-├── Input/
-│   ├── Input.tsx
-│   └── index.ts
-├── Modal/
-│   ├── Modal.tsx
-│   └── index.ts
-└── index.ts
-```
-
-**Import patterns:**
-```typescript
-import { Button, Input } from '@/shared/ui';
-
-import { Button } from '@/shared/ui/Button';
-```
-
----
-
-## Index File Challenges
-
-**Four major issues:**
-
-1. **Circular imports** — Internal files reimporting from index
-2. **Tree-shaking failures** — Unrelated utilities bundled together
-3. **Weak enforcement** — Nothing prevents direct imports technically
-4. **Performance degradation** — Too many indices slow dev servers
-
-**Solutions:**
-- Use relative imports within slices
-- Create separate indices per component in `shared/`
-- Review imports during code review
-- Consider monorepo for very large projects
+For Next.js server/client public API splitting (`index.server.ts`), see [NEXTJS.md](NEXTJS.md#server-vs-client-public-apis-indexserverts).
 
 ---
 
@@ -214,7 +197,7 @@ export const productSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   price: z.number().positive(),
-  imageUrl: z.string().url(),
+  imageUrl: z.url(),
   category: z.string(),
 });
 ```
@@ -256,7 +239,7 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
 ```
 
 ```typescript
-// entities/product/index.ts
+// entities/product/index.ts — the only barrel in this slice
 export { ProductCard } from './ui/ProductCard';
 export { getProducts, getProductById } from './api/productApi';
 export type { Product, ProductFilters } from './model/types';

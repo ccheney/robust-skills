@@ -5,6 +5,29 @@
 
 All 20 interactive element types with properties, constraints, and compatible blocks.
 
+## Table of Contents
+
+- [Button](#button)
+- [Overflow Menu](#overflow-menu)
+- [Select Menus (5 types)](#select-menus-5-types)
+- [Multi-Select Menus (5 types)](#multi-select-menus-5-types)
+- [Date Picker](#date-picker)
+- [Time Picker](#time-picker)
+- [Datetime Picker](#datetime-picker)
+- [Checkboxes](#checkboxes)
+- [Radio Buttons](#radio-buttons)
+- [Plain Text Input](#plain-text-input)
+- [Number Input](#number-input)
+- [Email Input](#email-input)
+- [URL Input](#url-input)
+- [Rich Text Input](#rich-text-input)
+- [File Input](#file-input)
+- [Feedback Buttons](#feedback-buttons)
+- [Icon Button](#icon-button)
+- [Image Element](#image-element)
+- [Workflow Button](#workflow-button)
+- [URL Source Element](#url-source-element)
+
 ---
 
 ## Button

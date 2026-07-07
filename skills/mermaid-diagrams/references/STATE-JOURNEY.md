@@ -2,6 +2,18 @@
 
 State diagrams model state machines and lifecycles. User journey diagrams map user experiences across tasks.
 
+## Contents
+
+- [State Diagrams](#state-diagrams)
+  - [States](#states), [Transitions](#transitions), [Composite States](#composite-states)
+  - [Choice (Decision Points)](#choice-decision-points), [Fork and Join](#fork-and-join-parallel-states), [Concurrent States](#concurrent-states)
+  - [Notes](#notes), [Direction](#direction), [Styling](#styling)
+  - [Examples: Order Lifecycle, Connection State Machine, Authentication Flow](#example-order-lifecycle)
+- [User Journey Diagrams](#user-journey-diagrams)
+  - [Structure](#structure) — title, sections, tasks with scores
+  - [Examples: SaaS Onboarding, Support Ticket, Mobile App Launch](#example-saas-onboarding)
+  - [Use Cases](#use-cases)
+
 ---
 
 # State Diagrams

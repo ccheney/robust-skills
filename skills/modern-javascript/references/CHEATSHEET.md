@@ -2,6 +2,29 @@
 
 Variables, arrow functions, destructuring, spread/rest, template literals, optional chaining, nullish coalescing, array methods, string methods, object methods, promises, async/await, classes, modules, Set/Map, iterators, generators, RegExp, BigInt, Temporal, resource management.
 
+## Contents
+
+- [Variables & Scope](#variables--scope)
+- [Arrow Functions](#arrow-functions)
+- [Destructuring](#destructuring)
+- [Spread & Rest](#spread--rest)
+- [Template Literals](#template-literals)
+- [Object Shorthand](#object-shorthand)
+- [Optional Chaining & Nullish Coalescing](#optional-chaining--nullish-coalescing)
+- [Array Methods](#array-methods)
+- [String Methods](#string-methods)
+- [Object Methods](#object-methods)
+- [Promises](#promises)
+- [Async/Await](#asyncawait)
+- [Classes](#classes)
+- [Modules](#modules)
+- [Set & Map](#set--map)
+- [Iterators & Generators](#iterators--generators)
+- [Regular Expressions](#regular-expressions)
+- [Primitives, Errors, Cloning, Resource Management](#primitives-errors-cloning-resource-management)
+- [Stage 3 Proposals (Decorators, Decorator Metadata)](#stage-3-proposals-decorators-decorator-metadata)
+- [Quick Migration Guide](#quick-migration-guide)
+
 ## Variables & Scope
 
 ```javascript
@@ -126,7 +149,7 @@ Map.groupBy(arr, x => x.type)
 // Create
 Array.from({ length: 5 }, (_, i) => i)
 Array.of(1, 2, 3)
-await Array.fromAsync(asyncIterable)  // ES2025
+await Array.fromAsync(asyncIterable)  // ES2026 (widely supported since 2024)
 ```
 
 ## String Methods
@@ -253,17 +276,20 @@ class Dog extends Animal {
 export const x = 1;
 export function fn() { }
 export default class { }
+const a = 1, b = 2;
 export { a, b as c };
+```
 
+```javascript
 // Import
 import Default from './module';
 import { x, fn } from './module';
-import { x as y } from './module';
+import { x as y } from './other';
 import * as mod from './module';
 import './module';  // Side effects only
 
 // Dynamic
-const mod = await import('./module');
+const dynamic = await import('./module');
 ```
 
 ## Set & Map
@@ -332,26 +358,32 @@ const pattern = /(?<year>\d{4})-(?<month>\d{2})/;
 const { year, month } = str.match(pattern).groups;
 
 // Lookbehind assertions (ES2018)
-/(?<=\$)\d+/        // Positive lookbehind
-/(?<!\$)\d+/        // Negative lookbehind
+/(?<=\$)\d+/;        // Positive lookbehind
+/(?<!\$)\d+/;        // Negative lookbehind
 
 // Flags
-/pattern/g          // Global
-/pattern/i          // Case-insensitive
-/pattern/m          // Multiline
-/pattern/s          // dotAll - . matches newlines (ES2018)
-/pattern/u          // Unicode
-/pattern/d          // Match indices (ES2022)
-/pattern/v          // Unicode sets (ES2024)
+/pattern/g;          // Global
+/pattern/i;          // Case-insensitive
+/pattern/m;          // Multiline
+/pattern/s;          // dotAll - . matches newlines (ES2018)
+/pattern/u;          // Unicode
+/pattern/d;          // Match indices (ES2022)
+/pattern/v;          // Unicode sets (ES2024)
+
+// Inline modifiers (ES2025) — toggle i/m/s for part of a pattern
+/^(?i:hello) world$/;
 
 // Unicode property escapes (ES2018)
-/\p{Letter}/u       // Any letter
-/\p{Emoji}/u        // Emoji
-/\p{Script=Greek}/u // Greek script
+/\p{Letter}/u;       // Any letter
+/\p{Emoji}/u;        // Emoji
+/\p{Script=Greek}/u; // Greek script
 
 // Unicode set operations (ES2024 /v flag)
-/[\p{Emoji}--\p{ASCII}]/v  // Emoji minus ASCII
-/[[a-z]&&[^aeiou]]/v       // Consonants only
+/[\p{Emoji}--\p{ASCII}]/v;  // Emoji minus ASCII
+/[[a-z]&&[^aeiou]]/v;       // Consonants only
+
+// Duplicate named groups across alternatives (ES2025)
+/(?<year>\d{4})-(?<month>\d{2})|(?<month>\d{2})\/(?<year>\d{4})/;
 
 // Match indices (ES2022)
 const match = /(?<g>\w+)/.exec('hello');
@@ -384,8 +416,11 @@ const deep = structuredClone(obj);
 str.isWellFormed()    // Check for lone surrogates
 str.toWellFormed()    // Fix lone surrogates
 
-// Private slot check (ES2022)
-#field in obj         // true if obj has #field
+// Private slot check (ES2022) — only valid inside the class body
+class HasField {
+  #field;
+  static check(obj) { return #field in obj; }  // true if obj has #field
+}
 
 // Static initialization blocks (ES2022)
 class C {
@@ -417,32 +452,53 @@ Symbol('name').description  // 'name'
 // Optional catch binding (ES2019)
 try { } catch { }  // No parameter needed
 
-// Hashbang (ES2023)
-#!/usr/bin/env node  // At file start
+// Hashbang (ES2023): '#!/usr/bin/env node' allowed as the very first line of a file
 
-// Explicit Resource Management (ES2025)
-using file = openFile('data.txt');  // Auto-disposed
-await using db = await connect();   // Async disposal
-Symbol.dispose                      // Cleanup method
-Symbol.asyncDispose                 // Async cleanup
-new DisposableStack()               // Aggregate disposables
+// Explicit Resource Management (Stage 4 → ES2027; Node 24+, Chrome 134+)
+{
+  using file = openFile('data.txt');  // file[Symbol.dispose]() runs on block exit
+}
+async function withDb() {
+  await using db = await connect();   // db[Symbol.asyncDispose]() awaited on exit
+}
+new DisposableStack()                 // Aggregate disposables
 
-// Array.fromAsync (ES2025)
+// Array.fromAsync (ES2026, widely supported since 2024)
 await Array.fromAsync(asyncIterable)
 await Array.fromAsync(generator(), mapFn)
 
-// Error.isError (ES2025)
+// Error.isError (ES2026)
 Error.isError(err)  // true for any Error, cross-realm safe
 
-// Intl.DurationFormat (ES2025)
+// Math.sumPrecise (ES2026)
+Math.sumPrecise([1e20, 0.1, -1e20])  // 0.1 (no float drift)
+
+// Uint8Array ⇄ base64/hex (ES2026)
+Uint8Array.fromBase64('SGVsbG8=')
+bytes.toBase64()
+bytes.toHex()
+
+// Map upsert (ES2026)
+map.getOrInsert(key, [])                    // insert default if absent
+map.getOrInsertComputed(key, k => make(k))  // lazy default
+
+// Iterator.concat (ES2026)
+Iterator.concat(iterA, iterB).toArray()
+
+// JSON source access (ES2026)
+JSON.parse(text, (k, v, ctx) => k === 'id' ? BigInt(ctx.source) : v)
+JSON.stringify({ id: JSON.rawJSON('12345678901234567890') })
+
+// Intl.DurationFormat (ECMA-402 Intl API)
 new Intl.DurationFormat('en', { style: 'long' })
   .format({ hours: 1, minutes: 30 })  // "1 hour, 30 minutes"
 
-// Temporal API (Stage 3 - requires polyfill)
+// Temporal API (Stage 4 → ES2027; native in Firefox 139+, Chrome 144+,
+// Node 26+ — use temporal-polyfill elsewhere)
 Temporal.PlainDate.from('2024-03-15')     // Date only
 Temporal.PlainTime.from('14:30:00')       // Time only
-Temporal.PlainDateTime.from('...')         // Date + time
-Temporal.ZonedDateTime.from('...[TZ]')    // With timezone
+Temporal.PlainDateTime.from('2024-03-15T14:30:00')            // Date + time
+Temporal.ZonedDateTime.from('2024-03-15T14:30:00[America/New_York]')  // With timezone
 Temporal.Now.instant()                     // Current moment
 Temporal.Duration.from({ hours: 2 })       // Duration
 date.add({ months: 1 })                    // Immutable arithmetic
@@ -481,5 +537,5 @@ User[Symbol.metadata]  // { name: 'string', ... }
 | `[].concat(a, b)` | `[...a, ...b]` |
 | `.then().catch()` | `async/await + try/catch` |
 | `let resolve; new Promise(r => resolve = r)` | `Promise.withResolvers()` |
-| `new Date()` | `Temporal.Now.*` (polyfill) |
+| `new Date()` | `Temporal.Now.*` (native in Firefox/Chrome/Node 26+, else polyfill) |
 | Manual grouping with reduce | `Object.groupBy()` |

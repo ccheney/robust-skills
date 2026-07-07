@@ -1,6 +1,19 @@
-# PostgreSQL 18 Features & Configuration
+# PostgreSQL 17/18 Features & Configuration
 
-Comprehensive reference for PostgreSQL 18 features, configuration, and best practices.
+Comprehensive reference for PostgreSQL 18 features (released September 2025),
+configuration, and best practices. Features marked PG18 require version 18+;
+everything else applies to 17 as well.
+
+## Contents
+
+- [PostgreSQL 18 New Features](#postgresql-18-new-features)
+- [Memory Configuration](#memory-configuration)
+- [Row-Level Security (RLS)](#row-level-security-rls)
+- [Table Partitioning](#table-partitioning)
+- [JSONB Operations](#jsonb-operations)
+- [Full-Text Search](#full-text-search)
+- [Useful System Views](#useful-system-views)
+- [Maintenance](#maintenance)
 
 ---
 
@@ -77,7 +90,8 @@ id: uuid('id').primaryKey().default(sql`uuidv7()`),
 
 ### Virtual Generated Columns
 
-Virtual columns compute values at read time (not stored on disk):
+Virtual columns compute values at read time (not stored on disk). In PG18,
+`VIRTUAL` is the default when neither keyword is given:
 
 ```sql
 CREATE TABLE products (
@@ -85,12 +99,14 @@ CREATE TABLE products (
   tax_rate numeric NOT NULL,
   -- Stored (computed at write, stored on disk)
   total_price numeric GENERATED ALWAYS AS (price * (1 + tax_rate)) STORED,
-  -- Virtual (computed at read, not stored)
-  display_price text GENERATED ALWAYS AS (price::text || ' USD')
+  -- Virtual (computed at read, not stored) — PG18 default
+  display_price text GENERATED ALWAYS AS (price::text || ' USD') VIRTUAL
 );
 ```
 
-**Note:** Virtual generated columns cannot be indexed.
+**Notes:** Virtual generated columns cannot be indexed. Drizzle's
+`generatedAlwaysAs()` only emits the `STORED` form for Postgres — define virtual
+columns in a custom migration (see [SCHEMA.md](SCHEMA.md#generated-columns)).
 
 ---
 
@@ -128,7 +144,7 @@ DELETE FROM audit_log
 WHERE created_at < now() - interval '90 days'
 RETURNING OLD.*;
 
--- MERGE with RETURNING
+-- MERGE with RETURNING (MERGE RETURNING is PG17+; OLD/NEW is PG18+)
 MERGE INTO products t
 USING staging s ON t.sku = s.sku
 WHEN MATCHED THEN UPDATE SET price = s.price
@@ -255,19 +271,58 @@ CREATE POLICY delete_own ON documents
   USING (owner_id = current_user_id());
 ```
 
-### Using with Drizzle
+### Defining Policies in Drizzle
+
+Drizzle (0.36+) can manage roles and policies in the schema so `drizzle-kit
+generate` emits the `CREATE POLICY` DDL. Defining any `pgPolicy` on a table
+enables RLS for it automatically; use `.enableRLS()` for a table with RLS but
+no policies (default-deny):
 
 ```typescript
-// Set tenant context before queries
-await db.execute(sql`SET app.current_tenant_id = ${tenantId}`);
+import { sql } from 'drizzle-orm';
+import { pgTable, pgPolicy, pgRole, uuid, text } from 'drizzle-orm/pg-core';
 
-// Or use transaction
+export const appUser = pgRole('app_user');
+
+export const documents = pgTable('documents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(),
+  body: text('body'),
+}, (table) => [
+  pgPolicy('tenant_isolation', {
+    for: 'all',
+    to: appUser,
+    using: sql`${table.tenantId} = current_setting('app.current_tenant_id')::uuid`,
+    withCheck: sql`${table.tenantId} = current_setting('app.current_tenant_id')::uuid`,
+  }),
+]);
+
+// RLS enabled, zero policies => nothing visible:
+export const audit = pgTable('audit', { id: uuid('id').primaryKey() }).enableRLS();
+```
+
+For Neon there is a higher-level wrapper:
+`import { crudPolicy, authenticatedRole } from 'drizzle-orm/neon'` —
+`crudPolicy({ role, read, modify })` expands to the four select/insert/update/delete
+policies. Supabase helpers live in `drizzle-orm/supabase`.
+
+### Setting RLS Context at Runtime
+
+```typescript
+// Use SET LOCAL inside a transaction: it scopes the setting to that
+// transaction, which is required with pooled connections (a plain SET
+// leaks onto whichever client reuses the connection)
 await db.transaction(async (tx) => {
-  await tx.execute(sql`SET LOCAL app.current_tenant_id = ${tenantId}`);
+  await tx.execute(
+    sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`,
+  );
   // Queries now filtered by RLS
   const docs = await tx.select().from(documents);
 });
 ```
+
+Remember RLS applies to the connecting role — superusers and table owners bypass
+it unless `FORCE ROW LEVEL SECURITY` is set, so connect as a non-owner app role.
 
 ---
 
@@ -400,29 +455,24 @@ SELECT jsonb_path_query(data, '$.items[*].name') FROM orders;
 
 ## Full-Text Search
 
-### Basic Setup
+### Basic Setup (Generated Column — preferred)
+
+Since PG12 the recommended approach is a **stored generated column**, not a
+trigger (simpler, can't drift out of sync). Note it must be `STORED` — tsvector
+columns need to be indexable:
 
 ```sql
--- Add search column
-ALTER TABLE posts ADD COLUMN search_vector tsvector;
+ALTER TABLE posts ADD COLUMN search_vector tsvector
+  GENERATED ALWAYS AS (
+    setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+    setweight(to_tsvector('english', coalesce(content, '')), 'B')
+  ) STORED;
 
--- Create GIN index
 CREATE INDEX posts_search_idx ON posts USING gin(search_vector);
-
--- Create trigger to update vector
-CREATE FUNCTION posts_search_trigger() RETURNS trigger AS $$
-BEGIN
-  NEW.search_vector := to_tsvector('english',
-    coalesce(NEW.title, '') || ' ' || coalesce(NEW.content, '')
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER posts_search_update
-  BEFORE INSERT OR UPDATE ON posts
-  FOR EACH ROW EXECUTE FUNCTION posts_search_trigger();
 ```
+
+Use a trigger instead only when the vector needs data from other tables or
+session state (generated columns can only reference the same row).
 
 ### Querying
 
@@ -445,7 +495,29 @@ WHERE search_vector @@ query;
 
 ### In Drizzle
 
+Drizzle has no built-in `tsvector` type — declare one with `customType`, define
+the column as generated, and index it with GIN:
+
 ```typescript
+import { SQL, sql } from 'drizzle-orm';
+import { customType, index, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+
+const tsvector = customType<{ data: string }>({
+  dataType() { return 'tsvector'; },
+});
+
+export const posts = pgTable('posts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  searchVector: tsvector('search_vector').generatedAlwaysAs(
+    (): SQL => sql`to_tsvector('english', ${posts.title} || ' ' || ${posts.content})`,
+  ),
+}, (table) => [
+  index('posts_search_idx').using('gin', table.searchVector),
+]);
+
+// Query
 const searchResults = await db
   .select()
   .from(posts)

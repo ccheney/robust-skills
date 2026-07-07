@@ -2,6 +2,20 @@
 
 Sequence diagrams show interactions between participants over time. Ideal for API flows, protocols, and service communication.
 
+## Contents
+
+- [Basic Syntax](#basic-syntax)
+- [Participants](#participants)
+- [Message Types](#message-types)
+- [Activation (Lifeline)](#activation-lifeline)
+- [Control Flow](#control-flow) — alt, opt, loop, par, critical, break
+- [Notes](#notes)
+- [Autonumbering](#autonumbering)
+- [Background Highlighting](#background-highlighting)
+- [Participant Boxes](#participant-boxes)
+- [Gotchas](#gotchas)
+- [Examples](#examples)
+
 ---
 
 ## Basic Syntax
@@ -299,6 +313,15 @@ sequenceDiagram
     A-->>C: Response
     C-->>U: Display
 ```
+
+---
+
+## Gotchas
+
+- **Participant names with spaces need aliases.** Declare `participant A as API Gateway`, then use `A` in messages. `API Gateway->>B: msg` fails.
+- **Activations must balance.** Every `+` (activate) needs a matching `-` (deactivate) on a later message to/from that participant; deactivating an inactive participant throws an error.
+- **Every block keyword needs its own `end`.** `alt`/`opt`/`loop`/`par`/`critical`/`break`/`rect`/`box` all close with `end`; nested blocks each need one.
+- **Message text follows a colon.** `A->>B: text` — omitting the colon breaks parsing.
 
 ---
 

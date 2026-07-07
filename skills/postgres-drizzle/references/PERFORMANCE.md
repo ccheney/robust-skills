@@ -2,6 +2,18 @@
 
 Comprehensive reference for PostgreSQL and Drizzle ORM performance optimization.
 
+## Contents
+
+- [Indexing Strategies](#indexing-strategies)
+- [Query Optimization](#query-optimization)
+- [Drizzle Query Optimization](#drizzle-query-optimization)
+- [Connection Pooling](#connection-pooling)
+- [Caching Strategies](#caching-strategies)
+- [Pagination Best Practices](#pagination-best-practices)
+- [Bulk Operations](#bulk-operations)
+- [Performance Checklist](#performance-checklist)
+- [Monitoring Queries](#monitoring-queries)
+
 ---
 
 ## Indexing Strategies
@@ -82,6 +94,14 @@ CREATE INDEX data_gin_idx ON events USING gin(data);
 
 -- Smaller, faster for containment only
 CREATE INDEX data_gin_path_idx ON events USING gin(data jsonb_path_ops);
+```
+
+**In Drizzle** (method first, columns after — there is no `.on().using()` chain):
+```typescript
+}, (table) => [
+  index('data_gin_idx').using('gin', table.data),
+  index('data_gin_path_idx').using('gin', table.data.op('jsonb_path_ops')),
+]);
 ```
 
 ### Expression Indexes
@@ -178,13 +198,18 @@ const user1 = await getUserById.execute({ id: 'uuid-1' });
 const user2 = await getUserById.execute({ id: 'uuid-2' });
 ```
 
+**Pooler caveat:** server-side prepared statements assume a stable session. Behind
+a transaction-mode pooler, either disable them (postgres.js: `postgres(url,
+{ prepare: false })`) or use PgBouncer 1.21+ with `max_prepared_statements > 0`.
+See [Transaction Pooling Limitations](#transaction-pooling-limitations).
+
 ### Avoid N+1 Queries
 
 **Bad (N+1):**
 ```typescript
-const posts = await db.select().from(posts);
-for (const post of posts) {
-  const author = await db
+const allPosts = await db.select().from(posts);
+for (const post of allPosts) {
+  const [author] = await db
     .select()
     .from(users)
     .where(eq(users.id, post.authorId));
@@ -194,15 +219,15 @@ for (const post of posts) {
 
 **Good (Relational Query):**
 ```typescript
-const posts = await db.query.posts.findMany({
+const postsWithAuthors = await db.query.posts.findMany({
   with: { author: true },
 });
-// Single query with JOIN
+// Single round trip
 ```
 
 **Good (Manual Join):**
 ```typescript
-const posts = await db
+const postsWithAuthors = await db
   .select()
   .from(posts)
   .leftJoin(users, eq(posts.authorId, users.id));
@@ -212,15 +237,15 @@ const posts = await db
 
 ```typescript
 // Bad - selects all columns
-const users = await db.select().from(users);
+const allUsers = await db.select().from(users);
 
 // Good - selects only needed columns
-const users = await db
+const userEmails = await db
   .select({ id: users.id, email: users.email })
   .from(users);
 
 // With relational queries
-const users = await db.query.users.findMany({
+const userEmails = await db.query.users.findMany({
   columns: { id: true, email: true },
 });
 ```
@@ -292,9 +317,13 @@ reserve_pool_size = 5
 
 ### Transaction Pooling Limitations
 
-- No `SET SESSION` (use `SET LOCAL`)
-- No `PREPARE` without config
-- Temp tables must be created/dropped in same transaction
+- No `SET SESSION` state (use `SET LOCAL` inside a transaction)
+- Prepared statements: postgres.js prepares statements by default, which breaks
+  in transaction mode unless the pooler tracks them. PgBouncer 1.21+ supports
+  protocol-level prepared statements via `max_prepared_statements = 200`;
+  otherwise set `prepare: false` in postgres.js. Named `.prepare()` statements
+  from Drizzle have the same constraint.
+- Temp tables, advisory session locks, LISTEN/NOTIFY must stay within one transaction/session
 
 ### Drizzle with postgres.js
 
@@ -307,6 +336,7 @@ const client = postgres(process.env.DATABASE_URL!, {
   max: 20,              // Max connections
   idle_timeout: 30,     // Close idle connections after 30s
   connect_timeout: 10,  // Connection timeout
+  // prepare: false,    // Required behind transaction-mode PgBouncer < 1.21 / Supavisor
 });
 ```
 
@@ -467,11 +497,11 @@ await db.execute(sql`
 ```typescript
 await db
   .insert(products)
-  .values(products)
+  .values(newProducts)   // array of rows
   .onConflictDoUpdate({
     target: products.sku,
     set: {
-      price: sql`excluded.price`,
+      price: sql`excluded.price`,   // "excluded" = the row that failed to insert
       updatedAt: new Date(),
     },
   });

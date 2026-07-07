@@ -8,6 +8,17 @@
 > - [Anti-Corruption Layer](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/acl.html) — AWS
 > - [Domain Analysis for Microservices](https://learn.microsoft.com/en-us/azure/architecture/microservices/model/domain-analysis) — Microsoft
 
+## Contents
+
+- [Domain Discovery Techniques](#domain-discovery-techniques)
+- [Ubiquitous Language](#ubiquitous-language)
+- [Bounded Contexts](#bounded-contexts)
+- [Subdomains](#subdomains)
+- [Context Mapping](#context-mapping)
+- [Context Map Diagram](#context-map-diagram)
+- [Integration Patterns](#integration-patterns)
+- [Strategic Design Checklist](#strategic-design-checklist)
+
 ## Overview
 
 Strategic DDD patterns help decompose large systems into manageable parts with clear boundaries. They answer: **"How do we divide a complex domain?"**
@@ -18,17 +29,22 @@ Strategic DDD patterns help decompose large systems into manageable parts with c
 
 ## Domain Discovery Techniques
 
-### Event Storming
+### EventStorming
 
-A workshop technique for discovering domain events, aggregates, and bounded contexts.
+A workshop technique (Alberto Brandolini) for discovering domain events, aggregates, and bounded contexts. Standard sticky-note colors:
 
 ```
-Orange sticky: Domain Event (past tense: "OrderPlaced")
-Blue sticky: Command (imperative: "Place Order")
-Yellow sticky: Aggregate (noun: "Order")
-Pink sticky: External System / Policy
-Purple sticky: Problem / Question
+Orange:        Domain Event (past tense: "OrderPlaced")
+Blue:          Command (imperative: "Place Order")
+Small yellow:  Actor (who issues the command)
+Large yellow:  Aggregate (noun: "Order")
+Pink:          External System (payment gateway, carrier)
+Lilac:         Policy / reaction ("When PaymentFailed, notify customer")
+Purple:        Hot Spot (problem, question, disagreement)
+Green:         Read Model (information the actor decides from)
 ```
+
+Colors vary slightly by workshop format; keep the legend visible and consistent within a session.
 
 **Workshop flow:**
 1. **Chaotic exploration** — Everyone adds events they know about
@@ -97,7 +113,7 @@ class Order {
 
 A **semantic boundary** where a particular domain model applies. Within a bounded context, terms have precise, unambiguous meaning.
 
-> **Key insight:** Polysemy (same word, different meanings) across departments is natural, not a problem. The same term meaning different things in different contexts is expected—"the dominant boundary factor is human culture and language variation." — Martin Fowler
+> **Key insight:** Polysemy (same word, different meanings) across departments is natural, not a problem. On what drives context boundaries: "Usually the dominant one is human culture, since models act as Ubiquitous Language, you need a different model when the language changes." — Martin Fowler
 
 ### Key Concepts
 
@@ -313,6 +329,9 @@ flowchart LR
 
 import Stripe from 'stripe';
 import { Payment, PaymentStatus } from '@/domain/payment/payment';
+import { PaymentId } from '@/domain/payment/value_objects';
+import { PaymentCompleted } from '@/domain/payment/events';
+import { DomainEvent } from '@/domain/shared/domain_event';
 import { Money } from '@/domain/shared/money';
 
 export class StripePaymentACL {
@@ -347,16 +366,17 @@ export class StripePaymentACL {
 
   translateWebhook(event: Stripe.Event): DomainEvent | null {
     switch (event.type) {
-      case 'payment_intent.succeeded':
+      case 'payment_intent.succeeded': {
         const intent = event.data.object as Stripe.PaymentIntent;
         return new PaymentCompleted(
-          PaymentId.from(intent.metadata.orderId),
+          PaymentId.from(intent.id),
           Money.fromCents(intent.amount, intent.currency.toUpperCase())
         );
+      }
       case 'payment_intent.payment_failed':
-        return null;
+        return null; // or translate to a PaymentFailed domain event
       default:
-        return null;
+        return null; // ignore Stripe events your context doesn't care about
     }
   }
 }

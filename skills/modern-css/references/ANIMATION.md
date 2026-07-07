@@ -6,6 +6,22 @@ CSS now handles entry/exit animations, intrinsic size interpolation, custom easi
 
 **Every animation in this file must respect `prefers-reduced-motion`.** The universal reset appears first. Per-feature approaches appear inline.
 
+## Contents
+
+- [Universal Reduced-Motion Reset](#universal-reduced-motion-reset)
+- [Animation Strategy Decision Flowchart](#animation-strategy-decision-flowchart)
+- [1. `@starting-style` — Entry Animations](#1-starting-style--entry-animations)
+- [2. `transition-behavior: allow-discrete`](#2-transition-behavior-allow-discrete)
+- [3. The Canonical Entry/Exit Pattern](#3-the-canonical-entryexit-pattern)
+- [4. `interpolate-size: allow-keywords` — Animate to/from `auto`](#4-interpolate-size-allow-keywords--animate-tofrom-auto)
+- [5. `calc-size()` — Math on Intrinsic Sizes](#5-calc-size--math-on-intrinsic-sizes)
+- [6. `linear()` Easing — Custom Curves](#6-linear-easing--custom-curves)
+- [7. View Transitions API](#7-view-transitions-api)
+- [8. `shape()` Function — Responsive Shapes](#8-shape-function--responsive-shapes)
+- [9. `corner-shape` — Non-Rounded Corners](#9-corner-shape--non-rounded-corners)
+- [10. `prefers-reduced-motion` — The Accessibility Contract](#10-prefers-reduced-motion--the-accessibility-contract)
+- [Anti-Patterns](#anti-patterns)
+
 ---
 
 ## Universal Reduced-Motion Reset
@@ -277,7 +293,7 @@ Setting on `:root` is safe — only affects elements that already have transitio
 
 **Reduced motion:** Keep functional open/close, just make it instant: `transition-duration: 0.01ms`.
 
-**Browser support:** Feature-detect:
+**Browser support:** Chromium-only (Chrome/Edge 129+) as of mid-2026. Not Baseline — other browsers snap instantly instead of animating, which is an acceptable degradation. Feature-detect:
 
 ```css
 @supports (interpolate-size: allow-keywords) {
@@ -319,7 +335,7 @@ Animatable when both states use the same keyword:
 | Add padding to `fit-content` | `calc-size(fit-content, size + 1rem)` |
 | Clamp `min-content` with a floor | `calc-size(min-content, max(size, 80px))` |
 
-**Browser support:** Always feature-detect.
+**Browser support:** Chromium-only (Chrome/Edge 129+) as of mid-2026. Always feature-detect with `@supports (width: calc-size(auto, size))` and provide a static fallback.
 
 ---
 
@@ -441,7 +457,7 @@ Child transitions animate independently within a parent group:
 }
 ```
 
-**Browser support:** Level 1 Baseline. Level 2 (cross-document, `view-transition-class`, `match-element`) is Interop 2025, shipping Chrome/Safari/Firefox.
+**Browser support (mid-2026):** Same-document view transitions — including `view-transition-class` and `match-element` — are Baseline Newly Available since October 2025 (Chrome 111+, Safari 18+, Firefox 144+). Cross-document view transitions (`@view-transition`) are NOT Baseline: Chromium 126+ and Safari 18.2+ support them; Firefox has them behind a flag (an Interop 2026 focus area). Cross-document transitions degrade gracefully — unsupported browsers get a normal navigation — so use them freely as an enhancement.
 
 ---
 
@@ -478,7 +494,7 @@ Animatable when both states have the same number and type of commands:
 
 **Reduced motion:** `transition: none;` — show final state.
 
-**Browser support:** Feature-detect with `@supports`.
+**Browser support:** Not Baseline as of mid-2026 — Chrome/Edge 135+ and Safari 18.4+ support `shape()` in `clip-path`; Firefox does not. Feature-detect with `@supports (clip-path: shape(from 0% 0%, line to 100% 100%))`.
 
 ---
 
@@ -510,7 +526,7 @@ Animatable between shapes:
 
 **Reduced motion:** `transition: none; corner-shape: squircle;` (apply preferred shape statically).
 
-**Browser support:** Experimental. Always feature-detect and provide `border-radius` fallback:
+**Browser support:** Chromium-only (Chrome/Edge 139+) as of mid-2026. Always feature-detect; plain `border-radius` is the automatic fallback:
 
 ```css
 @supports (corner-shape: squircle) {

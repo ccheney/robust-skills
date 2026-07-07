@@ -4,6 +4,19 @@
 
 This reference covers the primitives that power design systems in pure CSS: custom properties, typed registration, custom functions, conditional values, math, positional functions, and typed attribute access. Every section explains WHEN and WHY to reach for each feature.
 
+Custom properties, `@property`, and all math functions are Baseline. `@function`, `if()`, `sibling-index()`/`sibling-count()`, and typed `attr()` are NOT Baseline as of mid-2026 — each section notes current support.
+
+## Contents
+
+- [Custom Properties (`--*`)](#custom-properties---)
+- [`@property` — Typed Custom Properties](#property--typed-custom-properties)
+- [`@function` — Custom CSS Functions](#function--custom-css-functions)
+- [`if()` — Conditional Values](#if--conditional-values)
+- [CSS Math Functions](#css-math-functions)
+- [`sibling-index()` / `sibling-count()`](#sibling-index--sibling-count)
+- [Typed `attr()`](#typed-attr)
+- [Token Architecture Pattern](#token-architecture-pattern)
+
 ---
 
 ## Custom Properties (`--*`)
@@ -231,7 +244,7 @@ Gradients cannot be animated directly. Register the individual values and animat
 
 ## `@function` — Custom CSS Functions
 
-> Feature-detect with `@supports` or use progressive enhancement.
+> **Chromium-only (Chrome/Edge 139+) as of mid-2026. Not Baseline.** Unsupported browsers ignore the `@function` rule AND any declaration calling a `--fn()` — so always provide a fallback declaration before the one using the function.
 
 Define reusable computations that return a value. They accept parameters, support defaults, and are cascade-aware (last definition in the same layer wins).
 
@@ -327,7 +340,7 @@ Override a function in a later layer or later in the source.
 
 ## `if()` — Conditional Values
 
-> Feature-detect with `@supports (--x: if(media(width > 0): 1px))`.
+> **Chromium-only (Chrome/Edge 137+) as of mid-2026. Not Baseline.** Feature-detect against a real property, e.g. `@supports (color: if(style(--x): red; blue))`. Do NOT test with a custom property (`@supports (--x: if(...))`) — custom properties accept any value, so that test is always true.
 
 Evaluates conditions inline and returns the matching value. Reduces the need for multiple `@media` or `@container` blocks when varying a single property.
 
@@ -499,7 +512,7 @@ Baseline — use freely everywhere.
 
 ## `sibling-index()` / `sibling-count()`
 
-> Feature-detect with `@supports (--x: sibling-index())`.
+> **Not Baseline as of mid-2026:** Chrome/Edge 138+ and Safari 26.2+; no Firefox. Feature-detect against a real property: `@supports (transition-delay: calc(sibling-index() * 1ms))`. (Testing via a custom property is always true — see the `if()` note above.)
 
 Return the 1-based index and total count of siblings as integers usable in `calc()` — unlike `counter()` which returns strings only for `content`.
 
@@ -559,7 +572,7 @@ Use when you need positional styling that would otherwise require inline `style=
 
 ## Typed `attr()`
 
-> Feature-detect with `@supports (--x: attr(data-x type(<number>)))`.
+> **Chromium-only (Chrome/Edge 133+) as of mid-2026. Not Baseline.** Feature-detect against a real property: `@supports (width: attr(data-x type(<length>), 0px))`.
 
 Standard `attr()` only works in `content` and returns strings. Typed `attr()` parses HTML attributes as real CSS values — colors, numbers, lengths — usable in any property.
 
