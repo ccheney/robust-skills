@@ -39,7 +39,7 @@ Slack's `markdown` block explicitly documents support for:
 - images, translated to hyperlink text using the image alt text
 - backslash escaping of documented special characters
 
-All heading levels currently render at the same size according to the block reference. A single input block may translate into multiple output blocks. The cumulative `text` limit across all `markdown` blocks in one payload is 12,000 characters. A supplied `block_id` is ignored and not retained.
+The current block reference says all heading levels render at the same size, while Slack's March 6, 2026 changelog says variable-sized headers are being rolled out. Treat heading size as rollout- and client-dependent rather than relying on a specific visual hierarchy until the references converge. A single input block may translate into multiple output blocks. The cumulative `text` limit across all `markdown` blocks in one payload is 12,000 characters. A supplied `block_id` is ignored and not retained.
 
 ### `markdown_text` Chat Arguments
 
@@ -113,9 +113,9 @@ Slack normally unfurls links posted by users and apps, including media links in 
 | `unfurl_links` | Primarily text-based content |
 | `unfurl_media` | Media such as images, video, and audio |
 
-Set both to `false` to suppress all link previews. Slack does not unfurl a manually labeled link when the label is a complete substring of the URL after removing the protocol (for example, `<http://example.com|example.com>`). Streaming messages do not unfurl links.
+Set both to `false` to suppress all link previews. For messages containing LLM-generated URLs, disable unfurls by default with both `unfurl_links: false` and `unfurl_media: false`: Slack warns that its outbound preview request can complete prompt-injection data exfiltration. If previews are required, allow-list trusted external domains and reject or report URLs outside that list. Slack does not unfurl a manually labeled link when the label is a complete substring of the URL after removing the protocol (for example, `<http://example.com|example.com>`). Streaming messages do not unfurl links.
 
-Custom app unfurls use the renderer of each receiving field. Composer preview `elements` can contain an object with `type: "mrkdwn"`; blocks within the unfurl use their normal text-object rules. A `chat.unfurl` `user_auth_message` supports simple Slack formatting, while `user_auth_blocks` supplies a Block Kit alternative. Work Object entity metadata remains a separate standard-Markdown case as described above.
+Custom app unfurls use the renderer of each receiving field. Composer preview `elements` can contain an object with `type: "mrkdwn"`; blocks within the unfurl use their normal text-object rules. Exception: `chat.unfurl` does not currently support rich-text blocks and may return `invalid_blocks` for an otherwise valid Block Kit payload containing a rich-text section element. A `chat.unfurl` `user_auth_message` supports simple Slack formatting, while `user_auth_blocks` supplies a Block Kit alternative. Work Object entity metadata remains a separate standard-Markdown case as described above.
 
 ## Mentions and References
 
@@ -306,6 +306,7 @@ Secondary attachments are legacy. Prefer Block Kit for new development. Legacy f
 - [Formatting message text](https://docs.slack.dev/messaging/formatting-message-text/)
 - [Text object](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/)
 - [Markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/)
+- [Variable-sized header rollout — March 6, 2026](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/)
 - [Rich text block](https://docs.slack.dev/reference/block-kit/blocks/rich-text-block/)
 - [Alert block](https://docs.slack.dev/reference/block-kit/blocks/alert-block/) and [Card block](https://docs.slack.dev/reference/block-kit/blocks/card-block/)
 - [Option object](https://docs.slack.dev/reference/block-kit/composition-objects/option-object/)
@@ -315,6 +316,7 @@ Secondary attachments are legacy. Prefer Block Kit for new development. Legacy f
 - [Implementing Work Objects](https://docs.slack.dev/messaging/work-objects-implementation/) and [Work Object comments](https://docs.slack.dev/messaging/work-objects-comments/)
 - [Work object mention element](https://docs.slack.dev/reference/block-kit/block-elements/work-object-mention-element/)
 - [Unfurling links in messages](https://docs.slack.dev/messaging/unfurling-links-in-messages/)
+- [Security best practices](https://docs.slack.dev/concepts/security/)
 - [`chat.unfurl`](https://docs.slack.dev/reference/methods/chat.unfurl/)
 - [Legacy secondary message attachments](https://docs.slack.dev/legacy/legacy-messaging/legacy-secondary-message-attachments/)
 - [Desktop notification change — July 13, 2026](https://docs.slack.dev/changelog/2026/07/13/notification-changes/)

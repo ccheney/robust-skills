@@ -34,7 +34,7 @@ Not mrkdwn: `**bold**`, `[text](url)`, `# heading`, true list syntax, or languag
 - 12,000 characters cumulative across all `markdown` blocks in a payload.
 - A block can translate into multiple output blocks; `block_id` is ignored and not retained.
 - Documents bold/italic/strike, links, ordered/unordered lists, block quotes, inline/fenced code, syntax highlighting, headings, dividers, tables, task lists, image-to-link translation, and backslash escapes.
-- The current block reference says all heading levels render at the same size.
+- The block reference says all heading levels render at the same size, but Slack's March 6, 2026 changelog says variable-sized headers are rolling out. Treat heading size as rollout- and client-dependent.
 
 ### `markdown_text`
 
@@ -166,8 +166,10 @@ https://example.com
 
 - Spaces break URLs.
 - Set both `unfurl_links: false` and `unfurl_media: false` to suppress previews.
+- For LLM-generated URLs, default both flags to `false`; Slack warns that the preview crawl can complete prompt-injection data exfiltration. If previews are required, allow-list trusted domains.
 - `<http://example.com|example.com>` is not unfurled because its label is a complete substring of the URL without the protocol.
 - Composer unfurl preview elements with `type: "mrkdwn"` and unfurl Block Kit text objects use mrkdwn; Work Object metadata fields use standard Markdown instead.
+- `chat.unfurl` does not currently support rich-text blocks and may return `invalid_blocks` for a Block Kit payload containing a rich-text section element.
 
 ## Rich Text
 
