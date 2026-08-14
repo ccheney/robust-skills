@@ -59,19 +59,16 @@ fetchUser(userId)
 
 ```javascript
 async function getUserData(userId) {
-  try {
-    const user = await fetchUser(userId);
-    const posts = await fetchPosts(user.id);
-    const comments = await fetchComments(posts[0].id);
-    return { user, posts, comments };
-  } catch (error) {
-    console.error('Failed to get user data:', error);
-    throw error;
-  }
+  const user = await fetchUser(userId);
+  const posts = await fetchPosts(user.id);
+  const comments = await fetchComments(posts[0].id);
+  return { user, posts, comments };
 }
 ```
 
 ### Error Handling Patterns
+
+Let a rejection propagate unless this layer can recover, translate it, add useful context, or decide the final outcome. Catching, logging, and rethrowing at every layer commonly duplicates logs. Choose an owning boundary deliberately.
 
 ```javascript
 // Try/catch
@@ -163,16 +160,19 @@ const failures = results
 
 ### Promise.race()
 
-First to settle (resolve or reject) wins.
+First to settle (resolve or reject) wins. It does not cancel the losers. Use it only when losing operations may continue, or arrange cancellation through the operation's own protocol.
 
 ```javascript
-// Timeout pattern (ES2024)
+// fetch, AbortController, and timers are host APIs, not ECMAScript.
 async function fetchWithTimeout(url, ms) {
-  const { promise: timeout, reject } = Promise.withResolvers();
-  const timerId = setTimeout(() => reject(new Error('Timeout')), ms);
+  const controller = new AbortController();
+  const timerId = setTimeout(
+    () => controller.abort(new Error('Timeout')),
+    ms,
+  );
 
   try {
-    return await Promise.race([fetch(url), timeout]);
+    return await fetch(url, { signal: controller.signal });
   } finally {
     clearTimeout(timerId);
   }
@@ -239,25 +239,27 @@ const [users, posts, comments] = await Promise.all([
 ]);
 ```
 
-### Forgetting error handling
+### Choose an owning error boundary
+
+Ordinary rejection propagation is a valid async contract. Do not catch merely because an error can escape to the caller.
 
 ```javascript
-// ❌ Rejection is not handled at this boundary
-async function process() {
-  const data = await fetchData();  // Rejection escapes to the caller
+// Lower-level function deliberately propagates rejection.
+async function buildReport() {
+  const data = await fetchData();
   return transform(data);
 }
 ```
 
 ```javascript
-// ✅ Handle errors
-async function process() {
+// A job boundary owns logging and the final failure outcome.
+async function runReportJob() {
   try {
-    const data = await fetchData();
-    return transform(data);
+    await buildReport();
+    return { ok: true };
   } catch (error) {
-    logger.error('Processing failed:', error);
-    throw error;  // or return fallback
+    logger.error('Report job failed:', error);
+    return { ok: false, error };
   }
 }
 ```

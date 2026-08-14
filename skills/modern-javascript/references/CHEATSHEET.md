@@ -495,7 +495,8 @@ new Intl.DurationFormat('en', { style: 'long' })
   .format({ hours: 1, minutes: 30 })  // "1 hour, 30 minutes"
 
 // Temporal API (Stage 4 → expected ES2027; native in Firefox 139+,
-// Chrome 144+, Node 26; use a maintained polyfill elsewhere)
+// Chrome 144+, official Node 26 builds; feature-detect custom Node builds
+// and use a maintained polyfill elsewhere)
 Temporal.PlainDate.from('2024-03-15')     // Date only
 Temporal.PlainTime.from('14:30:00')       // Time only
 Temporal.PlainDateTime.from('2024-03-15T14:30:00')            // Date + time

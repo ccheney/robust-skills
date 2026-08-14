@@ -20,7 +20,7 @@ The Stage 4 proposals currently mapped to ES2027 are Temporal, explicit resource
 
 | Feature | Reached Stage 4 | Native support snapshot | Compatibility route |
 |---|---:|---|---|
-| Temporal | 2026-03-11 | Firefox 139, Chrome 144, Node 26; Safari preview | Dedicated Temporal polyfill |
+| Temporal | 2026-03-11 | Firefox 139, Chrome 144, official Node 26 binaries; Safari preview | Dedicated Temporal polyfill |
 | Explicit resource management | 2026-05-19 | Chrome 134, Firefox 141, Node 24; no stable Safari support recorded | Babel/TypeScript transform plus disposal built-ins as needed |
 | `Atomics.pause` | 2026-05-19 | Chrome 133, Firefox 137, Safari 18.4; no Node support recorded | No faithful polyfill; feature-detect a fallback |
 | `Iterator.zip` / `zipKeyed` | 2026-05-19 | Limited native support | current core-js modules |
@@ -57,7 +57,9 @@ Do not mechanically replace every `Date`:
 - Use plain types for calendar values without a timezone.
 - Use `Temporal.ZonedDateTime` when timezone rules are part of the value.
 
-For unsupported targets, use a maintained implementation listed by the [Temporal proposal](https://github.com/tc39/proposal-temporal#polyfills). A TypeScript `esnext.temporal` lib supplies types only.
+For unsupported targets, use a maintained implementation listed by the [Temporal proposal](https://github.com/tc39/proposal-temporal#polyfills). As of 2026-08-13, its table labels `temporal-polyfill` stable, `temporal-polyfill-lite` release candidate, and `@js-temporal/polyfill` alpha; recheck those labels and choose according to the project's stability and bundle requirements. A TypeScript `esnext.temporal` lib supplies types only.
+
+Node 26's official binaries enable Temporal by default, but custom/distributor builds may omit it when Node is built without the required Rust toolchain. Detect `globalThis.Temporal` at runtime instead of relying only on the Node version.
 
 ## Explicit resource management
 
@@ -188,6 +190,8 @@ Use ordinary objects/arrays, `Object.freeze` when shallow freezing is actually n
 - [July 2026 plenary agenda](https://github.com/tc39/agendas/blob/main/2026/07.md)
 - [May 2026 plenary notes](https://github.com/tc39/notes/blob/main/meetings/2026-05/may-19.md)
 - [Temporal proposal](https://github.com/tc39/proposal-temporal)
+- [Node.js 26.0.0 release](https://nodejs.org/en/blog/release/v26.0.0)
+- [Node.js Temporal build requirements](https://github.com/nodejs/node/blob/main/BUILDING.md#building-nodejs-with-temporal-support)
 - [Explicit resource management proposal](https://github.com/tc39/proposal-explicit-resource-management)
 - [Atomics.pause proposal](https://github.com/tc39/proposal-atomics-microwait)
 - [Joint iteration proposal](https://github.com/tc39/proposal-joint-iteration)

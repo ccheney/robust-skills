@@ -113,10 +113,20 @@ Pin and test the current core-js version in the project. A polyfill can match AP
 
 ### Temporal
 
-Temporal is too large to treat as a casual utility import. Prefer a runtime that ships it. Otherwise choose a maintained implementation listed by the [TC39 Temporal repository](https://github.com/tc39/proposal-temporal#polyfills), such as `@js-temporal/polyfill` or `temporal-polyfill`, and account for bundle cost and timezone/calendar data.
+Temporal is too large to treat as a casual utility import. Prefer a runtime that ships it. Otherwise choose a maintained implementation listed by the [TC39 Temporal repository](https://github.com/tc39/proposal-temporal#polyfills), and account for bundle cost, calendar coverage, API parity, and the project's release-stability policy.
+
+TC39's table labels these releases as follows, checked 2026-08-13:
+
+| Package | Upstream release label |
+|---|---|
+| `temporal-polyfill` | Stable |
+| `temporal-polyfill-lite` | Release candidate |
+| `@js-temporal/polyfill` | Alpha |
+
+These are dated upstream labels, not permanent rankings. Recheck them before choosing. The stable package supports a local ponyfill import, which avoids changing the global in a library:
 
 ```javascript
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 
 const today = Temporal.Now.plainDateISO();
 ```
@@ -149,12 +159,14 @@ Safari 18.4's `Error.isError` returns `false` for `DOMException`; BCD therefore 
 
 | Feature | Native position | Compatibility path |
 |---|---|---|
-| Temporal | Chrome 144, Firefox 139, Node 26; Safari preview | Dedicated Temporal polyfill |
+| Temporal | Chrome 144, Firefox 139, official Node 26 binaries; Safari preview | Dedicated Temporal polyfill |
 | Explicit resource management | Chrome 134, Firefox 141, Node 24; no stable Safari support recorded | Babel/TypeScript transform plus core-js protocol built-ins as needed |
 | `Atomics.pause` | Chrome 133, Firefox 137, Safari 18.4; no Node support recorded | Feature-detected fallback algorithm |
 | `Iterator.zip` / `zipKeyed` | Limited native support | current core-js modules |
 
 Do not turn these numbers into a universal baseline. Electron, embedded WebViews, serverless images, test runners, and bundlers may lag their upstream engine.
+
+Node 26's official binaries enable Temporal by default. Custom and distributor builds can omit it: Node's build probes for the required Rust toolchain and disables Temporal when the prerequisites are absent unless the builder explicitly requires it. Feature-detect `globalThis.Temporal` instead of trusting `process.versions.node` alone.
 
 ## Feature detection
 
@@ -183,3 +195,5 @@ Feature detection answers whether a property exists, not whether an old implemen
 - [Babel 8 migration guide](https://babeljs.io/docs/v8-migration)
 - [TypeScript 7.0 release](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)
 - [core-js feature documentation](https://github.com/zloirock/core-js#ecmascript)
+- [Node.js 26.0.0 release](https://nodejs.org/en/blog/release/v26.0.0)
+- [Building Node.js with Temporal support](https://github.com/nodejs/node/blob/main/BUILDING.md#building-nodejs-with-temporal-support)

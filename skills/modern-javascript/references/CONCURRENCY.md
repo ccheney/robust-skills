@@ -118,6 +118,8 @@ const data = await withRetry(() => fetchData(), {
 
 ## Timeout Wrapper
 
+`Promise.race` selects which result the wrapper observes; it does not stop the losing operation. The wrapper below clears its own timer, but `promise` keeps running after a timeout. When cancellation matters, pass an `AbortSignal` or use the operation's cancellation protocol.
+
 ```javascript
 // ES2024: Using Promise.withResolvers()
 async function withTimeout(promise, ms, message = 'Timeout') {
@@ -180,11 +182,16 @@ function throttleAsync(fn, ms) {
     }
 
     if (!pending) {
-      pending = new Promise(resolve => {
-        setTimeout(async () => {
-          lastCall = Date.now();
-          pending = null;
-          resolve(await fn(...args));
+      pending = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          (async () => {
+            lastCall = Date.now();
+            try {
+              return await fn(...args);
+            } finally {
+              pending = null;
+            }
+          })().then(resolve, reject);
         }, ms - timeSinceLastCall);
       });
     }
