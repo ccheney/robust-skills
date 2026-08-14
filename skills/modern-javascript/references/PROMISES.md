@@ -122,7 +122,7 @@ export { db };
 
 ### Promise.all()
 
-Wait for all promises; fail if any fails.
+Wait for all inputs; reject as soon as one rejects. It does not cancel the other operations.
 
 ```javascript
 // Parallel execution
@@ -136,7 +136,7 @@ const [users, posts, comments] = await Promise.all([
 try {
   const results = await Promise.all([taskA(), taskB(), taskC()]);
 } catch (error) {
-  // Any rejection cancels all
+  // Rejects when one input rejects; other operations keep running
   console.error('One task failed:', error);
 }
 ```
@@ -242,9 +242,9 @@ const [users, posts, comments] = await Promise.all([
 ### Forgetting error handling
 
 ```javascript
-// ❌ Unhandled rejection
+// ❌ Rejection is not handled at this boundary
 async function process() {
-  const data = await fetchData();  // If this fails, crash
+  const data = await fetchData();  // Rejection escapes to the caller
   return transform(data);
 }
 ```

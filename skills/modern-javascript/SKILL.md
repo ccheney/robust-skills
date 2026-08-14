@@ -1,385 +1,181 @@
 ---
 name: modern-javascript
-description: Proactively apply when creating web applications, Node.js services, or any JavaScript project. Triggers on JavaScript, ES6, ES2020, ES2022, ES2024, ES2025, ES2026, modern JS, refactor legacy, array methods, async/await, optional chaining, nullish coalescing, destructuring, spread, rest, template literals, arrow functions, toSorted, toReversed, at, groupBy, iterator helpers, Set union intersection difference, Promise, Promise.try, RegExp.escape, Array.fromAsync, using await using, Temporal, functional programming. Use when writing new JavaScript code, refactoring legacy code, modernizing codebases, implementing functional patterns, checking which ECMAScript edition or runtime supports a feature, or reviewing JS for performance and readability. Modern JavaScript (ES6-ES2026) patterns and best practices.
+description: Write, modernize, and review JavaScript against real ECMAScript language features and explicit runtime targets. Use for JavaScript or Node.js code, ES edition attribution (ES2015-ES2026), compatibility and polyfill/transpile decisions, array/iterator/Set/Map/Promise/RegExp/TypedArray APIs, modules, async code, Temporal, explicit resource management, decorators, or replacing stale and withdrawn proposal syntax. Prefer standardized features, while permitting mature proposals when the required maintained transform or polyfill is stated.
 ---
 
-# Modern JavaScript (ES6-ES2026)
+# Modern JavaScript
 
-Write clean, performant, maintainable JavaScript using modern language features. This skill covers ES6 through ES2026, emphasizing immutability, functional patterns, and expressive syntax — and it pins each feature to the ECMAScript edition and runtimes that actually support it, because misattributed versions are the most common way modern-JS advice breaks.
+Use current JavaScript without confusing specification status, runtime support, and toolchain support. Treat these as three separate questions:
 
-## Quick Decision Trees
+1. **Is it standardized?** Check the frozen annual ECMA-262 edition or TC39's current proposal tracker.
+2. **Does the target run it?** Check the project's declared Node/browser targets and current compatibility data.
+3. **Can tooling bridge the gap?** Syntax may need a transform; built-ins need a polyfill. One does not imply the other.
 
-### "Which array method should I use?"
+## Workflow
 
-```
-What do I need?
-├─ Transform each element           → .map()
-├─ Keep some elements               → .filter()
-├─ Find one element                 → .find() / .findLast()
-├─ Check if condition met           → .some() / .every()
-├─ Reduce to single value           → .reduce()
-├─ Get last element                 → .at(-1)
-├─ Sort without mutating            → .toSorted()
-├─ Reverse without mutating         → .toReversed()
-├─ Group by property                → Object.groupBy() / Map.groupBy()
-├─ Collect an async iterable        → Array.fromAsync()
-└─ Flatten nested arrays            → .flat() / .flatMap()
-```
+1. Inspect `package.json` (`engines`, `browserslist`, dependencies), runtime/deployment config, `tsconfig.json`, and Babel/bundler config. Do not invent a baseline.
+2. Select the simplest standardized feature supported by that baseline.
+3. For a newer standard or mature proposal, state the required runtime, transform, or polyfill in the implementation or handoff.
+4. Preserve observable behavior while modernizing: mutation, evaluation order, iterator consumption, concurrency, cancellation, property descriptors, and error propagation matter more than shorter syntax.
+5. Run the project's formatter, type-checker, linter, and tests. Exercise both the native path and compatibility path when both ship.
 
-### "How do I handle nullish values?"
+Read [references/COMPATIBILITY.md](references/COMPATIBILITY.md) whenever support is uncertain, the feature is newer than ES2023, or a proposal is involved.
 
-```
-Nullish handling?
-├─ Safe property access              → obj?.prop / obj?.[key]
-├─ Safe method call                  → obj?.method?.()
-├─ Default for null/undefined only   → value ?? 'default'
-├─ Default for any falsy             → value || 'default'
-├─ Assign if null/undefined          → obj.prop ??= 'default'
-└─ Check property exists             → Object.hasOwn(obj, 'key')
-```
+## Status Rules
 
-### "Should I mutate or copy?"
+- Use the [frozen ECMAScript 2026 specification](https://262.ecma-international.org/17.0/) for ES2026 attribution and the [living draft](https://tc39.es/ecma262/) for already-integrated future features.
+- Use TC39's [finished-proposals table](https://github.com/tc39/proposals/blob/main/finished-proposals.md) for Stage 4 publication-year mapping and its [active tracker](https://github.com/tc39/proposals) for current stages.
+- Do not infer an edition from the year a browser shipped a feature. `Array.fromAsync`, for example, shipped before its ES2026 publication.
+- Do not describe Stage 3 or 2.7 syntax as standard JavaScript. It can still be a sound project choice when a maintained toolchain implements the selected proposal revision.
+- Do not emit withdrawn Records & Tuples syntax (`#{}` / `#[]`).
 
-```
-Always prefer non-mutating methods:
-├─ Sort array      → .toSorted()    (not .sort())
-├─ Reverse array   → .toReversed()  (not .reverse())
-├─ Splice array    → .toSpliced()   (not .splice())
-├─ Update element  → .with(i, val)  (not arr[i] = val)
-├─ Add to array    → [...arr, item] (not .push())
-└─ Merge objects   → {...obj, key}  (not Object.assign())
-```
+## Edition Map
 
-## ES Version Quick Reference
+This is a routing index, not a substitute for the detailed references.
 
-Editions are set by which proposals reach TC39 Stage 4 before the spring cutoff, so a feature's edition often lags its browser availability (e.g. `Array.fromAsync` shipped in browsers in 2023-24 but is spec'd in ES2026). Cite editions from this table, not from memory.
+| Edition | Representative additions |
+|---|---|
+| ES2015 | `let`/`const`, classes, modules, arrow functions, destructuring, promises, generators, `Map`/`Set`, `Proxy` |
+| ES2016 | exponentiation, `Array.prototype.includes` |
+| ES2017 | async functions, `Object.values`/`entries`, string padding, shared memory and Atomics |
+| ES2018 | object rest/spread, async iteration, `Promise.prototype.finally`, major RegExp additions |
+| ES2019 | `flat`/`flatMap`, `Object.fromEntries`, optional catch binding, stable sort |
+| ES2020 | optional chaining, nullish coalescing, `BigInt`, `Promise.allSettled`, dynamic `import()`, `globalThis` |
+| ES2021 | logical assignment, `Promise.any`, `replaceAll`, numeric separators, `WeakRef` |
+| ES2022 | `.at`, `Object.hasOwn`, top-level `await`, class fields/private elements/static blocks, error cause, RegExp indices |
+| ES2023 | array change-by-copy methods, `findLast`/`findLastIndex`, hashbang grammar, symbols as weak keys |
+| ES2024 | grouping, `Promise.withResolvers`, well-formed strings, RegExp `v`, resizable/transferable buffers, `Atomics.waitAsync` |
+| ES2025 | Set methods, sync iterator helpers, `RegExp.escape`, `Promise.try`, import attributes/JSON modules, RegExp modifiers, Float16 |
+| ES2026 | `Array.fromAsync`, `Error.isError`, `Math.sumPrecise`, Uint8Array base64/hex, `Iterator.concat`, Map/WeakMap upsert, JSON source access |
 
-| Version | Year | Key Features |
-|---------|------|--------------|
-| ES6 | 2015 | let/const, arrow functions, classes, destructuring, spread, Promises, modules, Symbol, Map/Set, Proxy, generators |
-| ES2016 | 2016 | Array.includes(), exponentiation operator ** |
-| ES2017 | 2017 | async/await, Object.values/entries, padStart/padEnd, trailing commas, SharedArrayBuffer, Atomics |
-| ES2018 | 2018 | Rest/spread for objects, for await...of, Promise.finally(), RegExp named groups, lookbehind, dotAll flag |
-| ES2019 | 2019 | .flat(), .flatMap(), Object.fromEntries(), trimStart/End(), optional catch binding, stable Array.sort() |
-| ES2020 | 2020 | Optional chaining ?., nullish coalescing ??, BigInt, Promise.allSettled(), globalThis, dynamic import(), matchAll |
-| ES2021 | 2021 | String.replaceAll(), Promise.any(), logical assignment ??= \|\|= &&=, numeric separators 1_000_000, WeakRef |
-| ES2022 | 2022 | .at(), Object.hasOwn(), top-level await, private class fields #field, static blocks, Error cause, /d flag |
-| ES2023 | 2023 | .toSorted(), .toReversed(), .toSpliced(), .with(), .findLast(), .findLastIndex(), hashbang grammar |
-| ES2024 | 2024 | Object.groupBy(), Map.groupBy(), Promise.withResolvers(), RegExp /v flag, resizable ArrayBuffer + transfer(), Atomics.waitAsync(), isWellFormed() |
-| ES2025 | 2025 | Set methods (.union, .intersection, ...), iterator helpers (.map, .filter, .take), RegExp.escape(), Promise.try(), import attributes + JSON modules, duplicate named capture groups, RegExp inline modifiers, Float16Array |
-| ES2026 | 2026 | Array.fromAsync(), Error.isError(), Math.sumPrecise(), Uint8Array.fromBase64()/toBase64(), Iterator.concat(), Map.getOrInsert(), JSON.parse source access |
+Already Stage 4 with publication expected in ES2027: Temporal, explicit resource management (`using` / `await using`), `Atomics.pause`, and `Iterator.zip` / `zipKeyed`. See [references/UPCOMING.md](references/UPCOMING.md).
 
-Already Stage 4 and slated for ES2027: **Temporal**, **explicit resource management (`using`/`await using`)**, `Atomics.pause()`, `Iterator.zip()`. Decorators remain Stage 3 (transpiler only). Records & Tuples (`#{}`/`#[]`) was **withdrawn** — never emit that syntax. See [references/UPCOMING.md](references/UPCOMING.md).
+## Choose by Semantics
 
-## Runtime Support Rules of Thumb
+### Collections
 
-State the baseline when reaching for newer features; suggesting `.toSorted()` to someone on Node 18 produces a runtime `TypeError: arr.toSorted is not a function`.
+| Need | Prefer | Important behavior |
+|---|---|---|
+| Transform/filter an array | `map`, `filter`, `flatMap` | Eager; creates arrays |
+| Process a large/infinite sync source | iterator helpers | Lazy; consumes the iterator |
+| Find from the end | `findLast`, `findLastIndex` | Does not reverse or copy |
+| Change without mutating the source | `toSorted`, `toReversed`, `toSpliced`, `with` | Shallow copy |
+| Group under string/symbol keys | `Object.groupBy` | Returns a null-prototype object |
+| Group under identity keys | `Map.groupBy` | Preserves key identity |
+| Collect an async iterable | `Array.fromAsync` | Pulls and awaits sequentially |
+| Run already-created work concurrently | `Promise.all` | Rejects early; does not cancel inputs |
 
-- **Safe almost everywhere (Baseline widely available)**: everything through ES2023, plus ES2024 grouping/`Promise.withResolvers` and `Array.fromAsync` (Node 21-22+, Safari 16.4-17.4+).
-- **Needs a modern baseline (2024-2025 browsers, Node 22-23+)**: Set methods, iterator helpers, import attributes, Promise.try, duplicate named capture groups.
-- **Cutting edge (Node 24+, 2025+ browsers; Safari partly behind flags)**: RegExp.escape, Float16Array, `using`/`await using`, Error.isError, Uint8Array base64.
-- **Native but not universal**: Temporal (Firefox 139+, Chrome 144+, Node 26+; polyfill elsewhere). Decorators always need Babel or TypeScript.
-
-Per-feature version tables live at the end of [references/ES2024.md](references/ES2024.md), [references/ES2025.md](references/ES2025.md), and [references/ES2026.md](references/ES2026.md).
-
-## Modernization Patterns
-
-### Array Access
+Do not replace mutation mechanically. A private, newly allocated array can be mutated efficiently without exposing mutable shared state. Use change-by-copy methods when preserving the source is part of the contract.
 
 ```javascript
-// ❌ Legacy
-const last = arr[arr.length - 1];
-const secondLast = arr[arr.length - 2];
-```
+const ranked = scores.toSorted((a, b) => b.points - a.points);
 
-```javascript
-// ✅ Modern (ES2022)
-const last = arr.at(-1);
-const secondLast = arr.at(-2);
-```
-
-### Non-Mutating Array Operations
-
-```javascript
-// ❌ Mutates original array (and returns the same reference)
-const sorted = arr.sort((a, b) => a - b);
-const reversed = arr.reverse();
-```
-
-```javascript
-// ✅ Returns new array (ES2023)
-const sorted = arr.toSorted((a, b) => a - b);
-const reversed = arr.toReversed();
-const updated = arr.with(2, 'new value');
-const removed = arr.toSpliced(1, 1);
-```
-
-### String Replacement
-
-```javascript
-// ❌ Legacy with regex
-const result = str.replace(/foo/g, 'bar');
-```
-
-```javascript
-// ✅ Modern (ES2021) — no escaping worries for literal strings
-const result = str.replaceAll('foo', 'bar');
-```
-
-### Grouping Data
-
-```javascript
-// ❌ Manual grouping
-const grouped = items.reduce((acc, item) => {
-  const key = item.category;
-  acc[key] = acc[key] || [];
-  acc[key].push(item);
-  return acc;
-}, {});
-```
-
-```javascript
-// ✅ Modern (ES2024)
-const grouped = Object.groupBy(items, item => item.category);
-```
-
-Gotcha: `Object.groupBy` returns a **null-prototype object** — property access and destructuring work, but `grouped.hasOwnProperty(...)` throws. Use `Object.hasOwn()`. Use `Map.groupBy` when keys are objects or non-strings. There is no `Array.prototype.group()` — that earlier shape of the proposal never shipped.
-
-### Nullish Handling
-
-```javascript
-// ❌ Falsy check (0, '', false are valid values)
-const value = input || 'default';
-const name = user && user.profile && user.profile.name;
-```
-
-```javascript
-// ✅ Nullish check (only null/undefined)
-const value = input ?? 'default';
-const name = user?.profile?.name;
-```
-
-### Property Existence
-
-```javascript
-// ❌ Can be fooled by prototype or overwritten hasOwnProperty
-if (obj.hasOwnProperty('key')) { }
-```
-
-```javascript
-// ✅ Modern (ES2022) — also works on null-prototype objects
-if (Object.hasOwn(obj, 'key')) { }
-```
-
-### Logical Assignment
-
-```javascript
-// ❌ Verbose assignment
-if (obj.prop === null || obj.prop === undefined) {
-  obj.prop = 'default';
+const byTeam = Object.groupBy(players, player => player.team);
+if (Object.hasOwn(byTeam, requestedTeam)) {
+  render(byTeam[requestedTeam]);
 }
 ```
 
-```javascript
-// ✅ Modern (ES2021)
-obj.prop ??= 'default';  // Assign if null/undefined
-obj.count ||= 0;         // Assign if falsy
-obj.enabled &&= check(); // Assign if truthy
-```
-
-## Async Patterns
-
-### Promise Combinators
+### Nullish and Property Checks
 
 ```javascript
-// Wait for all, fail if any fails
-const [users, posts] = await Promise.all([fetchUsers(), fetchPosts()]);
+const city = user?.address?.city ?? 'Unknown';
 
-// Wait for all, get status of each
-const results = await Promise.allSettled([fetchA(), fetchB()]);
-results.forEach(r => {
-  if (r.status === 'fulfilled') console.log(r.value);
-  else console.error(r.reason);
-});
+// `??` preserves 0, false, and ''. Use `||` only when all falsy values mean absent.
+settings.timeout ??= 5_000;
 
-// First to succeed
-const fastest = await Promise.any([fetchFromCDN1(), fetchFromCDN2()]);
-
-// First to settle
-const winner = await Promise.race([fetchData(), timeout(5000)]);
+// Safe for overwritten or null-prototype objects.
+if (Object.hasOwn(record, 'id')) use(record.id);
 ```
 
-### Promise.withResolvers (ES2024)
+### Async Work
 
 ```javascript
-// ❌ Legacy pattern
-let resolve, reject;
-const promise = new Promise((res, rej) => {
-  resolve = res;
-  reject = rej;
-});
+// Independent work: concurrent.
+const [user, permissions] = await Promise.all([
+  fetchUser(id),
+  fetchPermissions(id),
+]);
+
+// Ordered source: sequential consumption.
+const pages = await Array.fromAsync(fetchPages());
+
+// A loop is correct when each step depends on the previous one.
+for (const migration of migrations) {
+  await migration.run();
+}
 ```
+
+Never use `forEach(async () => ...)` when completion must be awaited. Read [references/PROMISES.md](references/PROMISES.md) for combinators and [references/CONCURRENCY.md](references/CONCURRENCY.md) for bounded concurrency and cancellation.
+
+### Modules
+
+Use `with` for import attributes; the older `assert` spelling is not current ECMAScript.
 
 ```javascript
-// ✅ Modern (ES2024)
-const { promise, resolve, reject } = Promise.withResolvers();
+import config from './config.json' with { type: 'json' };
+
+const locale = await import(`./locales/${language}.js`);
 ```
 
-### Top-Level Await (ES2022)
+Import attributes and JSON modules are ES2025, but module loading remains host-sensitive. Verify Node, browser, bundler, and test-runner support together.
 
-```javascript
-// In ES modules, await at top level
-const config = await fetch('/config.json').then(r => r.json());
-const db = await connectDatabase(config);
+### Exact API Boundaries
 
-export { db };
-```
+- `structuredClone`, `fetch`, streams, `AbortController`, and DOM APIs are host/web APIs, not ECMA-262 language features.
+- `Intl.*` is standardized in ECMA-402, not ECMA-262.
+- TypeScript syntax and types are not JavaScript runtime features.
+- A TypeScript `lib` entry supplies type declarations, not a runtime implementation.
+- Babel syntax transforms do not automatically install missing globals or prototype methods.
 
-## Functional Patterns
+## Compatibility Paths
 
-### Immutable Object Updates
+Prefer native support when the target has it. Otherwise choose deliberately:
 
-```javascript
-// Add/update property
-const updated = { ...user, age: 31 };
+| Feature kind | Compatibility mechanism |
+|---|---|
+| Syntax (`using`, decorators) | Babel/TypeScript transform that matches the selected proposal revision |
+| Built-in (`Iterator.concat`, `Map#getOrInsert`) | Runtime upgrade or maintained polyfill such as current core-js |
+| Namespace API (Temporal) | Runtime upgrade or a maintained Temporal polyfill |
+| Shared-memory primitive (`Atomics.pause`) | Native support only; feature-detect and keep a fallback algorithm |
 
-// Remove property
-const { password, ...userWithoutPassword } = user;
+TypeScript 7.0 is released, but it is not a polyfill and 7.0 has no stable programmatic compiler API. Projects whose framework/linter embeds TypeScript may need TypeScript 6 alongside it. See [references/COMPATIBILITY.md](references/COMPATIBILITY.md).
 
-// Nested update
-const newState = {
-  ...state,
-  user: { ...state.user, name: 'New Name' }
-};
-```
+## Review Traps
 
-### Array Transformations
+- `.sort()`, `.reverse()`, `.splice()`, `Map#set`, `Set#add`, and most TypedArray methods mutate. That is not automatically wrong; make it intentional.
+- Object/array spread is shallow and invokes ordinary property access; it does not preserve prototypes or descriptors.
+- `structuredClone` is a host API and cannot clone functions, weak collections, or every platform object.
+- `Object.groupBy` has no inherited `hasOwnProperty` or `toString`.
+- Iterator helpers are lazy and single-pass; arrays are reusable and eager.
+- `Promise.all` does not cancel remaining operations after rejection. Pass `AbortSignal` when cancellation is required.
+- `Math.sumPrecise` accurately sums the binary Number inputs; it does not make decimal money exact.
+- `Error.isError` is cross-realm-safe for ECMAScript Error objects; host error types can have runtime-specific behavior.
+- `Temporal` is not part of ES2026. Its Stage 4 publication target is ES2027.
+- Standard decorators are not legacy TypeScript `experimentalDecorators`.
 
-```javascript
-// Chain transformations (ES2023)
-const result = users
-  .filter(u => u.active)
-  .map(u => u.name)
-  .toSorted();
+## References
 
-// Using flatMap for filter+map (single pass)
-const activeNames = users.flatMap(u => u.active ? [u.name] : []);
+Load only what the task needs.
 
-// ES2024: Group then process
-const byStatus = Object.groupBy(users, u => u.active ? 'active' : 'inactive');
-const activeUserNames = byStatus.active?.map(u => u.name) ?? [];
-```
+| Reference | Use for |
+|---|---|
+| [ES2016-ES2017.md](references/ES2016-ES2017.md) | early annual additions, async functions, shared memory |
+| [ES2018-ES2019.md](references/ES2018-ES2019.md) | async iteration, object spread, RegExp, flattening |
+| [ES2022-ES2023.md](references/ES2022-ES2023.md) | classes, `.at`, change-by-copy, weak symbol keys |
+| [ES2024.md](references/ES2024.md) | grouping, resolvers, Unicode sets, buffers |
+| [ES2025.md](references/ES2025.md) | Set/iterator helpers, modules, RegExp, Float16 |
+| [ES2026.md](references/ES2026.md) | all seven finalized ES2026 feature proposals |
+| [UPCOMING.md](references/UPCOMING.md) | Stage 4 ES2027 set, selected mature proposals, withdrawn syntax |
+| [COMPATIBILITY.md](references/COMPATIBILITY.md) | runtime matrices, Babel/TypeScript/core-js/polyfill decisions |
+| [PROMISES.md](references/PROMISES.md) | promise semantics and anti-patterns |
+| [CONCURRENCY.md](references/CONCURRENCY.md) | pools, retries, cancellation, async iteration |
+| [CHEATSHEET.md](references/CHEATSHEET.md) | compact syntax lookup |
 
-### Composition
+## Authority Order
 
-```javascript
-const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x);
-const compose = (...fns) => x => fns.reduceRight((v, f) => f(v), x);
-
-const processUser = pipe(
-  user => ({ ...user, name: user.name.trim() }),
-  user => ({ ...user, email: user.email.toLowerCase() }),
-  user => ({ ...user, createdAt: new Date() })
-);
-```
-
-## Destructuring Patterns
-
-### Object Destructuring
-
-```javascript
-// Basic with rename and default
-const { name: userName, age = 18 } = user;
-
-// Nested
-const { address: { city, country } } = user;
-
-// Rest
-const { id, ...userData } = user;
-```
-
-### Array Destructuring
-
-```javascript
-// Skip elements
-const [first, , third] = array;
-
-// Rest
-const [head, ...tail] = array;
-
-// Swap variables
-[a, b] = [b, a];
-
-// Function returns
-const [x, y] = getCoordinates();
-```
-
-## Anti-Patterns
-
-| Anti-Pattern | Problem | Modern Solution |
-|--------------|---------|-----------------|
-| `arr[arr.length-1]` | Verbose, error-prone | `arr.at(-1)` |
-| `.sort()` on original | Mutates array | `.toSorted()` |
-| `.replace(/x/g)` for literal strings | Needs regex escaping | `.replaceAll()` |
-| `obj.hasOwnProperty()` | Can be overwritten; throws on null-prototype objects | `Object.hasOwn()` |
-| `value \|\| default` | 0, '', false treated as falsy | `value ?? default` |
-| `obj && obj.prop && obj.prop.method()` | Verbose null checks | `obj?.prop?.method?.()` |
-| `for (let i = 0; ...)` | Index bugs, verbose | `.map()`, `.filter()`, `for...of` |
-| `items.forEach(async item => ...)` | forEach ignores promises; nothing is awaited | `for...of` + await, or `Promise.all(items.map(...))` |
-| `let resolve; new Promise(r => ...)` | Boilerplate, escape-hatch closures | `Promise.withResolvers()` |
-| Manual array grouping with reduce | Verbose, error-prone | `Object.groupBy()` / `Map.groupBy()` |
-| `#{ }` / `#[ ]` record/tuple literals | Proposal withdrawn April 2025; never valid syntax | Plain frozen objects, or Maps keyed manually |
-
-## Best Practices
-
-1. **Use `const` by default** — Only use `let` when reassignment is needed
-2. **Prefer arrow functions** — Especially for callbacks and short functions
-3. **Use template literals** — Instead of string concatenation
-4. **Destructure early** — Extract what you need at function start
-5. **Avoid mutations** — Use `.toSorted()`, `.toReversed()`, spread operator
-6. **Use optional chaining** — Prevent "Cannot read property of undefined"
-7. **Use nullish coalescing** — `??` for defaults, not `||` (unless intentional)
-8. **Prefer array methods** — `.map()`, `.filter()`, `.find()` over loops
-9. **Use `async/await`** — Instead of `.then()` chains
-10. **State the runtime baseline** — Note the Node/browser floor when using post-ES2023 features
-
-## Reference Documentation
-
-Open the reference that matches the task; SKILL.md alone is enough for everyday syntax choices.
-
-### ES Version References
-
-| Read this | When |
-|------|---------|
-| [references/ES2016-ES2017.md](references/ES2016-ES2017.md) | async/await fundamentals, Object.values/entries, string padding |
-| [references/ES2018-ES2019.md](references/ES2018-ES2019.md) | Object rest/spread, flat/flatMap, regex named groups/lookbehind/dotAll |
-| [references/ES2022-ES2023.md](references/ES2022-ES2023.md) | .at(), change-by-copy methods, private fields, static blocks, error cause |
-| [references/ES2024.md](references/ES2024.md) | Grouping data, Promise.withResolvers, /v regex, ArrayBuffer resize/transfer |
-| [references/ES2025.md](references/ES2025.md) | Set operations, iterator helpers, RegExp.escape, Promise.try, import attributes |
-| [references/ES2026.md](references/ES2026.md) | Array.fromAsync, Error.isError, base64 bytes, Math.sumPrecise, Map.getOrInsert |
-| [references/UPCOMING.md](references/UPCOMING.md) | Temporal, using/await using, decorators, proposal status questions |
-
-### Pattern References
-
-| Read this | When |
-|------|---------|
-| [references/PROMISES.md](references/PROMISES.md) | Writing async flows, choosing combinators, fixing promise anti-patterns |
-| [references/CONCURRENCY.md](references/CONCURRENCY.md) | Rate limiting, pools, retry/backoff, timeouts, cancellation, async iteration |
-| [references/IMMUTABILITY.md](references/IMMUTABILITY.md) | State updates (React/Redux), pure functions, deep clone decisions |
-| [references/COMPOSITION.md](references/COMPOSITION.md) | Higher-order functions, currying, memoization, Maybe/Result patterns |
-| [references/CHEATSHEET.md](references/CHEATSHEET.md) | Quick syntax lookup across all editions |
-
-## Resources
-
-### Specifications
-- **ECMAScript Specification**: https://tc39.es/ecma262/ (living standard)
-- **TC39 Proposals**: https://github.com/tc39/proposals (stage status; finished-proposals.md maps features to editions)
-- **TC39 Process**: https://tc39.es/process-document/ (how features are added)
-
-### Documentation
-- **MDN Web Docs**: https://developer.mozilla.org/en-US/docs/Web/JavaScript
-- **JavaScript.info**: https://javascript.info/
-
-### Compatibility
-- **Can I Use**: https://caniuse.com (browser support tables)
-- **Node.js ES Compatibility**: https://node.green/
+1. Frozen annual ECMA-262 editions for edition membership
+2. Living ECMA-262 plus TC39 proposal tracker/spec repositories for future status and semantics
+3. Test262 for conformance cases
+4. MDN Browser Compatibility Data and official engine/runtime releases for availability
+5. Official TypeScript, Babel, and polyfill documentation for compatibility paths

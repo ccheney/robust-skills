@@ -1,6 +1,6 @@
 # Modern JavaScript Cheatsheet
 
-Variables, arrow functions, destructuring, spread/rest, template literals, optional chaining, nullish coalescing, array methods, string methods, object methods, promises, async/await, classes, modules, Set/Map, iterators, generators, RegExp, BigInt, Temporal, resource management.
+Syntax lookup for standardized ECMAScript through ES2026, plus explicitly labeled Stage 4 ES2027 features and selected toolchain-backed proposals. Check [COMPATIBILITY.md](COMPATIBILITY.md) before using post-ES2023 APIs on an undeclared baseline.
 
 ## Contents
 
@@ -22,7 +22,7 @@ Variables, arrow functions, destructuring, spread/rest, template literals, optio
 - [Iterators & Generators](#iterators--generators)
 - [Regular Expressions](#regular-expressions)
 - [Primitives, Errors, Cloning, Resource Management](#primitives-errors-cloning-resource-management)
-- [Stage 3 Proposals (Decorators, Decorator Metadata)](#stage-3-proposals-decorators-decorator-metadata)
+- [Post-ES2026 and Toolchain Features](#post-es2026-and-toolchain-features)
 - [Quick Migration Guide](#quick-migration-guide)
 
 ## Variables & Scope
@@ -149,7 +149,7 @@ Map.groupBy(arr, x => x.type)
 // Create
 Array.from({ length: 5 }, (_, i) => i)
 Array.of(1, 2, 3)
-await Array.fromAsync(asyncIterable)  // ES2026 (widely supported since 2024)
+await Array.fromAsync(asyncIterable)  // ES2026; sequential async consumption
 ```
 
 ## String Methods
@@ -386,7 +386,7 @@ const { year, month } = str.match(pattern).groups;
 /(?<year>\d{4})-(?<month>\d{2})|(?<month>\d{2})\/(?<year>\d{4})/;
 
 // Match indices (ES2022)
-const match = /(?<g>\w+)/.exec('hello');
+const match = /(?<g>\w+)/d.exec('hello');
 match.indices.groups.g  // [0, 5]
 
 // RegExp.escape (ES2025)
@@ -409,7 +409,7 @@ globalThis.setTimeout
 // Error cause (ES2022)
 throw new Error('msg', { cause: originalError });
 
-// structuredClone
+// structuredClone (host/web API, not ECMA-262)
 const deep = structuredClone(obj);
 
 // String well-formed (ES2024)
@@ -454,7 +454,7 @@ try { } catch { }  // No parameter needed
 
 // Hashbang (ES2023): '#!/usr/bin/env node' allowed as the very first line of a file
 
-// Explicit Resource Management (Stage 4 → ES2027; Node 24+, Chrome 134+)
+// Explicit Resource Management (Stage 4 → expected ES2027)
 {
   using file = openFile('data.txt');  // file[Symbol.dispose]() runs on block exit
 }
@@ -468,10 +468,11 @@ await Array.fromAsync(asyncIterable)
 await Array.fromAsync(generator(), mapFn)
 
 // Error.isError (ES2026)
-Error.isError(err)  // true for any Error, cross-realm safe
+Error.isError(err)  // Cross-realm-safe for ECMAScript Error objects
 
 // Math.sumPrecise (ES2026)
-Math.sumPrecise([1e20, 0.1, -1e20])  // 0.1 (no float drift)
+Math.sumPrecise([1e20, 0.1, -1e20])  // 0.1 (one final rounding)
+// Accurate for binary Number inputs; not exact decimal-money arithmetic.
 
 // Uint8Array ⇄ base64/hex (ES2026)
 Uint8Array.fromBase64('SGVsbG8=')
@@ -493,8 +494,8 @@ JSON.stringify({ id: JSON.rawJSON('12345678901234567890') })
 new Intl.DurationFormat('en', { style: 'long' })
   .format({ hours: 1, minutes: 30 })  // "1 hour, 30 minutes"
 
-// Temporal API (Stage 4 → ES2027; native in Firefox 139+, Chrome 144+,
-// Node 26+ — use temporal-polyfill elsewhere)
+// Temporal API (Stage 4 → expected ES2027; native in Firefox 139+,
+// Chrome 144+, Node 26; use a maintained polyfill elsewhere)
 Temporal.PlainDate.from('2024-03-15')     // Date only
 Temporal.PlainTime.from('14:30:00')       // Time only
 Temporal.PlainDateTime.from('2024-03-15T14:30:00')            // Date + time
@@ -504,18 +505,25 @@ Temporal.Duration.from({ hours: 2 })       // Duration
 date.add({ months: 1 })                    // Immutable arithmetic
 ```
 
-## Stage 3 Proposals (Decorators, Decorator Metadata)
+## Post-ES2026 and Toolchain Features
 
 ```javascript
-// Decorators (Stage 3 - requires Babel or TypeScript 5.0+)
+// Decorators (Stage 2.7 as of 2026-08; requires a pinned transform)
 @logged
 class User {
   @validate name;
   @memoize getData() { }
 }
 
-// Decorator Metadata (Stage 3)
+// Decorator Metadata (Stage 2.7; requires compatible Symbol.metadata)
 User[Symbol.metadata]  // { name: 'string', ... }
+
+// Joint iteration (Stage 4 → expected ES2027)
+Iterator.zip([[1, 2], ['a', 'b']]).toArray()
+// [[1, 'a'], [2, 'b']]
+
+// Atomics.pause (Stage 4 → expected ES2027; native engine hint only)
+if (typeof Atomics.pause === 'function') Atomics.pause()
 ```
 
 ## Quick Migration Guide
@@ -537,5 +545,5 @@ User[Symbol.metadata]  // { name: 'string', ... }
 | `[].concat(a, b)` | `[...a, ...b]` |
 | `.then().catch()` | `async/await + try/catch` |
 | `let resolve; new Promise(r => resolve = r)` | `Promise.withResolvers()` |
-| `new Date()` | `Temporal.Now.*` (native in Firefox/Chrome/Node 26+, else polyfill) |
+| Ambiguous date/time model | Select the correct Temporal type when native or intentionally polyfilled; keep `Date` for required platform interop |
 | Manual grouping with reduce | `Object.groupBy()` |

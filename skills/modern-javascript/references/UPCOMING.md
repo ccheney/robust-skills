@@ -1,180 +1,154 @@
-# Upcoming JavaScript Features (Stage 4 for ES2027, and Active Proposals)
+# Post-ES2026 JavaScript
 
-Temporal API, explicit resource management (`using` / `await using`), Atomics.pause, Iterator.zip, Decorators, Decorator Metadata, import defer — plus withdrawn proposals to avoid (Records & Tuples).
+Status snapshot: 2026-08-13. The latest TC39 plenary ran 2026-07-20 through 2026-07-23; use the current [TC39 proposal tracker](https://github.com/tc39/proposals) for outcomes even when detailed meeting notes have not yet been published.
 
-Status snapshot (mid-2026, per https://github.com/tc39/proposals):
+The Stage 4 proposals currently mapped to ES2027 are Temporal, explicit resource management, `Atomics.pause`, and joint iteration (`Iterator.zip` / `zipKeyed`). They are finished proposals and can be used with an explicit runtime/polyfill plan; they are not part of ES2026.
 
-| Feature | Status | How to use today |
-|---------|--------|------------------|
-| Temporal | **Stage 4** (Sept 2025) → ES2027 | Native: Firefox 139+, Chrome 144+, Node 26+. Elsewhere: `temporal-polyfill` / `@js-temporal/polyfill` |
-| `using` / `await using` | **Stage 4** (May 2025) → ES2027 | Native: Chrome 134+, Firefox 141+, Node 24+. Safari: flagged. Transpile: TypeScript 5.2+, Babel |
-| Atomics.pause | **Stage 4** (Oct 2024) → ES2027 | Chrome 133+, Firefox 137+, Safari 18.4+ |
-| Iterator.zip / zipKeyed | **Stage 4** (Nov 2025) → ES2027 | Firefox 148+ only so far |
-| Decorators + Metadata | Stage 3 (no engine ships them) | Babel or TypeScript 5.0+ only |
-| `import defer` | Stage 3 | TypeScript 5.9+ (syntax), SWC, webpack/Rspack |
-| Records & Tuples `#{}` `#[]` | **Withdrawn April 2025** | Never emit this syntax; successor "Composites" is Stage 1 |
+## Contents
 
-## Temporal API (Stage 4 → ES2027)
+- [Stage 4 for ES2027](#stage-4-for-es2027)
+- [Temporal](#temporal)
+- [Explicit resource management](#explicit-resource-management)
+- [Atomics.pause](#atomicspause)
+- [Joint iteration](#joint-iteration)
+- [Selected mature proposals](#selected-mature-proposals)
+- [Decorators and metadata](#decorators-and-metadata)
+- [Withdrawn Records and Tuples](#withdrawn-records-and-tuples)
+- [Sources](#sources)
 
-Modern replacement for the broken `Date` object. Immutable, timezone-aware, and calendar-correct. Reached Stage 4 in September 2025; native in Firefox 139+, Chrome 144+, and Node 26+, still behind a flag in Safari — use a polyfill (`temporal-polyfill`) when you can't pin those baselines.
+## Stage 4 for ES2027
 
-### Why Temporal over Date?
+| Feature | Reached Stage 4 | Native support snapshot | Compatibility route |
+|---|---:|---|---|
+| Temporal | 2026-03-11 | Firefox 139, Chrome 144, Node 26; Safari preview | Dedicated Temporal polyfill |
+| Explicit resource management | 2026-05-19 | Chrome 134, Firefox 141, Node 24; no stable Safari support recorded | Babel/TypeScript transform plus disposal built-ins as needed |
+| `Atomics.pause` | 2026-05-19 | Chrome 133, Firefox 137, Safari 18.4; no Node support recorded | No faithful polyfill; feature-detect a fallback |
+| `Iterator.zip` / `zipKeyed` | 2026-05-19 | Limited native support | current core-js modules |
 
-```javascript
-// ❌ Date problems
-const legacyDate = new Date('2024-03-10');  // Parsed as UTC? Local? Depends!
-legacyDate.setMonth(1);                      // Mutates original
-legacyDate.getMonth();                       // 0-indexed (January = 0)
+The dates come from the TC39 proposal-tracker commits and linked meeting records. Older articles and tool documentation may show earlier stages or different edition labels.
 
-// ✅ Temporal - immutable, explicit, correct
-const date = Temporal.PlainDate.from('2024-03-10');
-const nextMonth = date.add({ months: 1 });  // Returns new instance
-date.month;  // 3 (March, 1-indexed!)
-```
+## Temporal
 
-### Temporal Types
+Temporal provides immutable, explicit date/time types. Choose the type that matches the domain instead of defaulting every value to an instant:
 
 ```javascript
-// PlainDate - date only, no time or timezone
 const birthday = Temporal.PlainDate.from('1990-05-15');
-const today = Temporal.Now.plainDateISO();
-
-// PlainTime - time only
-const meeting = Temporal.PlainTime.from('14:30:00');
-
-// PlainDateTime - date + time, no timezone
-const appointment = Temporal.PlainDateTime.from('2024-03-15T14:30:00');
-
-// ZonedDateTime - full date/time with timezone (DST-aware!)
+const appointment = Temporal.PlainDateTime.from('2026-08-13T14:30');
 const flight = Temporal.ZonedDateTime.from(
-  '2024-03-15T14:30:00[America/New_York]'
+  '2026-08-13T14:30-04:00[America/New_York]',
 );
-
-// Instant - exact moment in time (like Unix timestamp)
-const now = Temporal.Now.instant();
-
-// Duration - length of time
-const duration = Temporal.Duration.from({ hours: 2, minutes: 30 });
+const receivedAt = Temporal.Now.instant();
+const timeout = Temporal.Duration.from({ seconds: 30 });
 ```
 
-### Date Arithmetic
+Calendar and timezone arithmetic remain explicit and return new values:
 
 ```javascript
 const date = Temporal.PlainDate.from('2024-01-31');
+date.add({ months: 1 }).toString(); // '2024-02-29'
 
-// Add months correctly (clamps to end of month; leap-year aware)
-date.add({ months: 1 });  // 2024-02-29
-
-// Subtract
-date.subtract({ days: 15 });
-
-// Compare
-date1.equals(date2);
-Temporal.PlainDate.compare(date1, date2);  // -1, 0, or 1
-
-// Difference
-const diff = date1.until(date2);
-diff.days;  // Number of days between
+const london = flight.withTimeZone('Europe/London');
 ```
 
-### Timezone Handling
+Do not mechanically replace every `Date`:
+
+- Keep `Date` where a platform API requires it.
+- Use `Temporal.Instant` for an exact timeline point.
+- Use plain types for calendar values without a timezone.
+- Use `Temporal.ZonedDateTime` when timezone rules are part of the value.
+
+For unsupported targets, use a maintained implementation listed by the [Temporal proposal](https://github.com/tc39/proposal-temporal#polyfills). A TypeScript `esnext.temporal` lib supplies types only.
+
+## Explicit resource management
+
+`using` and `await using` guarantee LIFO cleanup on normal and abrupt scope exit.
 
 ```javascript
-// Convert between timezones
-const nyTime = Temporal.ZonedDateTime.from(
-  '2024-03-15T14:30:00[America/New_York]'
-);
-const londonTime = nyTime.withTimeZone('Europe/London');
-
-// Handle DST transitions correctly
-const beforeDST = Temporal.ZonedDateTime.from(
-  '2024-03-10T01:30:00[America/New_York]'
-);
-beforeDST.add({ hours: 2 });  // Correctly handles "spring forward"
-```
-
-### Migration Guide
-
-| Use Case | Date | Temporal |
-|----------|------|----------|
-| Store timestamps | `Date.now()` | `Temporal.Now.instant()` |
-| Display dates | `new Date()` | `Temporal.Now.zonedDateTimeISO()` |
-| Birthdays, holidays | `new Date(y, m-1, d)` | `Temporal.PlainDate.from()` |
-| Meeting times | Manual TZ conversion, DST bugs | `Temporal.ZonedDateTime` |
-| Duration math | Manual calculation | `Temporal.Duration` |
-
----
-
-## Explicit Resource Management — `using` / `await using` (Stage 4 → ES2027)
-
-Automatic cleanup of resources like file handles, connections, and locks. Native in Chrome 134+, Firefox 141+, and Node 24+; Safari still flags it. TypeScript 5.2+ and Babel can transpile for older targets.
-
-```javascript
-// Synchronous disposal with `using`
 {
   using file = openFile('data.txt');
-  // Work with file...
-} // file[Symbol.dispose]() called automatically, even on throw
+  process(file);
+} // file[Symbol.dispose]() runs
 
-// Asynchronous disposal with `await using` (inside async contexts/modules)
-async function run() {
-  await using db = await connectDatabase();
-  await db.query('SELECT * FROM users');
-} // db[Symbol.asyncDispose]() awaited automatically
+async function runQuery() {
+  await using connection = await connect();
+  return connection.query('SELECT 1');
+} // awaits connection[Symbol.asyncDispose]()
+```
 
-// Creating disposable resources
-class FileHandle {
-  #handle;
+The feature group includes:
 
-  constructor(path) {
-    this.#handle = fs.openSync(path);
+- `Symbol.dispose` and `Symbol.asyncDispose`
+- `DisposableStack` and `AsyncDisposableStack`
+- `SuppressedError`
+- `using` / `await using`, including loop forms
+
+`null` and `undefined` initializers require no disposal. Other non-disposable values throw when registered. Resources are disposed in reverse acquisition order, and disposal still runs on `throw`, `return`, or `break`.
+
+Babel's explicit-resource-management transform and TypeScript 5.2+ provide compatibility emit. Add current core-js protocol built-ins when the target lacks the symbols/stacks used by the code or emitted helpers. Test thrown-body plus thrown-disposer behavior; `SuppressedError` preserves both failures.
+
+## Atomics.pause
+
+`Atomics.pause()` is a zero-argument hint for spin-wait loops. It is not a sleep, timer, yield, synchronization operation, or configurable-duration pause. TC39 removed the proposal's unused optional iteration hint when it advanced to Stage 4.
+
+```javascript
+function tryBoundedSpin(view, index, expected, spinLimit = 64) {
+  for (let attempt = 0; attempt < spinLimit; attempt++) {
+    if (Atomics.load(view, index) !== expected) return true;
+    if (typeof Atomics.pause === 'function') Atomics.pause();
   }
-
-  read() { /* ... */ }
-
-  [Symbol.dispose]() {
-    fs.closeSync(this.#handle);
-    console.log('File closed');
-  }
-}
-
-// DisposableStack for multiple resources
-{
-  using stack = new DisposableStack();
-  const file1 = stack.use(openFile('a.txt'));
-  const file2 = stack.use(openFile('b.txt'));
-  // Both disposed in reverse order when block exits
-}
-
-// AsyncDisposableStack for async cleanup
-async function runAll() {
-  await using stack = new AsyncDisposableStack();
-  const conn1 = stack.use(await connect('db1'));
-  const conn2 = stack.use(await connect('db2'));
+  return false; // Caller switches to Atomics.wait/waitAsync or another strategy.
 }
 ```
 
-**Key concepts:**
-- `Symbol.dispose` / `Symbol.asyncDispose` — the cleanup methods a resource implements
-- Disposal runs in reverse declaration order, even when the block exits via `throw`/`return`
-- `DisposableStack` / `AsyncDisposableStack` — aggregate multiple disposables
-- `SuppressedError` — thrown when disposal itself errors while another error is in flight
-- `using` bindings are block-scoped and cannot be reassigned; the initializer must be an object with the dispose symbol (or `null`/`undefined`)
+Prefer `Atomics.wait`, `Atomics.waitAsync`, messaging, or a higher-level synchronization design when actual blocking/wakeup semantics are needed. A library cannot faithfully polyfill an engine CPU-pause hint.
 
----
+## Joint iteration
 
-## Decorators (Stage 3 — Requires Transpiler)
-
-Annotate and modify classes/methods with `@decorator` syntax. Still Stage 3 as of mid-2026 with **no engine shipping it unflagged** — usable only via Babel or TypeScript 5.0+ (the standard semantics; legacy `experimentalDecorators: true` is a different, incompatible system).
+`Iterator.zip` synchronizes positional iterables; `Iterator.zipKeyed` preserves an object's enumerable keys.
 
 ```javascript
-// Requires transpiler (Babel or TypeScript 5.0+)
+Iterator.zip([
+  [0, 1, 2],
+  [3, 4, 5],
+]).toArray();
+// [[0, 3], [1, 4], [2, 5]]
 
-// Method decorator
-function logged(target, context) {
+Iterator.zipKeyed({
+  name: ['Ada', 'Grace'],
+  role: ['engineer', 'admiral'],
+}).toArray();
+// [{ name: 'Ada', role: 'engineer' }, ...]
+```
+
+The options `mode: 'shortest'` (default), `'longest'`, and `'strict'` control unequal lengths. Longest mode accepts per-input padding. Use current core-js when native support is outside the project's baseline.
+
+## Selected mature proposals
+
+These are **not standard JavaScript yet**. Recommend one only when its exact implementation path is already supported and tested by the project's toolchain.
+
+| Proposal | Current stage | Current practical position |
+|---|---:|---|
+| Await Dictionary (`Promise.allKeyed`, `allSettledKeyed`) | 3 (advanced 2026-07-20) | Proposal reports no native or polyfill implementation; do not ship without owning one |
+| Deferring Module Evaluation (`import defer`) | 3 | Syntax/tooling support is host- and bundler-specific; no universal runtime path |
+| Source Phase Imports | 3 | Requires host integration; check the exact Wasm/JS host and bundler |
+| Import Text | 3 | Requires host integration; do not confuse it with bundler raw-loader syntax |
+| Iterator chunking / includes / join | 3 | Feature-detect or use a maintained library with equivalent semantics |
+| Error Stack Accessor | 3 | Existing `Error.prototype.stack` behavior remains engine-sensitive until standardized and shipped |
+| RegExp Buffer Boundaries | 3 | New regex syntax requires parser/engine support; avoid untransformed use |
+
+Stage 3 means the design is mature, not that the platform provides it. A stable library with equivalent behavior can be a compatibility route for methods; new grammar and host integration usually require the actual compiler/host to participate.
+
+## Decorators and metadata
+
+TC39's current tracker places both Decorators and Decorator Metadata at **Stage 2.7** as of the May 2026 plenary. Some Babel, TypeScript, and proposal pages still say Stage 3; use the tracker for current status.
+
+They remain reasonable in projects that deliberately adopt a maintained transform:
+
+```javascript
+function logged(method, context) {
   return function (...args) {
-    console.log(`Calling ${context.name} with`, args);
-    return target.apply(this, args);
+    console.log(`Calling ${String(context.name)}`);
+    return method.apply(this, args);
   };
 }
 
@@ -184,84 +158,38 @@ class Calculator {
     return a + b;
   }
 }
-
-// Class decorator
-function singleton(Class, context) {
-  let instance;
-  return function (...args) {
-    if (!instance) {
-      instance = new Class(...args);
-    }
-    return instance;
-  };
-}
-
-@singleton
-class Database {
-  constructor(url) {
-    this.url = url;
-  }
-}
 ```
 
-**Key points:**
-- `@decorator` syntax before classes, methods, fields, accessors
-- Receives `(value, context)` — value being decorated + metadata
-- Must return the decorated value (or a replacement of the same kind)
-- No parameter decorators (unlike TypeScript legacy decorators)
-- TypeScript 5.0+ supports TC39 decorators when `experimentalDecorators` is off (the default)
+Compatibility requirements:
 
-## Decorator Metadata (Stage 3 — Requires Transpiler)
+- Babel: pin `@babel/plugin-proposal-decorators` to `version: '2023-11'`.
+- TypeScript: use standard decorators (supported since 5.0), not `experimentalDecorators` legacy semantics.
+- Metadata: provide a compatible `Symbol.metadata` polyfill before decorated code when the runtime lacks it.
+- Lock compiler/transform versions and test decorator order, initializers, inheritance, and metadata. Stage 2.7 can still change.
 
-Store metadata on decorated elements (complements Decorators). Requires Babel or TypeScript 5.2+.
+Standard decorators do not support legacy TypeScript parameter decorators, and legacy `emitDecoratorMetadata` expectations are not the standard metadata proposal.
+
+## Withdrawn Records and Tuples
+
+The Records & Tuples proposal was withdrawn in April 2025. The literal forms below were never standard JavaScript and must not be emitted:
 
 ```javascript
-function meta(value) {
-  return function (target, context) {
-    context.metadata[context.name] = value;
-    return target;
-  };
-}
-
-class User {
-  @meta('string')
-  name;
-
-  @meta('number')
-  age;
-}
-
-User[Symbol.metadata];
-// { name: 'string', age: 'number' }
+// Invalid and withdrawn:
+// const point = #{ x: 1, y: 2 };
+// const pair = #[1, 2];
 ```
 
-## import defer (Stage 3)
+Use ordinary objects/arrays, `Object.freeze` when shallow freezing is actually needed, and explicit structural comparison/keying. The successor Composites work is early-stage and is not a production compatibility target.
 
-Load a module's code eagerly but defer *evaluation* until first property access — a startup-cost optimization. Syntax only, namespace-import form:
+## Sources
 
-```javascript
-import defer * as heavyLib from './heavy-lib.js';
-
-export function rarelyCalled() {
-  return heavyLib.process();  // module body executes here, on first access
-}
-```
-
-Deferred modules cannot use top-level await (evaluation must be synchronous). Supported by TypeScript 5.9+ (syntax), SWC, webpack/Rspack; not yet in stable engines.
-
----
-
-## Withdrawn: Records & Tuples
-
-The `#{ x: 1 }` / `#[1, 2]` immutable-primitives proposal was **withdrawn at the April 2025 TC39 plenary** (performance expectations couldn't be met, and adding new primitives lost consensus). LLMs and older articles still suggest this syntax — it was never valid JavaScript and never will be.
-
-Use instead:
-- `Object.freeze({ ... })` for shallow immutability
-- Structural-equality needs: compare manually or use a library (e.g. a keyed Map)
-- Watch the successor **Composites** proposal (Stage 1): frozen *objects* with well-defined equality, not new primitives
-
-## Resources
-
-- **TC39 Proposals**: https://github.com/tc39/proposals (authoritative stage tracking)
-- **Temporal docs**: https://tc39.es/proposal-temporal/docs/
-- **Can I Use**: https://caniuse.com (browser support tables)
+- [TC39 finished proposals](https://github.com/tc39/proposals/blob/main/finished-proposals.md)
+- [TC39 active proposal tracker](https://github.com/tc39/proposals)
+- [July 2026 plenary agenda](https://github.com/tc39/agendas/blob/main/2026/07.md)
+- [May 2026 plenary notes](https://github.com/tc39/notes/blob/main/meetings/2026-05/may-19.md)
+- [Temporal proposal](https://github.com/tc39/proposal-temporal)
+- [Explicit resource management proposal](https://github.com/tc39/proposal-explicit-resource-management)
+- [Atomics.pause proposal](https://github.com/tc39/proposal-atomics-microwait)
+- [Joint iteration proposal](https://github.com/tc39/proposal-joint-iteration)
+- [Decorators proposal](https://github.com/tc39/proposal-decorators)
+- [Await Dictionary proposal](https://github.com/tc39/proposal-await-dictionary)

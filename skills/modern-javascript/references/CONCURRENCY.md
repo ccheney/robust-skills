@@ -28,7 +28,7 @@ async function sequential(items) {
   return results;
 }
 
-// ES2025: Using Array.fromAsync with async generator
+// ES2026: Drain an async generator into an array
 async function* processSequentially(items) {
   for (const item of items) {
     yield await processItem(item);
@@ -67,23 +67,22 @@ async function batched(items, batchSize) {
 
 ```javascript
 async function pool(items, concurrency, fn) {
-  const results = [];
-  const executing = new Set();
+  if (!Number.isInteger(concurrency) || concurrency < 1) {
+    throw new RangeError('concurrency must be a positive integer');
+  }
 
-  for (const item of items) {
-    const promise = fn(item).then(result => {
-      executing.delete(promise);
-      return result;
-    });
-    results.push(promise);
-    executing.add(promise);
+  const entries = items.entries();
+  const results = new Array(items.length);
 
-    if (executing.size >= concurrency) {
-      await Promise.race(executing);
+  async function worker() {
+    for (const [index, item] of entries) {
+      results[index] = await fn(item);
     }
   }
 
-  return Promise.all(results);
+  const workerCount = Math.min(concurrency, items.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  return results;
 }
 
 // Process 100 items, max 5 concurrent
@@ -121,10 +120,14 @@ const data = await withRetry(() => fetchData(), {
 
 ```javascript
 // ES2024: Using Promise.withResolvers()
-function withTimeout(promise, ms, message = 'Timeout') {
+async function withTimeout(promise, ms, message = 'Timeout') {
   const { promise: timeout, reject } = Promise.withResolvers();
-  setTimeout(() => reject(new Error(message)), ms);
-  return Promise.race([promise, timeout]);
+  const timerId = setTimeout(() => reject(new Error(message)), ms);
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timerId);
+  }
 }
 
 const data = await withTimeout(fetchData(), 5000);
