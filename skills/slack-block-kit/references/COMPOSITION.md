@@ -2,8 +2,22 @@
 
 > Sources:
 > - [Block Kit Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
+> - [Text object](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/) — Slack
 
 Composition objects are reusable JSON patterns used inside blocks and elements.
+
+## Contents
+
+- [Text Object](#text-object)
+- [Option Object](#option-object)
+- [Option Group Object](#option-group-object)
+- [Confirmation Dialog Object](#confirmation-dialog-object)
+- [Conversation Filter Object](#conversation-filter-object)
+- [Dispatch Action Configuration Object](#dispatch-action-configuration-object)
+- [Slack File Object](#slack-file-object)
+- [Slack Icon Object](#slack-icon-object)
+- [Trigger and Input Parameter Objects](#trigger-object)
+- [Workflow Object](#workflow-object)
 
 ---
 
@@ -15,8 +29,8 @@ The most common composition object. Appears in nearly every block and element.
 |----------|------|----------|-------------|
 | `type` | string | Yes | `"mrkdwn"` or `"plain_text"` |
 | `text` | string | Yes | Min 1 char, max 3000 chars |
-| `emoji` | boolean | No | `plain_text` only. Converts `:emoji:` to rendered emoji |
-| `verbatim` | boolean | No | `mrkdwn` only. Default `false`. When `true`, disables auto-link conversion and mention parsing |
+| `emoji` | boolean | No | `plain_text` only. Indicates that emojis in the field should be escaped into colon emoji format |
+| `verbatim` | boolean | No | `mrkdwn` only. Default `false`; `true` skips plain-text preprocessing but still processes mrkdwn and explicit manual parsing strings |
 
 ### Type Rules
 
@@ -31,7 +45,7 @@ The most common composition object. Appears in nearly every block and element.
 | Input hint | `plain_text` only |
 | Modal title / submit / close | `plain_text` only |
 | Confirmation dialog (title/confirm/deny) | `plain_text` only |
-| Confirmation dialog (text) | `plain_text` only |
+| Confirmation dialog (text) | Reference field table says `plain_text`; Slack's own current example uses `mrkdwn` (see note below) |
 | Option text (select/overflow) | `plain_text` only |
 | Option text (checkboxes/radio) | `mrkdwn` or `plain_text` |
 | Option description | `plain_text` (or `mrkdwn` for checkboxes/radio buttons) |
@@ -44,8 +58,9 @@ When `verbatim: false` (default):
 - Mentions auto-parse
 
 When `verbatim: true`:
-- Markdown formatting still processes
-- No auto-linking or mention parsing
+- mrkdwn formatting still processes
+- Explicit manual parsing strings still process
+- Slack does not modify otherwise plain-text content (for example, it does not auto-link a channel name)
 - Useful for displaying raw URLs or text containing `@` or `#` that aren't mentions
 
 ```json
@@ -104,12 +119,12 @@ Max 100 option groups per menu.
 
 ## Confirmation Dialog Object
 
-Adds a confirmation step to any interactive element.
+Adds a confirmation step to an element that exposes a `confirm` property.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `title` | text object | Yes | `plain_text` only, max 100 chars |
-| `text` | text object | Yes | `plain_text` only, max 300 chars |
+| `text` | text object | Yes | Max 300 chars; see documentation inconsistency below |
 | `confirm` | text object | Yes | `plain_text` only, max 30 chars |
 | `deny` | text object | Yes | `plain_text` only, max 30 chars |
 | `style` | string | No | `"primary"` (green) or `"danger"` (red). Default `"primary"` |
@@ -128,6 +143,8 @@ Mobile: `danger` = red text, `primary` = blue text.
 ```
 
 **Used in:** Any element that accepts a `confirm` property (buttons, select menus, overflow, datepicker, timepicker, checkboxes, radio buttons).
+
+**Current Slack-doc inconsistency:** the field table calls `text` a `plain_text` object, while Slack's official example uses `mrkdwn`. Prefer `plain_text` when formatting is unnecessary; if following the example, use `mrkdwn` only for this explanatory field, never for `title`, `confirm`, or `deny`.
 
 ---
 
@@ -158,7 +175,7 @@ At least one property must be supplied.
 
 ## Dispatch Action Configuration Object
 
-Controls when plain_text_input or rich_text_input elements return `block_actions` payloads during input.
+Controls when supported text-like inputs (`plain_text_input`, `rich_text_input`, `number_input`, `email_text_input`, and `url_text_input`) return `block_actions` payloads during input. The composition-object page still describes plain-text input specifically, while each of the other live element pages exposes the same property.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
@@ -194,7 +211,7 @@ Requires `dispatch_action: true` on the parent input block.
 
 References a Slack-hosted file for use in image blocks or image elements.
 
-Provide either `url` or `id` (not both):
+Provide exactly one of `url` or `id`. The file must be an image, the posting user must have access to it, and Slack currently supports Slack-hosted PNG, JPG/JPEG, and GIF files. Supplying both properties rejects the payload.
 
 ```json
 { "url": "https://files.slack.com/files-pri/T0123-F0123/image.png" }
@@ -238,9 +255,9 @@ Contains trigger information for workflow buttons.
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `url` | string | Yes | Trigger URL |
-| `customizable_input_parameters` | param[] | No | Input parameters for the workflow |
+| `customizable_input_parameters` | input parameter[] | No | Names must match workflow inputs configured as customizable; values must match those inputs' declared types |
 
-Each parameter: `{ name: string, value: string }`.
+Values can be visible to end users. Never put secrets or other sensitive information in these parameters.
 
 ```json
 {
@@ -252,6 +269,23 @@ Each parameter: `{ name: string, value: string }`.
   }
 }
 ```
+
+---
+
+## Input Parameter Object
+
+Supplies a customized workflow input inside `trigger.customizable_input_parameters`.
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `name` | string | Yes | Must exactly match an input on the workflow behind the link trigger, and that trigger mapping must be marked customizable |
+| `value` | value matching workflow input type | Yes | Must match the declared workflow input type; it may be visible client-side |
+
+```json
+{ "name": "input_parameter_a", "value": "Value for input param A" }
+```
+
+Slack's composition-object index links to a dedicated input-parameter page, but as of the documentation audit that Markdown endpoint returns 404 and the browser route falls back to the docs home page. The trigger-object reference above is therefore the authoritative field description currently available.
 
 ---
 

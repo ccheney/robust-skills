@@ -3,6 +3,8 @@
 > Sources:
 > - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
+> - [Markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/) — Slack
+> - [March 2026 Block Kit rich-text rollout](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) — Slack
 
 All 21 block types with full property tables, constraints, and surface compatibility.
 
@@ -34,6 +36,31 @@ All 21 block types with full property tables, constraints, and surface compatibi
 
 ---
 
+## Current surface compatibility
+
+This matrix follows Slack's live block index. Do not infer compatibility from an example rendered on a different surface.
+
+| Block | Messages | Modals | Home tabs |
+|---|:---:|:---:|:---:|
+| actions, context, divider, header, image, input, rich_text, section, video | Yes | Yes | Yes |
+| alert | No | Yes | No |
+| card | Yes | Yes | Yes |
+| carousel | Yes | No | Yes |
+| container | Yes | No | No |
+| context_actions | Yes | No | No |
+| data_table | Yes | No | Yes |
+| data_visualization | Yes | No | No |
+| file | Retrieval only | No | No |
+| markdown | Yes | No | No |
+| plan, task_card | Yes | No | No |
+| table | Yes | No | Yes |
+
+The `file` block is returned when retrieving messages with remote files; apps cannot add it directly to a surface.
+
+For block types that support and retain `block_id`, keep it at 255 characters or fewer, make it unique within the payload, and use a new value for each updated iteration of a message or view. Slack normally generates one when it is omitted. The `markdown` block is the exception: its `block_id` is ignored and not retained, so do not rely on a supplied or generated ID for that block. Modal input-state preservation is a deliberate update exception described in [SURFACES.md](SURFACES.md#modals).
+
+---
+
 ## 1. Header Block
 
 Large, bold text for section titles.
@@ -43,6 +70,7 @@ Large, bold text for section titles.
 | `type` | string | Yes | Must be `"header"` |
 | `text` | text object | Yes | `plain_text` only, max 150 chars |
 | `block_id` | string | No | Max 255 chars, unique per message |
+| `level` | integer | No | Heading level 1-4 (H1-H4) |
 
 **Surfaces:** Messages, Modals, Home tabs
 
@@ -70,7 +98,7 @@ Primary content block with text, fields, and accessory.
 
 **Surfaces:** Messages, Modals, Home tabs
 
-**Compatible accessories:** button, overflow, datepicker, timepicker, select menus, multi-select menus, checkboxes, radio_buttons, image.
+**Compatible accessories:** button, overflow, datepicker, timepicker, select menus, multi-select menus, checkboxes, radio_buttons, image, workflow_button.
 
 ```json
 {
@@ -219,7 +247,7 @@ Compact, scannable preview for entities, records, summaries, or agent results.
 | `actions` | button[] | No | Max 3 buttons. `danger` buttons left-align; `primary`/unstyled right-align (`primary` furthest right) |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages
+**Surfaces:** Messages, Modals, Home tabs
 
 At least one of `hero_image`, `title`, `actions`, or `body` is required. There is currently no size attribute. For the Slack icon object (`{ "type": "icon", "name": "rocket" }`), see [COMPOSITION.md](COMPOSITION.md#slack-icon-object).
 
@@ -265,7 +293,7 @@ Horizontal group of cards for options, recommendations, search results, or next 
 | `elements` | card[] | Yes | Minimum 1 card, maximum 10 cards |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages
+**Surfaces:** Messages, Home tabs
 
 ```json
 {
@@ -286,13 +314,15 @@ Groups related blocks under a title, optionally collapsible. Useful for record p
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"container"` |
-| `title` | text object | Yes | `plain_text` only, max 150 chars |
+| `title` | text object | Conditional | `plain_text`, max 150 chars. One of `title` or `rich_text_title` is required |
+| `rich_text_title` | rich_text object | Conditional | Rich-text title; takes precedence when both title fields are present |
 | `child_blocks` | block[] | Yes | Max 10 blocks from the supported list below |
 | `subtitle` | text object | No | `plain_text` or `mrkdwn`, max 150 chars |
 | `icon` | image element | No | Small image next to title/subtitle. URL max 3000 chars, alt_text max 2000 |
 | `width` | string | No | `"narrow"`, `"standard"` (default), `"wide"`, or `"full"` |
 | `is_collapsible` | boolean | No | Default `false`. When `true`, the block collapses to show only the title |
 | `default_collapsed` | boolean | No | Default `false`. Only applies when `is_collapsible` is `true` |
+| `has_header_divider` | boolean | No | Visible divider below header; only applies when not collapsible. Default `false` |
 | `block_id` | string | No | Max 255 chars |
 
 **Supported child blocks:** actions, context, divider, file, header, image, input, rich_text, section, table, video. Containers cannot nest containers, cards, or AI blocks (plan, task_card).
@@ -377,18 +407,18 @@ Formatted text with nested structure. See [RICH-TEXT.md](RICH-TEXT.md) for deep 
 
 ## 12. Table Block
 
-Basic tabular data display. Supports filtering and basic interactivity only — for pagination, sorting, and clickable cells, use the [data table block](#13-data-table-block) instead.
+Basic static tabular data display. For pagination, sorting, filtering, and clickable cells, use the [data table block](#13-data-table-block) instead.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"table"` |
-| `rows` | cell[][] | Yes | Max 100 rows. Each row is an array of max 20 cell objects. First row = header |
+| `rows` | cell[][] | Yes | Max 100 rows. Each row is an array of max 20 cell objects |
 | `column_settings` | setting[] | No | Max 20 items, with `align` and `is_wrapped`. Use `null` to skip a column; columns beyond the array get defaults |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages only (via `blocks` or `attachments` in `chat.postMessage`)
+**Surfaces:** Messages, Home tabs. For messages, publish as a top-level table in `blocks` or `attachments`.
 
-**There is no `columns` property.** The first row in `rows` acts as the header row.
+**There is no `columns` property.** A static table does not have a dedicated header-row schema; style label cells explicitly when you want a visual header. (The first row is a semantic header only for `data_table`.)
 
 **Row structure:** Each row is a flat array of cell objects — NOT an object with a `cells` property.
 
@@ -435,19 +465,19 @@ Rich table with pagination, sorting, filtering, and interactivity (clickable lin
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"data_table"` |
-| `rows` | cell[][] | Yes | Min 2 rows (header + 1 data row), max 101 rows (header + 100). All rows must have the same number of cells. 1–20 columns |
+| `rows` | cell[][] | Yes | Min 2 rows (header + 1 data row), max 201 rows (header + 200). All rows must have the same number of cells. 1–20 columns |
 | `caption` | string | Yes | Table caption (used as the HTML caption element) |
 | `page_size` | integer | No | Rows per page, 1–100. Defaults to 5 |
 | `row_header_column_index` | integer | No | 0-based index of the column that uniquely identifies each row (used by screen readers). Defaults to 0 |
 | `block_id` | string | No | Max 255 chars |
 
-**Surfaces:** Messages (via `chat.postMessage`)
+**Surfaces:** Messages, Home tabs
 
 **Cell types:** `raw_text`, `raw_number` (`{ "type": "raw_number", "value": 42, "text": "42" }`), `rich_text`. Header row cells cannot be `rich_text`.
 
 **Sorting:** Alphabetical by default; numeric when every cell in a column is `raw_number`.
 
-**Character limits:** Same as table block — 10,000 chars per table and 10,000 aggregate across all table cells per message.
+**Character limits:** 20,000 chars per data table and 20,000 aggregate across all data-table cells per message. This is intentionally double the static table limit.
 
 ```json
 {
@@ -481,6 +511,8 @@ Rich table with pagination, sorting, filtering, and interactivity (clickable lin
 ## 14. Data Visualization Block
 
 Renders pie, bar, area, or line charts natively in Slack.
+
+Maximum 2 data visualization blocks per message.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|
@@ -558,7 +590,9 @@ Standard Markdown rendering, designed for AI app output.
 
 **Surfaces:** Messages only
 
-**Supports:** bold, italic, strikethrough, links, headers (all header levels render at the same size), ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (rendered as hyperlink text), and character escaping.
+**Supports:** bold, italic, strikethrough, links, headers, ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (rendered as hyperlink text), and character escaping.
+
+**Header rollout note:** the current markdown-block reference says every header level renders at the same size, but Slack's [March 6, 2026 changelog](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) says variable-sized headers are being rolled out. Use semantic levels and expect client/workspace variation while the reference and rollout converge.
 
 **Note:** A single markdown block may translate into multiple Slack blocks after rendering.
 
