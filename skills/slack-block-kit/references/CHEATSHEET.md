@@ -2,6 +2,9 @@
 
 > Sources:
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
+> - [Markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/) — Slack
+> - [March 2026 Block Kit rich-text rollout](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) — Slack
+> - [`chat.appendStream`](https://docs.slack.dev/reference/methods/chat.appendStream/) and [Node SDK append arguments](https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/ChatAppendStreamArguments/) — Slack
 
 ---
 
@@ -23,13 +26,15 @@
 | Table | `table` | Msg, Home | 100 rows, 20 cols. 10K chars/table and per msg. No semantic header schema. Rows are flat cell arrays; no `columns` prop |
 | Data Table | `data_table` | Msg, Home | `caption` required. Header + 1-200 rows, 20K chars, page_size 1-100 (default 5). Sortable/paginated |
 | Data Visualization | `data_visualization` | Msg only | Title ≤50. pie/bar/area/line. 1-12 series/segments, 1-20 points, labels ≤20 |
-| Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD incl. tables, task lists, dividers, syntax-highlighted code |
+| Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD incl. tables, task lists, dividers, syntax-highlighted code; variable header sizes rolling out |
 | Context Actions | `context_actions` | Msg only | 5 elements |
 | Input | `input` | Modal, Msg, Home | label required, many element types |
 | Video | `video` | Msg, Modal, Home | links.embed:write scope |
 | Plan | `plan` | Msg only | Sequential task cards for AI agent output |
 | Task Card | `task_card` | Msg only | Single task with status, details, output, sources |
-| File | `file` | Msg only | Read-only, source: "remote" |
+| File | `file` | Retrieval only | Read-only, source: "remote"; apps cannot author it |
+
+The current markdown-block reference says all header levels render at the same size, while Slack's March 6, 2026 changelog says variable-sized headers are rolling out. Use semantic levels and expect temporary client/workspace variation.
 
 ---
 
@@ -67,7 +72,7 @@
 | Text (`mrkdwn` / `plain_text`) | Most blocks and elements |
 | Option | Select menus, overflow, checkboxes, radio buttons |
 | Option Group | Select menus (grouped options) |
-| Confirmation Dialog | Any interactive element (via `confirm` property) |
+| Confirmation Dialog | Elements that expose a `confirm` property |
 | Conversation Filter | Conversation select menus (via `filter`) |
 | Dispatch Action Config | plain/rich/number/email/URL text-like inputs |
 | Slack File | Image block/element (via `slack_file`) |
@@ -154,7 +159,7 @@ The current index also defines `attachment_mention`, `canvas`, `canvas_message_u
 |------|--------|
 | Scope | `chat:write` |
 | Start requires | `channel`, `thread_ts` (+ `recipient_user_id`, `recipient_team_id` for channels) |
-| Append requires | `channel`, streaming message `ts`, `markdown_text`; `chunks` remains optional |
+| Append requires | `channel`, streaming message `ts`, plus at least one of `markdown_text` or `chunks` per the official Node SDK contract |
 | Stop requires | `channel`, streaming message `ts` |
 | Chunk types | `markdown_text` (`text` field), flat `task_update`, flat `plan_update`, `blocks` |
 | `task_display_mode` | `timeline` (default), `plan`, `dense` |
@@ -162,7 +167,7 @@ The current index also defines `attachment_mention`, `canvas`, `canvas_message_u
 | Top-level `blocks` | Only stopStream; rendered below final stream, separate 50-block limit |
 | Rate limits | start/stop Tier 2 (20+/min), append Tier 4 (100+/min) |
 
-The live method references and the Developing an agent guide currently conflict on append required fields and some chunk shapes. Follow the method reference/SDK type for the actual call.
+The live Web API field table marks append `markdown_text` required and `chunks` optional. In contrast, the official Node SDK marks both optional but says either is required, the Python SDK accepts both as optional, and the Developing an agent guide shows chunks-only append. For SDK calls, provide at least one; raw-HTTP callers should check the current method schema before omitting `markdown_text` and include it whenever that schema still marks it required. Validate chunk shapes against the current method reference and SDK model.
 
 ---
 

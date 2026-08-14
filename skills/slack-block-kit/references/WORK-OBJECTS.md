@@ -490,7 +490,7 @@ Respond with `entity.presentComments`; it requires no additional scope and is Ti
 }
 ```
 
-Required top-level response fields are `trigger_id`, `comments`, and (per the comment schema) `can_post_comment`. Each comment requires `id`, `sender`, `timestamp`, and `comment`. `comment` provides either a single rich-text block through `blocks` or a string through `value` (with optional `format: "markdown"`). Optional comment fields: `url`, `cursor`, `last_edit_ts`, `can_edit`, `can_delete`, `can_reply`, `reply_count`, `reply_users` (max 2), `latest_reply_ts`, and `thread_root_id`.
+Slack's `entity.presentComments` page contradicts itself about `can_post_comment`: the Web API argument table marks it optional, while the detailed comment schema marks it required. Include it explicitly in every normal comments response so composer visibility is deterministic. The documented authentication branch is different: send `trigger_id`, `user_auth_required: true`, and `user_auth_url`, while omitting `comments` and `can_post_comment`. For normal responses, `trigger_id` and `comments` are required. Each comment requires `id`, `sender`, `timestamp`, and `comment`. `comment` provides either a single rich-text block through `blocks` or a string through `value` (with optional `format: "markdown"`). Optional comment fields: `url`, `cursor`, `last_edit_ts`, `can_edit`, `can_delete`, `can_reply`, `reply_count`, `reply_users` (max 2), `latest_reply_ts`, and `thread_root_id`.
 
 When `can_delete` is true, set a non-empty `delete_action_id`; otherwise the delete control renders but does nothing. Use `user_auth_required` plus `user_auth_url` instead of `comments` if the user must authenticate.
 

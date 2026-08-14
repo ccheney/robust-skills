@@ -110,7 +110,7 @@ Compatible accessories: button, overflow, datepicker, timepicker, select menus, 
 
 ### context
 
-Small, muted text for metadata. Elements: mrkdwn text objects or image elements. Max 10 elements.
+Small, muted text for metadata. Elements: `plain_text` or `mrkdwn` text objects, plus image elements. Max 10 elements.
 
 ```json
 { "type": "context", "elements": [{ "type": "mrkdwn", "text": "Last updated: Feb 9, 2026 • deploy-bot" }] }
@@ -276,7 +276,7 @@ Standard Markdown rendering for AI app output. Messages only.
 { "type": "markdown", "text": "**Bold**, *italic*, [link](https://example.com)\n\n## Heading\n\n- List item" }
 ```
 
-Supports bold, italic, strikethrough, links, headers (all levels render the same size), lists, code (inline and fenced with syntax highlighting), block quotes, dividers, tables, task lists, and escaping. Images render as hyperlink text. Cumulative 12,000-char limit across all markdown blocks per payload. `block_id` is ignored. One markdown block may translate into multiple Slack blocks.
+Supports bold, italic, strikethrough, links, headers, lists, code (inline and fenced with syntax highlighting), block quotes, dividers, tables, task lists, and escaping. The current block reference says all header levels render at the same size, while Slack's March 6, 2026 changelog says variable-sized headers are rolling out. Use semantic heading levels and do not depend on uniform sizing across clients during the rollout. Images render as hyperlink text. Cumulative 12,000-char limit across all markdown blocks per payload. `block_id` is ignored. One markdown block may translate into multiple Slack blocks.
 
 ### context_actions
 
@@ -313,7 +313,7 @@ Remote file reference. Read-only — cannot be directly added to messages by app
 
 ## Streaming Agent Output
 
-Use `chat.startStream`, `chat.appendStream`, and `chat.stopStream` for live AI responses (all require `chat:write`). Start requires `channel` and `thread_ts`—streamed messages should reply to a user request. Append requires `channel`, the streaming message `ts`, and `markdown_text` even though its reference also accepts optional `chunks`. Stop requires `channel` and `ts`. When streaming to channels, start also requires `recipient_user_id` and `recipient_team_id`.
+Use `chat.startStream`, `chat.appendStream`, and `chat.stopStream` for live AI responses (all require `chat:write`). Start requires `channel` and `thread_ts`—streamed messages should reply to a user request. Append always requires `channel` and the streaming message `ts`; send at least one of `markdown_text` or `chunks` under the official SDK contract described below. Stop requires `channel` and `ts`. When streaming to channels, start also requires `recipient_user_id` and `recipient_team_id`.
 
 `chunks` (accepted by all three methods) can include:
 - `markdown_text` chunks — `{ "type": "markdown_text", "text": "standard Markdown" }` (the chunk field is `text`, unlike the top-level `markdown_text` argument)
@@ -332,7 +332,7 @@ All three method references accept `blocks` chunks inside `chunks`. Only `chat.s
 
 Streaming messages do not unfurl links.
 
-Slack's current Developing an agent guide has streaming examples that differ from the live method schemas (for example, append chunks without the method reference's required `markdown_text`, and alternate nested chunk shapes). Generate against each Web API method reference and SDK type, and treat the guide examples as conceptual until Slack reconciles them.
+Slack's current sources contradict one another on `chat.appendStream`: the Web API argument table marks `markdown_text` required and `chunks` optional; the official Node SDK interface marks both optional but states that either `markdown_text` or `chunks` is required; the Python SDK signature accepts both as optional; and the Developing an agent guide shows a chunks-only append. For SDK calls, provide at least one of `markdown_text` or `chunks` as the Node contract directs. Raw-HTTP callers should check the current method schema before omitting `markdown_text` and include it whenever that schema still marks it required. The guide also contains alternate nested chunk shapes, so validate chunk payloads against the current method reference and SDK model.
 
 ## Composition Objects
 
@@ -348,7 +348,7 @@ Option object (used in selects, overflow, checkboxes, radio buttons):
 
 Text max 75 chars, `value` max 150 chars, `description` max 75 chars.
 
-Confirmation dialog (add to any interactive element via `confirm`):
+Confirmation dialog (add only to an element that exposes `confirm`):
 
 ```json
 {
@@ -471,10 +471,13 @@ Work Objects use `chat.unfurl` with `metadata.entities[]`; each entity carries t
 
 - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
 - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
+- [Markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/) — Slack
 - [Block Kit Elements](https://docs.slack.dev/reference/block-kit/block-elements) — Slack
 - [Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
 - [chat.startStream](https://docs.slack.dev/reference/methods/chat.startStream/) — Slack
 - [chat.appendStream](https://docs.slack.dev/reference/methods/chat.appendStream/) — Slack
+- [Node SDK `ChatAppendStreamArguments`](https://docs.slack.dev/tools/node-slack-sdk/reference/web-api/interfaces/ChatAppendStreamArguments/) — Slack
+- [Python SDK `chat_appendStream`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_appendStream) — Slack
 - [chat.stopStream](https://docs.slack.dev/reference/methods/chat.stopStream/) — Slack
 - [Work Objects overview](https://docs.slack.dev/messaging/work-objects-overview/) — Slack
 - [Implementing Work Objects](https://docs.slack.dev/messaging/work-objects-implementation/) — Slack
@@ -484,3 +487,4 @@ Work Objects use `chat.unfurl` with `metadata.entities[]`; each entity carries t
 - [App Home](https://docs.slack.dev/surfaces/app-home) — Slack
 - [Developing agents](https://docs.slack.dev/ai/developing-agents) — Slack
 - [Notification changes](https://docs.slack.dev/changelog/2026/07/13/notification-changes) — Slack
+- [Block Kit rich-text rollout](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) — Slack

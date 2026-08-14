@@ -12,6 +12,7 @@
 > - [Canvases](https://docs.slack.dev/surfaces/canvases)
 > - [Handling interactions](https://docs.slack.dev/interactivity/handling-user-interaction)
 > - [Interaction payloads](https://docs.slack.dev/reference/interaction-payloads)
+> - [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/)
 > - [July 2026 notification change](https://docs.slack.dev/changelog/2026/07/13/notification-changes)
 > - [Agent context change](https://docs.slack.dev/changelog/2026/07/02/app-context)
 > - [Agent messaging experience](https://docs.slack.dev/changelog/2026/06/30/agent-messages-tab)
@@ -123,7 +124,7 @@ Acknowledge `view_submission` within three seconds. The acknowledgement body can
 | `{ "response_action": "clear" }` | Close all views |
 | `{ "response_action": "errors", "errors": {"block_id": "message"} }` | Attach validation errors to input blocks |
 
-Preserve user-entered state across view updates by retaining identical `block_id` and `action_id` values.
+To preserve user-entered state across a modal view update, deliberately retain identical `block_id` and `action_id` values for each corresponding input. This is a narrow exception to Slack's general instruction to use a new `block_id` for every updated message/view iteration. Outside that state-preservation case, follow the component's update guidance, use fresh block IDs, and keep stable logical routing keys in application code instead of reusing a stale `block_id`.
 
 ### Reading submitted state
 
@@ -204,7 +205,7 @@ Lists are Slack-native work-management surfaces operated with the `lists.*` meth
 
 ### Required request handling
 
-Slack sends interaction payloads as an `application/x-www-form-urlencoded` POST whose `payload` form field contains JSON. Verify the request, parse `payload`, and acknowledge every valid interaction with HTTP 200 within three seconds. Defer expensive work until after acknowledgement.
+When an app uses a configured HTTP Request URL, Slack sends interaction payloads as an `application/x-www-form-urlencoded` POST whose `payload` form field contains JSON. Verify the request, parse `payload`, and acknowledge every valid interaction with HTTP 200 within three seconds. With Socket Mode, Slack instead delivers an envelope over the authenticated WebSocket; acknowledge it promptly by returning its `envelope_id` (and a response payload only where supported). The same three-second acknowledgement deadline applies. Defer expensive work until after acknowledgement.
 
 | Payload type | Trigger |
 |---|---|
@@ -223,4 +224,4 @@ For `block_actions`, inspect `actions[]` plus its `block_id` and `action_id`; in
 - A `trigger_id` expires after three seconds and is single-use.
 - Global shortcuts do not provide `response_url`; a modal with a response-enabled conversations/channels select can generate one at submission time.
 
-Keep `block_id` and `action_id` stable identifiers, authorize the acting user and target independently of client-provided values, and make action handlers idempotent because retries and duplicate delivery can occur.
+Keep action-routing semantics stable, but do not treat a rendered `block_id` as a permanent identifier: use a new block ID for each updated message/view iteration unless retaining matching modal input IDs specifically to preserve entered state. Authorize the acting user and target independently of client-provided values, and make action handlers idempotent because retries and duplicate delivery can occur.

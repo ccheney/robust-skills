@@ -2,6 +2,7 @@
 
 > Sources:
 > - [Block Kit Composition Objects](https://docs.slack.dev/reference/block-kit/composition-objects) — Slack
+> - [Text object](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/) — Slack
 
 Composition objects are reusable JSON patterns used inside blocks and elements.
 
@@ -28,8 +29,8 @@ The most common composition object. Appears in nearly every block and element.
 |----------|------|----------|-------------|
 | `type` | string | Yes | `"mrkdwn"` or `"plain_text"` |
 | `text` | string | Yes | Min 1 char, max 3000 chars |
-| `emoji` | boolean | No | `plain_text` only. Converts `:emoji:` to rendered emoji |
-| `verbatim` | boolean | No | `mrkdwn` only. Default `false`. When `true`, disables auto-link conversion and mention parsing |
+| `emoji` | boolean | No | `plain_text` only. Indicates that emojis in the field should be escaped into colon emoji format |
+| `verbatim` | boolean | No | `mrkdwn` only. Default `false`; `true` skips plain-text preprocessing but still processes mrkdwn and explicit manual parsing strings |
 
 ### Type Rules
 
@@ -57,8 +58,9 @@ When `verbatim: false` (default):
 - Mentions auto-parse
 
 When `verbatim: true`:
-- Markdown formatting still processes
-- No auto-linking or mention parsing
+- mrkdwn formatting still processes
+- Explicit manual parsing strings still process
+- Slack does not modify otherwise plain-text content (for example, it does not auto-link a channel name)
 - Useful for displaying raw URLs or text containing `@` or `#` that aren't mentions
 
 ```json
@@ -117,7 +119,7 @@ Max 100 option groups per menu.
 
 ## Confirmation Dialog Object
 
-Adds a confirmation step to any interactive element.
+Adds a confirmation step to an element that exposes a `confirm` property.
 
 | Property | Type | Required | Constraints |
 |----------|------|----------|-------------|

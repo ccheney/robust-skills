@@ -3,6 +3,8 @@
 > Sources:
 > - [Block Kit Blocks](https://docs.slack.dev/reference/block-kit/blocks) — Slack
 > - [Block Kit Reference](https://docs.slack.dev/reference/block-kit) — Slack
+> - [Markdown block](https://docs.slack.dev/reference/block-kit/blocks/markdown-block/) — Slack
+> - [March 2026 Block Kit rich-text rollout](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) — Slack
 
 All 21 block types with full property tables, constraints, and surface compatibility.
 
@@ -55,7 +57,7 @@ This matrix follows Slack's live block index. Do not infer compatibility from an
 
 The `file` block is returned when retrieving messages with remote files; apps cannot add it directly to a surface.
 
-For every block type, keep `block_id` at 255 characters or fewer, make it unique within the payload, and use a new value for each updated iteration of a message or view. Slack generates one when it is omitted.
+For block types that support and retain `block_id`, keep it at 255 characters or fewer, make it unique within the payload, and use a new value for each updated iteration of a message or view. Slack normally generates one when it is omitted. The `markdown` block is the exception: its `block_id` is ignored and not retained, so do not rely on a supplied or generated ID for that block. Modal input-state preservation is a deliberate update exception described in [SURFACES.md](SURFACES.md#modals).
 
 ---
 
@@ -588,7 +590,9 @@ Standard Markdown rendering, designed for AI app output.
 
 **Surfaces:** Messages only
 
-**Supports:** bold, italic, strikethrough, links, headers (all header levels render at the same size), ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (rendered as hyperlink text), and character escaping.
+**Supports:** bold, italic, strikethrough, links, headers, ordered/unordered lists, inline code, code blocks with optional syntax highlighting, block quotes, horizontal rules/dividers, tables, task lists, images (rendered as hyperlink text), and character escaping.
+
+**Header rollout note:** the current markdown-block reference says every header level renders at the same size, but Slack's [March 6, 2026 changelog](https://docs.slack.dev/changelog/2026/03/06/block-kit-rich-text/) says variable-sized headers are being rolled out. Use semantic levels and expect client/workspace variation while the reference and rollout converge.
 
 **Note:** A single markdown block may translate into multiple Slack blocks after rendering.
 
