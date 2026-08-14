@@ -9,19 +9,19 @@
 
 | Block | Type String | Surfaces | Key Limits |
 |-------|------------|----------|-----------|
-| Header | `header` | Msg, Modal, Home | 150 chars, plain_text only |
+| Header | `header` | Msg, Modal, Home | 150 chars, plain_text only; optional level 1-4 |
 | Section | `section` | Msg, Modal, Home | 3000 chars text, 10 fields (2000 each), 1 accessory |
 | Divider | `divider` | Msg, Modal, Home | No fields |
 | Context | `context` | Msg, Modal, Home | 10 elements (text + image) |
 | Actions | `actions` | Msg, Modal, Home | 25 elements |
 | Alert | `alert` | Modal only | 200 chars. Levels: default/info/warning/error/success |
-| Card | `card` | Msg | Title/subtitle 150, body/subtext 200 chars, max 3 buttons |
-| Carousel | `carousel` | Msg | 1-10 card elements |
-| Container | `container` | Msg | Title 150 chars (plain_text), max 10 child blocks, collapsible |
+| Card | `card` | Msg, Modal, Home | Title/subtitle 150, body/subtext 200 chars, max 3 buttons |
+| Carousel | `carousel` | Msg, Home | 1-10 card elements |
+| Container | `container` | Msg | `title` or `rich_text_title`, max 10 child blocks, collapsible; optional non-collapsible header divider |
 | Image | `image` | Msg, Modal, Home | alt_text required, png/jpg/gif |
 | Rich Text | `rich_text` | Msg, Modal, Home | Nested sub-elements |
-| Table | `table` | Msg only | 100 rows, 20 cols. 10K chars/table and per msg. First row = header. Rows are flat cell arrays. No `columns` prop |
-| Data Table | `data_table` | Msg only | `caption` required. Header + 1-100 rows, 20 cols, page_size 1-100 (default 5). Sortable/paginated |
+| Table | `table` | Msg, Home | 100 rows, 20 cols. 10K chars/table and per msg. No semantic header schema. Rows are flat cell arrays; no `columns` prop |
+| Data Table | `data_table` | Msg, Home | `caption` required. Header + 1-200 rows, 20K chars, page_size 1-100 (default 5). Sortable/paginated |
 | Data Visualization | `data_visualization` | Msg only | Title ≤50. pie/bar/area/line. 1-12 series/segments, 1-20 points, labels ≤20 |
 | Markdown | `markdown` | Msg only | 12K chars cumulative, standard MD incl. tables, task lists, dividers, syntax-highlighted code |
 | Context Actions | `context_actions` | Msg only | 5 elements |
@@ -37,7 +37,7 @@
 
 | Element | Type String | Compatible Blocks |
 |---------|------------|-------------------|
-| Button | `button` | section, actions, card |
+| Button | `button` | section, actions; card has a separate button-shaped actions array |
 | Overflow Menu | `overflow` | section, actions |
 | Select Menu | `static_select` / `external_select` / `users_select` / `conversations_select` / `channels_select` | section, actions, input |
 | Multi-Select | `multi_static_select` / `multi_external_select` / `multi_users_select` / `multi_conversations_select` / `multi_channels_select` | section, actions, input |
@@ -69,10 +69,11 @@
 | Option Group | Select menus (grouped options) |
 | Confirmation Dialog | Any interactive element (via `confirm` property) |
 | Conversation Filter | Conversation select menus (via `filter`) |
-| Dispatch Action Config | plain_text_input, rich_text_input |
+| Dispatch Action Config | plain/rich/number/email/URL text-like inputs |
 | Slack File | Image block/element (via `slack_file`) |
 | Slack Icon | Card block (via `slack_icon`) |
 | Trigger | Workflow button (via `workflow.trigger`) |
+| Input Parameter | Workflow trigger `customizable_input_parameters` |
 | Workflow | Workflow button (wraps trigger object) |
 
 ---
@@ -86,11 +87,11 @@
 | `rich_text_preformatted` | Code block | `elements`, `border` |
 | `rich_text_quote` | Blockquote | `elements`, `border` |
 
-### Inline Elements (within sections)
+### Inline Elements
 
 | Type | Key Properties |
 |------|----------------|
-| `text` | `text`, `style: { bold, italic, strike, code, underline, highlight, client_highlight, unlink }` |
+| `text` | `text`, `style: { bold, italic, strike, underline, highlight, client_highlight, unlink }` |
 | `link` | `url`, `text`, `style` |
 | `emoji` | `name` |
 | `user` | `user_id` |
@@ -99,6 +100,8 @@
 | `broadcast` | `range` (here/channel/everyone) |
 | `date` | `timestamp`, `format`, `fallback` |
 | `color` | `value` (hex) |
+
+The current index also defines `attachment_mention`, `canvas`, `canvas_message_unfurl`, `canvas_user_mention`, `citation`, `file`, `list_record`, `message_mention`, `salesforce_data_field`, `tag`, `team`, `work_object_mention`, and `workflow_mention`. Sections, list-item sections, and quotes accept the broad inline set; `rich_text_preformatted` accepts only `text` and `link`. See [RICH-TEXT.md](RICH-TEXT.md) before authoring specialized/output-oriented types.
 
 ---
 
@@ -130,7 +133,7 @@
 | Container child blocks / title | 10 / 150 chars |
 | Table rows / cols | 100 / 20 |
 | Table cell chars (per table & per msg) | 10,000 |
-| Data table rows | header + 100 |
+| Data table rows / cell chars | header + 200 / 20,000 per table and per message |
 | Data viz series/segments / points | 1-12 / 1-20 |
 | Modal title | 24 chars |
 | Modal views stack | 3 |
@@ -139,7 +142,8 @@
 | Select options | 100 |
 | Overflow options | 5 |
 | Placeholder text | 150 chars |
-| File input max size | 10MB per file |
+| File input max size | 100MB per file |
+| Rich text input lines | `min_lines`/`max_lines` 1-100; maximum defaults to 8 |
 | Streaming chunk fields (task/plan update) | 256 chars |
 
 ---
@@ -150,11 +154,15 @@
 |------|--------|
 | Scope | `chat:write` |
 | Start requires | `channel`, `thread_ts` (+ `recipient_user_id`, `recipient_team_id` for channels) |
-| Chunk types | `markdown_text`, `task_update`, `plan_update`, `blocks` |
+| Append requires | `channel`, streaming message `ts`, `markdown_text`; `chunks` remains optional |
+| Stop requires | `channel`, streaming message `ts` |
+| Chunk types | `markdown_text` (`text` field), flat `task_update`, flat `plan_update`, `blocks` |
 | `task_display_mode` | `timeline` (default), `plan`, `dense` |
 | Blocks per chunk array | 50 (extras dropped with warning) |
-| stopStream final `blocks` | Separate 50-block limit → 100 total |
+| Top-level `blocks` | Only stopStream; rendered below final stream, separate 50-block limit |
 | Rate limits | start/stop Tier 2 (20+/min), append Tier 4 (100+/min) |
+
+The live method references and the Developing an agent guide currently conflict on append required fields and some chunk shapes. Follow the method reference/SDK type for the actual call.
 
 ---
 
@@ -167,7 +175,8 @@
 | App Home | Yes (100 blocks) | `views.publish` |
 | Canvases | No (markdown only) | `canvases.create` |
 | Lists | No | `lists.*` |
-| Split View | Config-based | Agents & AI Apps |
+| Agent Messages | `agent_view` (new apps) | Standard Messages tab with threads |
+| Legacy Assistant | `assistant_view` (existing apps) | Chat + History; eventual deprecation |
 
 ---
 
@@ -180,3 +189,5 @@
 | Incident | `slack#/entities/incident` |
 | Content Item | `slack#/entities/content_item` |
 | Item | `slack#/entities/item` |
+
+Unfurl entities live at `metadata.entities[]` and require per-entity `app_unfurl_url`, `url`, `external_ref`, `entity_type`, and `entity_payload`. `entity_comments` is the sibling bidirectional-comments envelope; see [WORK-OBJECTS.md](WORK-OBJECTS.md).
