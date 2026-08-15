@@ -1,3 +1,5 @@
+[![skills.sh](https://skills.sh/b/ccheney/robust-skills)](https://skills.sh/ccheney/robust-skills)
+
 # robust-skills
 
 Architectural taste for agentic engineering and agents. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2026), Slack Block Kit, Slack mrkdwn formatting, Microsoft Teams Adaptive Cards, and Teams message formatting. Every skill is grounded against current official documentation, with verified examples and accurate version/support claims.
