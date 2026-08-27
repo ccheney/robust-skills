@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bazel"
+  short_description: "Manage scalable, hermetic Bazel monorepos"
+  default_prompt: "Use $bazel to configure, maintain, or troubleshoot this Bazel monorepo."

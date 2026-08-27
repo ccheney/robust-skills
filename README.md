@@ -2,10 +2,18 @@
 
 # robust-skills
 
-Architectural taste for agentic engineering and agents. Backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2026), Slack Block Kit, Slack mrkdwn formatting, Microsoft Teams Adaptive Cards, and Teams message formatting. Every skill is grounded against current official documentation, with verified examples and accurate version/support claims.
+Architectural taste for agentic engineering and agents. Bazel monorepo builds, backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2026), Slack Block Kit, Slack mrkdwn formatting, Microsoft Teams Adaptive Cards, and Teams message formatting. Every skill is grounded against current official documentation, with verified examples and accurate version/support claims.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
+```
+
+### bazel
+
+Manage, structure, modernize, and troubleshoot Bazel monorepos against Bazel 9.2. Covers the package/target/action graph, direct dependency and visibility discipline, Bazel 9's Bzlmod-only external dependency model, explicit external language rules, `query`/`cquery`/`aquery`/`mod`, `.bazelrc`, platforms and toolchains, hermetic actions, sandboxing, local and remote caching, remote execution, CI, performance profiling, Starlark extensions, and incremental adoption. Includes decision trees and diagnostics for the failure modes that commonly pass locally but fail under caching, sandboxing, or remote execution.
+
+```bash
+npx skills add https://github.com/ccheney/robust-skills --skill bazel
 ```
 
 ### clean-ddd-hexagonal
