@@ -1,0 +1,5 @@
+{
+  "type": "TextBlock",
+  "text": "<b>Release 42</b>\n<a href=\"https://example.com/42\">View release</a>",
+  "wrap": false
+}

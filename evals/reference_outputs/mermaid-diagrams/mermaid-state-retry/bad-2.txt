@@ -1,0 +1,6 @@
+stateDiagram-v2
+ [*] --> Queued
+ Queued --> Running: start
+ Running --> Queued: retry
+ Running --> Done: finish
+ Done --> Running

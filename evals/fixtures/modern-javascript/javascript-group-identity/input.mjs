@@ -1,0 +1,1 @@
+export function groupByOwner(rows){return Object.groupBy(rows,r=>JSON.stringify(r.owner));}

@@ -1,0 +1,1 @@
+.host{container-type:inline-size}.card{display:grid;grid-template-columns:1fr;gap:12px}@container(min-width:400px){.card{grid-template-columns:1fr 1fr}}

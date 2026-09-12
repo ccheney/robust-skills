@@ -1,0 +1,1 @@
+.field{border:1px solid gray}input:invalid{border-color:rgb(220 0 0)}

@@ -1,0 +1,6 @@
+{
+  "authoritative_store": "append_only_event_log",
+  "event_update_policy": "rewrite_old_events",
+  "projection_rebuildable": true,
+  "schema_evolution": "upcast"
+}

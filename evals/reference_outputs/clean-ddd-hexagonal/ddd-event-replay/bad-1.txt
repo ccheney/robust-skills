@@ -1,0 +1,6 @@
+{
+  "authoritative_store": "dashboard_projection",
+  "event_update_policy": "append_only",
+  "projection_rebuildable": true,
+  "schema_evolution": "upcast"
+}

@@ -1,0 +1,1 @@
+.header{display:grid;grid-template-columns:subgrid}.row{display:grid;grid-template-columns:80px 1fr 120px;gap:12px}

@@ -1,0 +1,1 @@
+export class Money {constructor(cents,currency){this.cents=cents;this.currency=currency;}add(other){return new Money(this.cents+other.cents,this.currency);}}

@@ -1,0 +1,29 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Approve REQ-42",
+      "wrap": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "Approve",
+      "verb": "approveRequest",
+      "data": {
+        "requestId": "REQ-99"
+      },
+      "fallback": {
+        "type": "Action.Submit",
+        "title": "Approve",
+        "data": {
+          "action": "approve",
+          "requestId": "REQ-42"
+        }
+      }
+    }
+  ]
+}

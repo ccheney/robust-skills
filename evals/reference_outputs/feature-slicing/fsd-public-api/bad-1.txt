@@ -1,0 +1,8 @@
+{
+  "public_exports": [
+    "UserCard",
+    "UserId",
+    "UserDatabaseRow"
+  ],
+  "wildcard_exports": false
+}

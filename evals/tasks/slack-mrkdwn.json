@@ -1,0 +1,530 @@
+[
+  {
+    "id": "slack-escape-untrusted",
+    "skill": "slack-mrkdwn",
+    "category": "escaping",
+    "group": "slack-mrkdwn/slack-escape-untrusted",
+    "split": "development",
+    "prompt": "Implement escapeMrkdwn(text) for raw user text going into a Slack mrkdwn field. Neutralize control delimiters while preserving quotes, Unicode, and ordinary formatting markers. The input is raw, not pre-escaped. Return only the JavaScript ES module. Use Node 24, no dependencies.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-escape-untrusted/input.json"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-escape-untrusted/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-escape-untrusted/bad-1.txt",
+        "fails": [
+          "single-encoding"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-escape-untrusted/bad-2.txt",
+        "fails": [
+          "mention-neutralized",
+          "link-neutralized"
+        ]
+      }
+    ],
+    "test": "assertions/slack-mrkdwn/slack-escape-untrusted.mjs",
+    "exports": [
+      "escapeMrkdwn"
+    ],
+    "assertion_ids": [
+      "single-encoding",
+      "mention-neutralized",
+      "link-neutralized",
+      "raw-ampersands",
+      "preserves-content",
+      "empty"
+    ]
+  },
+  {
+    "id": "slack-date-seconds",
+    "skill": "slack-mrkdwn",
+    "category": "date-controls",
+    "group": "slack-mrkdwn/slack-date-seconds",
+    "split": "holdout",
+    "prompt": "Implement dateToken(date, fallback) returning a Slack date control with {date_num} {time}, Unix seconds (floor), and the supplied already-safe timezone-bearing fallback. date is a valid Date. No link. Return only the JavaScript ES module. Use Node 24, no dependencies.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-date-seconds/input.json"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-date-seconds/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-date-seconds/bad-1.txt",
+        "fails": [
+          "seconds"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-date-seconds/bad-2.txt",
+        "fails": [
+          "fallback"
+        ]
+      }
+    ],
+    "test": "assertions/slack-mrkdwn/slack-date-seconds.mjs",
+    "exports": [
+      "dateToken"
+    ],
+    "assertion_ids": [
+      "seconds",
+      "fallback",
+      "negative-time"
+    ]
+  },
+  {
+    "id": "slack-trusted-mention-boundary",
+    "skill": "slack-mrkdwn",
+    "category": "mention-boundaries",
+    "group": "slack-mrkdwn/slack-trusted-mention-boundary",
+    "split": "holdout",
+    "prompt": "Implement assignment(userId, note). Produce Assigned to <@ID>: NOTE in a Slack mrkdwn string. userId is a supplied valid Slack ID; note is raw untrusted text. Only the intended assignee should notify. Return only the JavaScript ES module. Use Node 24, no dependencies.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-trusted-mention-boundary/input.json"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-trusted-mention-boundary/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-trusted-mention-boundary/bad-1.txt",
+        "fails": [
+          "untrusted-note"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-trusted-mention-boundary/bad-2.txt",
+        "fails": [
+          "intended-assignee"
+        ]
+      }
+    ],
+    "test": "assertions/slack-mrkdwn/slack-trusted-mention-boundary.mjs",
+    "exports": [
+      "assignment"
+    ],
+    "assertion_ids": [
+      "intended-assignee",
+      "untrusted-note",
+      "alternate-id"
+    ]
+  },
+  {
+    "id": "slack-message-renderer",
+    "skill": "slack-mrkdwn",
+    "category": "renderer",
+    "group": "slack-mrkdwn/slack-message-renderer",
+    "split": "development",
+    "prompt": "Repair the Slack chat.postMessage text field. Preserve the two lines, bold status, URL and link label. Keep a text-only message. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-message-renderer/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-message-renderer/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-message-renderer/bad-1.txt",
+        "fails": [
+          "message-markup"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-message-renderer/bad-2.txt",
+        "fails": [
+          "message-markup"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "message-markup",
+        "op": "equals",
+        "path": [
+          "text"
+        ],
+        "value": "*Build failed*\n<https://example.com/build/42|View build>"
+      },
+      {
+        "id": "no-blocks",
+        "op": "absent",
+        "path": [
+          "blocks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slack-standard-markdown-field",
+    "skill": "slack-mrkdwn",
+    "category": "renderer",
+    "group": "slack-mrkdwn/slack-standard-markdown-field",
+    "split": "development",
+    "prompt": "Repair this non-streaming chat.postMessage call using its markdown_text field. Preserve status emphasis and the labelled URL; remove mutually exclusive fields. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-standard-markdown-field/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-standard-markdown-field/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-standard-markdown-field/bad-1.txt",
+        "fails": [
+          "standard-markdown"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-standard-markdown-field/bad-2.txt",
+        "fails": [
+          "no-text"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "standard-markdown",
+        "op": "equals",
+        "path": [
+          "markdown_text"
+        ],
+        "value": "**Build failed**\n[View build](https://example.com/build/42)"
+      },
+      {
+        "id": "no-text",
+        "op": "absent",
+        "path": [
+          "text"
+        ]
+      },
+      {
+        "id": "no-blocks",
+        "op": "absent",
+        "path": [
+          "blocks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slack-literal-label",
+    "skill": "slack-mrkdwn",
+    "category": "literal-text",
+    "group": "slack-mrkdwn/slack-literal-label",
+    "split": "development",
+    "prompt": "Format the literal button label for a Slack plain_text text object. Preserve every visible character; the label must have no formatting or notification behavior. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-literal-label/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-literal-label/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-literal-label/bad-1.txt",
+        "fails": [
+          "literal-type"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-literal-label/bad-2.txt",
+        "fails": [
+          "literal-content"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "literal-type",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "plain_text"
+      },
+      {
+        "id": "literal-content",
+        "op": "equals",
+        "path": [
+          "text"
+        ],
+        "value": "R&D <ops> \"ready\""
+      },
+      {
+        "id": "no-verbatim",
+        "op": "absent",
+        "path": [
+          "verbatim"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slack-stable-ids",
+    "skill": "slack-mrkdwn",
+    "category": "mentions",
+    "group": "slack-mrkdwn/slack-stable-ids",
+    "split": "development",
+    "prompt": "Repair the message using the resolved IDs. Preserve the wording, labelled link and channel reference, disable both unfurl kinds. Do not notify any broader group. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-stable-ids/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-stable-ids/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-stable-ids/bad-1.txt",
+        "fails": [
+          "explicit-controls"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-stable-ids/bad-2.txt",
+        "fails": [
+          "media-unfurls"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "explicit-controls",
+        "op": "equals",
+        "path": [
+          "text"
+        ],
+        "value": "<@U123ABC> please review <https://example.com/42|release 42> in <#C123ABC>."
+      },
+      {
+        "id": "link-unfurls",
+        "op": "equals",
+        "path": [
+          "unfurl_links"
+        ],
+        "value": false
+      },
+      {
+        "id": "media-unfurls",
+        "op": "equals",
+        "path": [
+          "unfurl_media"
+        ],
+        "value": false
+      }
+    ]
+  },
+  {
+    "id": "slack-missing-identity",
+    "skill": "slack-mrkdwn",
+    "category": "missing-information",
+    "group": "slack-mrkdwn/slack-missing-identity",
+    "split": "holdout",
+    "prompt": "Prepare a ready-to-send personal mention for Ada. There is no directory/lookup tool and only her display name is known. Return status (ready/needs_identity), missing (identity fields), and text containing a plain visible fallback; do not invent an ID. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-missing-identity/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-missing-identity/good-1.txt",
+      "reference_outputs/slack-mrkdwn/slack-missing-identity/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-missing-identity/bad-1.txt",
+        "fails": [
+          "request-identity"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-missing-identity/bad-2.txt",
+        "fails": [
+          "fallback"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-missing-identity/bad-3.txt",
+        "fails": [
+          "missing-user-id"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "request-identity",
+        "op": "equals",
+        "path": [
+          "status"
+        ],
+        "value": "needs_identity"
+      },
+      {
+        "id": "missing-user-id",
+        "op": "one_of",
+        "path": [
+          "missing"
+        ],
+        "value": [
+          [
+            "slack_user_id"
+          ],
+          [
+            "user_id"
+          ]
+        ]
+      },
+      {
+        "id": "fallback",
+        "op": "equals",
+        "path": [
+          "text"
+        ],
+        "value": "Ada, please review release 42."
+      }
+    ]
+  },
+  {
+    "id": "slack-verbatim-controls",
+    "skill": "slack-mrkdwn",
+    "category": "escaping",
+    "group": "slack-mrkdwn/slack-verbatim-controls",
+    "split": "development",
+    "prompt": "Repair this mrkdwn text object carrying raw external content. Keep verbatim enabled to reduce auto-parsing, but also neutralize explicit controls. Preserve visible external text. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-verbatim-controls/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-verbatim-controls/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-verbatim-controls/bad-1.txt",
+        "fails": [
+          "safe-explicit-controls"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-verbatim-controls/bad-2.txt",
+        "fails": [
+          "auto-parse"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "safe-explicit-controls",
+        "op": "equals",
+        "path": [
+          "text"
+        ],
+        "value": "R&amp;D &lt;!channel&gt; &lt;https://bad.example|click&gt;"
+      },
+      {
+        "id": "renderer",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "mrkdwn"
+      },
+      {
+        "id": "auto-parse",
+        "op": "equals",
+        "path": [
+          "verbatim"
+        ],
+        "value": true
+      }
+    ]
+  },
+  {
+    "id": "slack-notification-content",
+    "skill": "slack-mrkdwn",
+    "category": "accessibility",
+    "group": "slack-mrkdwn/slack-notification-content",
+    "split": "development",
+    "prompt": "Repair only the supplied fallback text for screen readers and mobile notifications. It must include the complete displayed status, environment, owner and rollback URL. Return {text}; do not change or return the blocks. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-mrkdwn/slack-notification-content/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-mrkdwn/slack-notification-content/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-notification-content/bad-1.txt",
+        "fails": [
+          "owner"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-mrkdwn/slack-notification-content/bad-2.txt",
+        "fails": [
+          "environment"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "deployment",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "42"
+      },
+      {
+        "id": "status",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "failed"
+      },
+      {
+        "id": "environment",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "production"
+      },
+      {
+        "id": "owner",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "Ada"
+      },
+      {
+        "id": "rollback",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "https://example.com/rollback/42"
+      },
+      {
+        "id": "text-only",
+        "op": "absent",
+        "path": [
+          "blocks"
+        ]
+      }
+    ]
+  }
+]

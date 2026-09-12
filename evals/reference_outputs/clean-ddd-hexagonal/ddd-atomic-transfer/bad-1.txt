@@ -1,0 +1,9 @@
+{
+  "consistency": "eventual",
+  "transaction_members": [
+    "debit",
+    "credit"
+  ],
+  "async_credit": false,
+  "presentation_path": "presentation"
+}

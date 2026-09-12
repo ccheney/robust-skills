@@ -1,0 +1,1 @@
+SELECT DISTINCT ON(customer_id) id,customer_id FROM orders ORDER BY customer_id,created_at DESC,id DESC

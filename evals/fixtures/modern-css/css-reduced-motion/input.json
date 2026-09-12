@@ -1,0 +1,4 @@
+{
+  "html": "<style>.spinner{width:20px;height:20px;background:blue}.status{display:block;width:120px;height:20px}</style><div class=\"spinner\"></div><span class=\"status\">Processing</span>",
+  "current_css": "@keyframes spin{to{transform:rotate(360deg)}}.spinner{animation:spin 1s linear infinite}"
+}

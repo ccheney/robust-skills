@@ -1,0 +1,1 @@
+export const buildMentions=users=>({body:{contentType:'html',content:users.map(u=>`<at id="0">${u.name}</at>`).join(', ')},mentions:[]});

@@ -1,0 +1,17 @@
+{
+  "folders": [
+    "domain",
+    "application",
+    "infrastructure",
+    "presentation"
+  ],
+  "aggregates": [
+    "Account A",
+    "Account B"
+  ],
+  "operations": [
+    "debit",
+    "credit"
+  ],
+  "invariant": "No observable state may debit A without crediting B. Both accounts use one database."
+}

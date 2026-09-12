@@ -1,0 +1,5 @@
+{
+  "method": "chat.postMessage",
+  "channel": "C_RELEASES",
+  "markdown": "## Release\n\n**Ready** \u2014 [runbook](https://example.com/runbook)"
+}

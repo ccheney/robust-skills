@@ -1,0 +1,5 @@
+sequenceDiagram
+ Client->>API: request
+ API->>DB: insert
+ API-->>Client: success
+ DB-->>API: saved

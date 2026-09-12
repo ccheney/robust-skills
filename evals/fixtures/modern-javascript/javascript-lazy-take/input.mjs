@@ -1,0 +1,1 @@
+export function* take(source,count){yield* Array.from(source).slice(0,count);}

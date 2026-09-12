@@ -1,0 +1,1 @@
+export const dateToken=(date,fallback)=>`<!date^${date.getTime()}^{date_num} {time}|${fallback}>`;

@@ -1,0 +1,1 @@
+export const owns=(record,key)=>key in record;

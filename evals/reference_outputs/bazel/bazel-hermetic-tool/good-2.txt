@@ -1,0 +1,1 @@
+genrule(name="generated",srcs=["schema.json"],outs=["generated.txt"],tools=[":compiler"],cmd="$(execpath :compiler) $(location schema.json) > $@")

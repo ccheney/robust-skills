@@ -1,0 +1,26 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.3",
+  "body": [
+    {
+      "type": "Input.Text",
+      "id": "value",
+      "label": "Comment"
+    },
+    {
+      "type": "Input.Text",
+      "id": "value",
+      "label": "Owner"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Save",
+      "data": {
+        "action": "save",
+        "recordId": "42"
+      }
+    }
+  ]
+}

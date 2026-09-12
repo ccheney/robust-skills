@@ -1,6 +1,6 @@
 ---
 name: teams-adaptive-cards
-description: Build, validate, or repair Microsoft Teams Adaptive Card JSON and bot, webhook, or Graph wrappers. Use for card layouts, actions, forms, or MessageCard migration; not Teams text-only formatting or non-Teams card hosts.
+description: Build, validate, or repair Adaptive Card layouts, actions, forms, and delivery wrappers for Microsoft Teams. Use when Teams is the target host, including bot, webhook, Graph, and MessageCard migration tasks. Exclude Windows/custom card hosts and Teams text-only formatting.
 ---
 
 # Teams Adaptive Cards

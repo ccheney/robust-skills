@@ -1,0 +1,9 @@
+{
+  "atomic_operations": [
+    "save_order",
+    "insert_outbox"
+  ],
+  "broker_publish_phase": "after_commit",
+  "delivery": "at_least_once",
+  "consumer_deduplication": false
+}

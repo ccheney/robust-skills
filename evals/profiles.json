@@ -1,0 +1,35 @@
+{
+  "smoke": {
+    "routing": [
+      "modern-javascript-indirect",
+      "modern-javascript-negative",
+      "slack-mrkdwn-indirect",
+      "teams-adaptive-cards-negative"
+    ],
+    "tasks": [
+      "save-all",
+      "graph",
+      "checkout-placement"
+    ]
+  },
+  "full": {
+    "routing": "all",
+    "tasks": "all"
+  },
+  "coverage": {
+    "routing": [],
+    "tasks": [
+      "bazel-direct-dependency",
+      "ddd-money-value-object",
+      "checkout-placement",
+      "mermaid-reserved-id",
+      "css-responsive-cards",
+      "save-all",
+      "postgres-nullable-fk",
+      "slack-table-rows",
+      "slack-escape-untrusted",
+      "graph",
+      "teams-graph-renderer"
+    ]
+  }
+}

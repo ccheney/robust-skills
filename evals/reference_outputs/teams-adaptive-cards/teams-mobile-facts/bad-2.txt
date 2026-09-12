@@ -1,0 +1,15 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Service",
+          "value": "API"
+        }
+      ]
+    }
+  ]
+}

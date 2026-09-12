@@ -1,0 +1,4 @@
+{
+  "html": "<style>body{margin:0}.avatar{width:64px;height:40px;flex:none}.card{width:300px}.title{display:block}</style><div class=\"card\"><div class=\"avatar\">IMG</div><div class=\"copy\"><span class=\"title\">EXTREMELYLONGUNBROKENPRODUCTIDENTIFIERTHATDOESNOTFIT</span></div></div>",
+  "current_css": ".card{display:flex;gap:16px}.copy{flex:1}.title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"
+}

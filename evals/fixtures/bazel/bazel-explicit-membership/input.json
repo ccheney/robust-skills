@@ -1,0 +1,10 @@
+{
+  "file": "app/BUILD.bazel",
+  "content": "load(\"@rules_python//python:defs.bzl\",\"py_library\")\npy_library(name=\"api\",srcs=glob([\"**/*.py\"]))",
+  "files": [
+    "main.py",
+    "api.py",
+    "tools/BUILD.bazel",
+    "tools/helper.py"
+  ]
+}

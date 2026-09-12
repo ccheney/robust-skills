@@ -87,9 +87,9 @@ and version-specific invariants remain in the appropriate references.
   execution, and live Slack/Teams delivery were not performed in these bounded
   cases. No dependency installation or live mutation was needed.
 
-The [selection cases](../tests/skill-cases.json) include direct, indirect,
+The [selection cases](../evals/routing.json) include direct, indirect,
 negative, incomplete-input, and scope-boundary requests for each skill. The
-[workflow cases](../tests/workflow-cases.json) include their raw artifacts and
+[workflow cases](../evals/workflows.json) include their raw artifacts and
 instructions so the review can be repeated. Selection case expectations should
 be withheld from an evaluator. Explicit-invocation workflow results assess the
 loaded instructions, not automatic selection.

@@ -1,0 +1,1 @@
+SELECT c.id FROM customers c WHERE NOT EXISTS(SELECT 1 FROM blocked b WHERE b.customer_id=c.id)

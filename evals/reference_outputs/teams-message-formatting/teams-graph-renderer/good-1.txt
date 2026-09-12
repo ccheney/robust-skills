@@ -1,0 +1,6 @@
+{
+  "body": {
+    "contentType": "html",
+    "content": "<p><strong>Release 42</strong>: <a href=\"https://example.com/42\">View release</a></p>"
+  }
+}

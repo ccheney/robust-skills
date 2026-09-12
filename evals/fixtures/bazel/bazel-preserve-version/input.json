@@ -1,0 +1,6 @@
+{
+  "bazel_version": "8.4.2",
+  "dependency_system": "WORKSPACE",
+  "requested_file": "lib/auth/BUILD.bazel",
+  "request": "Expose one target to its intended consumer; no upgrade requested."
+}

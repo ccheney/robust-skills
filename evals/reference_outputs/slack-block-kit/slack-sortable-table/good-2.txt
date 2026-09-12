@@ -1,0 +1,38 @@
+{
+  "type": "data_table",
+  "caption": "Service latency",
+  "rows": [
+    [
+      {
+        "type": "raw_text",
+        "text": "Service"
+      },
+      {
+        "type": "raw_text",
+        "text": "Latency"
+      }
+    ],
+    [
+      {
+        "type": "raw_text",
+        "text": "API"
+      },
+      {
+        "type": "raw_number",
+        "value": 12,
+        "text": "12"
+      }
+    ],
+    [
+      {
+        "type": "raw_text",
+        "text": "Worker"
+      },
+      {
+        "type": "raw_number",
+        "value": 8,
+        "text": "8"
+      }
+    ]
+  ]
+}

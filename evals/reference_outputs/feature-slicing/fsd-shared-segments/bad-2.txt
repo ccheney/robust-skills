@@ -1,0 +1,7 @@
+{
+  "allowed_edges": [
+    "a",
+    "b"
+  ],
+  "rejected_edges": []
+}

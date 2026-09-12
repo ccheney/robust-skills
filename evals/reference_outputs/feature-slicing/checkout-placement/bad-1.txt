@@ -1,0 +1,14 @@
+{
+  "form_path": "src/features/checkout/ui/form.ts",
+  "validation_path": "src/pages/checkout/model/validation.ts",
+  "imports": [
+    {
+      "from": "src/pages/checkout/ui/form.ts",
+      "to": "src/pages/checkout/model/validation.ts"
+    },
+    {
+      "from": "src/pages/checkout/ui/form.ts",
+      "to": "src/shared/ui/button"
+    }
+  ]
+}

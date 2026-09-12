@@ -1,0 +1,4 @@
+{
+  "text": "*Build failed*\n<https://example.com/build/42|View build>",
+  "mrkdwn": true
+}

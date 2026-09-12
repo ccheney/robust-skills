@@ -1,0 +1,6 @@
+{
+  "block_id": "release_actions",
+  "action_id": "view_release",
+  "label": "View release",
+  "url": "https://example.com/releases/42"
+}

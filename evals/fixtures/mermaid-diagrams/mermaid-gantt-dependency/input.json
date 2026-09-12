@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "id": "d1",
+      "name": "Design",
+      "start": "2026-09-14",
+      "duration": "2d"
+    },
+    {
+      "id": "d2",
+      "name": "Implement",
+      "after": "d1",
+      "duration": "3d"
+    }
+  ]
+}

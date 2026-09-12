@@ -1,0 +1,4 @@
+{
+  "component_import": "../model/state",
+  "external_import": "@/entities/user/ui/Card"
+}

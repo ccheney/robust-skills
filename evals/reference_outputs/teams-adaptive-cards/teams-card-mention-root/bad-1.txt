@@ -1,0 +1,14 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Assigned to <at>Ada</at>",
+      "wrap": true
+    }
+  ],
+  "msteams": {
+    "entities": []
+  }
+}

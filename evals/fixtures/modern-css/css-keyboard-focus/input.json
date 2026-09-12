@@ -1,0 +1,4 @@
+{
+  "html": "<button class=\"action\">Continue</button>",
+  "current_css": ".action:focus{outline:none}"
+}

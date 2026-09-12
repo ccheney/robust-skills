@@ -1,0 +1,672 @@
+[
+  {
+    "id": "postgres-nullable-fk",
+    "skill": "postgres-drizzle",
+    "category": "schema",
+    "group": "postgres-drizzle/postgres-nullable-fk",
+    "split": "development",
+    "prompt": "Add nullable orders.customer_id referencing customers.id. Preserve existing rows and reject nonexistent customers. Do not cascade customer deletion. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-nullable-fk/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-nullable-fk/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-nullable-fk/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-nullable-fk/bad-1.txt",
+        "fails": [
+          "foreign-key"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-nullable-fk/bad-2.txt",
+        "fails": [
+          "no-cascade"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-nullable-fk/input.sql",
+      "query": false,
+      "checks": [
+        {
+          "id": "preserve-rows",
+          "sql": "SELECT count(*) FROM orders",
+          "rows": [
+            "1"
+          ]
+        },
+        {
+          "id": "nullable",
+          "sql": "SELECT customer_id IS NULL FROM orders",
+          "rows": [
+            "t"
+          ]
+        },
+        {
+          "id": "foreign-key",
+          "sql": "INSERT INTO orders VALUES('00000000-0000-0000-0000-000000000043','00000000-0000-0000-0000-000000000099')",
+          "error": "23503"
+        },
+        {
+          "id": "valid-customer",
+          "sql": "UPDATE orders SET customer_id='00000000-0000-0000-0000-000000000001'",
+          "rows": []
+        },
+        {
+          "id": "no-cascade",
+          "sql": "DELETE FROM customers",
+          "error": "23503"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-backfill-required",
+    "skill": "postgres-drizzle",
+    "category": "migration",
+    "group": "postgres-drizzle/postgres-backfill-required",
+    "split": "development",
+    "prompt": "Add required invoices.status without losing data. Existing zero-total invoices become settled; positive-total invoices become open. After backfill reject NULL status. Do not give both existing rows the same status. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-backfill-required/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-backfill-required/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-backfill-required/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-backfill-required/bad-1.txt",
+        "fails": [
+          "correct-backfill"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-backfill-required/bad-2.txt",
+        "fails": [
+          "required-status"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-backfill-required/input.sql",
+      "query": false,
+      "checks": [
+        {
+          "id": "correct-backfill",
+          "sql": "SELECT id,status,total FROM invoices ORDER BY id",
+          "rows": [
+            "1|open|100",
+            "2|settled|0"
+          ]
+        },
+        {
+          "id": "required-status",
+          "sql": "INSERT INTO invoices VALUES(3,20,NULL)",
+          "error": "23502"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-partial-unique",
+    "skill": "postgres-drizzle",
+    "category": "indexing",
+    "group": "postgres-drizzle/postgres-partial-unique",
+    "split": "development",
+    "prompt": "Enforce unique email among live users (deleted_at IS NULL) using an index. Archived users may reuse an email. Preserve the existing row. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-partial-unique/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-partial-unique/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-partial-unique/bad-1.txt",
+        "fails": [
+          "archived-duplicate"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-partial-unique/bad-2.txt",
+        "fails": [
+          "live-duplicate"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-partial-unique/input.sql",
+      "query": false,
+      "checks": [
+        {
+          "id": "archived-duplicate",
+          "sql": "INSERT INTO users VALUES(2,'a@example.com','2026-01-01')",
+          "rows": []
+        },
+        {
+          "id": "live-duplicate",
+          "sql": "INSERT INTO users VALUES(3,'a@example.com',NULL)",
+          "error": "23505"
+        },
+        {
+          "id": "existing-row",
+          "sql": "SELECT count(*) FROM users WHERE id=1",
+          "rows": [
+            "1"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-keyset-ties",
+    "skill": "postgres-drizzle",
+    "category": "pagination",
+    "group": "postgres-drizzle/postgres-keyset-ties",
+    "split": "holdout",
+    "prompt": "Return the next two events after cursor (2026-01-02T00:00:00Z,id=2), ordered ascending by created_at then id. Include tied timestamps without repeating the cursor row. Expose id and created_at columns. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-keyset-ties/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-keyset-ties/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-keyset-ties/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-keyset-ties/bad-1.txt",
+        "fails": [
+          "ties-not-skipped"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-keyset-ties/bad-2.txt",
+        "fails": [
+          "cursor-not-repeated"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-keyset-ties/input.sql",
+      "query": true,
+      "checks": [
+        {
+          "id": "ties-not-skipped",
+          "sql": "SELECT id FROM result ORDER BY created_at,id",
+          "rows": [
+            "3",
+            "4"
+          ]
+        },
+        {
+          "id": "cursor-not-repeated",
+          "sql": "SELECT count(*) FROM result WHERE id=2",
+          "rows": [
+            "0"
+          ]
+        },
+        {
+          "id": "new-data",
+          "sql": "SELECT id FROM result ORDER BY created_at,id",
+          "rows": [
+            "3",
+            "5"
+          ],
+          "before": "INSERT INTO events VALUES(5,'2026-01-02')"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-latest-valid-order",
+    "skill": "postgres-drizzle",
+    "category": "query-semantics",
+    "group": "postgres-drizzle/postgres-latest-valid-order",
+    "split": "development",
+    "prompt": "Return the latest non-cancelled order per customer. Break timestamp ties by greatest id. Expose id and customer_id; do not select a cancelled order and then discard the customer. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-latest-valid-order/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-latest-valid-order/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-latest-valid-order/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-latest-valid-order/bad-1.txt",
+        "fails": [
+          "exclude-cancelled"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-latest-valid-order/bad-2.txt",
+        "fails": [
+          "deterministic-ties"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-latest-valid-order/input.sql",
+      "query": true,
+      "checks": [
+        {
+          "id": "exclude-cancelled",
+          "sql": "SELECT id FROM result WHERE customer_id=10",
+          "rows": [
+            "1"
+          ]
+        },
+        {
+          "id": "deterministic-ties",
+          "sql": "SELECT id FROM result WHERE customer_id=20",
+          "rows": [
+            "4"
+          ]
+        },
+        {
+          "id": "new-customer",
+          "sql": "SELECT id FROM result WHERE customer_id=30",
+          "rows": [
+            "5"
+          ],
+          "before": "INSERT INTO orders VALUES(5,30,'2026-01-04','paid')"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-join-fanout",
+    "skill": "postgres-drizzle",
+    "category": "aggregation",
+    "group": "postgres-drizzle/postgres-join-fanout",
+    "split": "development",
+    "prompt": "Report each order id, line_total, and paid_total. Multiple lines and payments must not multiply each other. Orders with no child rows must appear with zero totals. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-join-fanout/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-join-fanout/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-join-fanout/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-join-fanout/bad-1.txt",
+        "fails": [
+          "no-fanout",
+          "empty-order"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-join-fanout/bad-2.txt",
+        "fails": [
+          "empty-order"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-join-fanout/input.sql",
+      "query": true,
+      "checks": [
+        {
+          "id": "no-fanout",
+          "sql": "SELECT line_total,paid_total FROM result WHERE id=1",
+          "rows": [
+            "30|30"
+          ]
+        },
+        {
+          "id": "empty-order",
+          "sql": "SELECT line_total,paid_total FROM result WHERE id=2",
+          "rows": [
+            "0|0"
+          ]
+        },
+        {
+          "id": "changing-data",
+          "sql": "SELECT line_total,paid_total FROM result WHERE id=1",
+          "rows": [
+            "35|30"
+          ],
+          "before": "INSERT INTO lines VALUES(1,5)"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-null-antijoin",
+    "skill": "postgres-drizzle",
+    "category": "null-semantics",
+    "group": "postgres-drizzle/postgres-null-antijoin",
+    "split": "holdout",
+    "prompt": "Return customer ids absent from blocked.customer_id. NULL entries in the blocked list must not suppress all results. Expose id. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-null-antijoin/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-null-antijoin/good-1.txt",
+      "reference_outputs/postgres-drizzle/postgres-null-antijoin/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-null-antijoin/bad-1.txt",
+        "fails": [
+          "null-safe"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-null-antijoin/bad-2.txt",
+        "fails": [
+          "blocked-excluded"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-null-antijoin/input.sql",
+      "query": true,
+      "checks": [
+        {
+          "id": "null-safe",
+          "sql": "SELECT id FROM result ORDER BY id",
+          "rows": [
+            "1",
+            "3"
+          ]
+        },
+        {
+          "id": "blocked-excluded",
+          "sql": "SELECT count(*) FROM result WHERE id=2",
+          "rows": [
+            "0"
+          ]
+        },
+        {
+          "id": "new-data",
+          "sql": "SELECT id FROM result ORDER BY id",
+          "rows": [
+            "1",
+            "3",
+            "4"
+          ],
+          "before": "INSERT INTO customers VALUES(4)"
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-tenant-rls",
+    "skill": "postgres-drizzle",
+    "category": "tenant-isolation",
+    "group": "postgres-drizzle/postgres-tenant-rls",
+    "split": "development",
+    "prompt": "Enable RLS for app_user. Tenant identity comes from app.tenant_id; missing or empty settings must yield no rows. Reads and inserts must stay within that tenant. Do not hardcode tenant A or rely on table-owner behavior. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-tenant-rls/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-tenant-rls/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-tenant-rls/bad-1.txt",
+        "fails": [
+          "tenant-a",
+          "empty-tenant",
+          "cross-tenant-insert"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-tenant-rls/bad-2.txt",
+        "fails": [
+          "empty-tenant"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-tenant-rls/input.sql",
+      "query": false,
+      "checks": [
+        {
+          "id": "tenant-a",
+          "sql": "SET app.tenant_id='00000000-0000-0000-0000-000000000001'; SELECT id FROM documents ORDER BY id",
+          "rows": [
+            "1"
+          ],
+          "as_role": "app_user"
+        },
+        {
+          "id": "tenant-b",
+          "sql": "SET app.tenant_id='00000000-0000-0000-0000-000000000002'; SELECT id FROM documents ORDER BY id",
+          "rows": [
+            "2"
+          ],
+          "as_role": "app_user"
+        },
+        {
+          "id": "empty-tenant",
+          "sql": "SET app.tenant_id=''; SELECT count(*) FROM documents",
+          "rows": [
+            "0"
+          ],
+          "as_role": "app_user"
+        },
+        {
+          "id": "cross-tenant-insert",
+          "as_role": "app_user",
+          "sql": "SET app.tenant_id='00000000-0000-0000-0000-000000000001'; INSERT INTO documents VALUES(3,'00000000-0000-0000-0000-000000000002','bad')",
+          "error": "42501"
+        },
+        {
+          "id": "same-tenant-insert",
+          "as_role": "app_user",
+          "sql": "SET app.tenant_id='00000000-0000-0000-0000-000000000001'; INSERT INTO documents VALUES(5,'00000000-0000-0000-0000-000000000001','A2') RETURNING body;",
+          "rows": [
+            "A2"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "postgres-atomic-reservation",
+    "skill": "postgres-drizzle",
+    "category": "concurrency",
+    "group": "postgres-drizzle/postgres-atomic-reservation",
+    "split": "holdout",
+    "prompt": "Create reserve(item text,requested integer) returning boolean. Atomically decrement stock only if enough remains. Return false for unknown SKU, nonpositive quantity, or insufficient stock. Concurrent requests must not oversell. Target PostgreSQL 18. Return SQL only; do not execute it against a live service.",
+    "inputs": [
+      "fixtures/postgres-drizzle/postgres-atomic-reservation/input.sql"
+    ],
+    "grader": "postgres-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/postgres-atomic-reservation/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-atomic-reservation/bad-1.txt",
+        "fails": [
+          "one-reservation",
+          "remaining-stock"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/postgres-atomic-reservation/bad-2.txt",
+        "fails": [
+          "invalid-quantity"
+        ]
+      }
+    ],
+    "runtime": {
+      "setup": "fixtures/postgres-drizzle/postgres-atomic-reservation/input.sql",
+      "query": false,
+      "checks": [
+        {
+          "id": "one-reservation",
+          "parallel": [
+            "SELECT reserve('widget',3)",
+            "SELECT reserve('widget',3)"
+          ],
+          "rows": [
+            [
+              "f"
+            ],
+            [
+              "t"
+            ]
+          ]
+        },
+        {
+          "id": "remaining-stock",
+          "sql": "SELECT quantity FROM stock WHERE sku='widget'",
+          "rows": [
+            "2"
+          ]
+        },
+        {
+          "id": "invalid-quantity",
+          "sql": "SELECT reserve('widget',-2)",
+          "rows": [
+            "f"
+          ]
+        },
+        {
+          "id": "unknown-sku",
+          "sql": "SELECT reserve('missing',1)",
+          "rows": [
+            "f"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "drizzle-stable-schema",
+    "skill": "postgres-drizzle",
+    "category": "orm-compatibility",
+    "group": "postgres-drizzle/drizzle-stable-schema",
+    "split": "holdout",
+    "prompt": "Use installed drizzle-orm 0.44.7 to implement and export users, posts, and postsRelations in one TypeScript module. Both tables have UUID primary-key id. users.email is required text. posts.userId maps to required UUID user_id, references users.id with cascade deletion, and has an index. Define author in postsRelations for db.query. Preserve the stable relations API; do not upgrade dependencies.",
+    "inputs": [
+      "fixtures/postgres-drizzle/drizzle-stable-schema/input.json"
+    ],
+    "grader": "drizzle-runtime",
+    "references": [
+      "reference_outputs/postgres-drizzle/drizzle-stable-schema/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/postgres-drizzle/drizzle-stable-schema/bad-1.txt",
+        "fails": [
+          "foreign-key"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/drizzle-stable-schema/bad-2.txt",
+        "fails": [
+          "required"
+        ]
+      },
+      {
+        "path": "reference_outputs/postgres-drizzle/drizzle-stable-schema/bad-3.txt",
+        "fails": [
+          "drizzle-types"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "users-primary",
+        "op": "equals",
+        "path": [
+          "users",
+          "columns",
+          "id",
+          "primary"
+        ],
+        "value": true
+      },
+      {
+        "id": "uuid",
+        "op": "equals",
+        "path": [
+          "posts",
+          "columns",
+          "user_id",
+          "type"
+        ],
+        "value": "uuid"
+      },
+      {
+        "id": "required",
+        "op": "equals",
+        "path": [
+          "posts",
+          "columns",
+          "user_id",
+          "notNull"
+        ],
+        "value": true
+      },
+      {
+        "id": "index",
+        "op": "equals",
+        "path": [
+          "posts",
+          "indexes"
+        ],
+        "value": [
+          [
+            "user_id"
+          ]
+        ]
+      },
+      {
+        "id": "foreign-key",
+        "op": "equals",
+        "path": [
+          "posts",
+          "foreignKeys"
+        ],
+        "value": [
+          {
+            "columns": [
+              "user_id"
+            ],
+            "table": "users",
+            "references": [
+              "id"
+            ],
+            "onDelete": "cascade"
+          }
+        ]
+      },
+      {
+        "id": "relation",
+        "op": "equals",
+        "path": [
+          "author"
+        ],
+        "value": {
+          "table": "users",
+          "fields": [
+            "user_id"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      }
+    ]
+  }
+]

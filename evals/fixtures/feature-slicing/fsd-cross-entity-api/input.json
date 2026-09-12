@@ -1,0 +1,6 @@
+{
+  "from": "src/entities/order/model/types.ts",
+  "bad_import": "src/entities/product/model/internal.ts",
+  "available_type": "ProductId",
+  "consumer_entity": "order"
+}

@@ -1,0 +1,4 @@
+{
+  "html": "<div id=\"bad\" class=\"field\"><input type=\"email\" required value=\"invalid\"></div><div id=\"good\" class=\"field\"><input type=\"email\" required value=\"a@example.com\"></div>",
+  "current_css": ".field{border:1px solid rgb(128 128 128)}.field:has(input){border-color:rgb(220 0 0)}"
+}

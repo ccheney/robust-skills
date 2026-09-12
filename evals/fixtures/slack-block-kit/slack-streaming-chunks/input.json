@@ -1,0 +1,11 @@
+{
+  "method": "chat.appendStream",
+  "sdk_contract": "Accepts chunks-only append",
+  "channel": "C_RELEASES",
+  "ts": "123.456",
+  "task": {
+    "id": "build",
+    "title": "Build package",
+    "status": "complete"
+  }
+}

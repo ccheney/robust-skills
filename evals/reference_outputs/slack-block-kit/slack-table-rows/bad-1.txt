@@ -1,0 +1,33 @@
+{
+  "blocks": [
+    {
+      "type": "table",
+      "rows": [
+        {
+          "cells": [
+            {
+              "type": "raw_text",
+              "text": "Service"
+            },
+            {
+              "type": "raw_text",
+              "text": "Status"
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "type": "raw_text",
+              "text": "API"
+            },
+            {
+              "type": "raw_text",
+              "text": "Healthy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

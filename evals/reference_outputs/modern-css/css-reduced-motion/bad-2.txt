@@ -1,0 +1,1 @@
+@keyframes spin{to{transform:rotate(360deg)}}.spinner{animation:spin 1s linear infinite}@media(prefers-reduced-motion:reduce){.spinner{animation:none}}@media(prefers-reduced-motion:reduce){.status{display:none}}

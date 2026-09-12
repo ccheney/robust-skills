@@ -106,7 +106,7 @@ def validate(root):
         for resource in resources:
             if resource.resolve() not in visited:
                 errors.append(f"{label}: unreachable resource {resource.relative_to(root)}")
-    cases_file = root / "tests/skill-cases.json"
+    cases_file = root / "evals/routing.json"
     try:
         cases = json.loads(cases_file.read_text())
         if not isinstance(cases, list):
@@ -122,7 +122,7 @@ def validate(root):
             if not isinstance(expected, list) or any(not isinstance(n, str) or n not in names for n in expected):
                 raise ValueError(f"invalid expected skills in {case['id']}")
             kind = case.get("kind")
-            if kind not in {"direct", "indirect", "negative", "incomplete", "boundary"}:
+            if kind not in {"direct", "indirect", "negative", "incomplete", "boundary", "near-miss", "mixed"}:
                 raise ValueError(f"invalid kind in {case['id']}")
             coverage[case["owner"]].add(kind)
         for name, kinds in coverage.items():
@@ -131,7 +131,7 @@ def validate(root):
                 errors.append(f"{name}: missing evaluation categories {sorted(missing)}")
     except (OSError, ValueError) as exc:
         errors.append(f"{cases_file}: {exc}")
-    workflow_file = root / "tests/workflow-cases.json"
+    workflow_file = root / "evals/workflows.json"
     try:
         workflows = json.loads(workflow_file.read_text())
         if not isinstance(workflows, list) or any(not isinstance(c, dict) for c in workflows):

@@ -1,0 +1,1 @@
+export function rank(scores){return scores.map(x=>({...x})).sort((a,b)=>b.points-a.points);}

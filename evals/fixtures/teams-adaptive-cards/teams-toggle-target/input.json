@@ -1,0 +1,29 @@
+{
+  "card": {
+    "type": "AdaptiveCard",
+    "version": "1.2",
+    "body": [
+      {
+        "type": "Container",
+        "id": "details",
+        "isVisible": false,
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "Build 42 logs",
+            "wrap": true
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.ToggleVisibility",
+        "title": "Show details",
+        "targetElements": [
+          "detail"
+        ]
+      }
+    ]
+  }
+}

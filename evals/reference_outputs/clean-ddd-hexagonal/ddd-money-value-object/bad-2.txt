@@ -1,0 +1,1 @@
+export class Money {constructor(cents,currency){if(!Number.isSafeInteger(cents)||cents<0)throw Error();this.cents=cents;this.currency=currency;}add(other){if(this.currency!==other.currency)throw Error();this.cents+=other.cents;return this;}}

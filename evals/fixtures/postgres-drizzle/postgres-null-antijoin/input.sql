@@ -1,0 +1,1 @@
+CREATE TABLE customers(id integer PRIMARY KEY); CREATE TABLE blocked(customer_id integer); INSERT INTO customers VALUES(1),(2),(3); INSERT INTO blocked VALUES(2),(NULL);

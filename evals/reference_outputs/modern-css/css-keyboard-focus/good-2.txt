@@ -1,0 +1,1 @@
+.action:focus{outline-width:3px;outline-style:solid;outline-color:#0055cc;outline-offset:2px}

@@ -43,7 +43,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill feature-slicing
 
 ### modern-javascript
 
-Write, modernize, or review JavaScript language features and async code. Use for ECMAScript semantics, runtime compatibility, or polyfill/transform decisions; not unrelated framework or TypeScript type design.
+Implement or debug JavaScript language behavior, including promise completion, async iteration, mutation, and runtime compatibility. Use for ECMAScript semantics or polyfill/transform choices; not unrelated framework or TypeScript type design.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill modern-javascript
@@ -99,13 +99,21 @@ npx skills add https://github.com/ccheney/robust-skills --skill teams-message-fo
 
 ### teams-adaptive-cards
 
-Build, validate, or repair Microsoft Teams Adaptive Card JSON and bot, webhook, or Graph wrappers. Use for card layouts, actions, forms, or MessageCard migration; not Teams text-only formatting or non-Teams card hosts.
+Build, validate, or repair Adaptive Card layouts, actions, forms, and delivery wrappers for Microsoft Teams. Use when Teams is the target host, including bot, webhook, Graph, and MessageCard migration tasks. Exclude Windows/custom card hosts and Teams text-only formatting.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill teams-adaptive-cards
 ```
 
 ## Contributing and validation
+
+The root [evals directory](evals/README.md) contains reusable cases, fixtures,
+112 artifact tasks, 226 routing requests, deterministic graders, and a bounded
+Gemini 3.8 Flash free-tier runner. Run evaluations
+locally with your Google CLI account or an environment key. See the evaluation
+guide for setup and limits. No evaluation workflow runs in GitHub Actions.
+
+> We have a local skill evaluation suite covering routing and generated artifacts, with executable graders and baseline comparisons. We’re validating its coverage and measuring skill effectiveness.
 
 Use a description that identifies the actual task, and keep conditional detail
 in a linked reference. Preserve explicit user choices and keep verification
@@ -121,6 +129,6 @@ python3 scripts/validate_skills.py
 
 The validator checks metadata, local resource links, and evaluation coverage.
 It does not measure model activation or technical correctness. Use the
-[representative prompts](tests/skill-cases.json) and
-[workflow cases](tests/workflow-cases.json) to review behavior when changing a
+[representative prompts](evals/routing.json) and
+[workflow cases](evals/workflows.json) to review behavior when changing a
 skill. Keep expected routing separate from the evaluator's input.

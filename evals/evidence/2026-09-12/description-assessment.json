@@ -1,0 +1,393 @@
+{
+  "kind": "Independent manual catalog assessment after description edits; not observed host tool calls",
+  "results": [
+    {
+      "id": "modern-javascript-direct",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Refactoring a JavaScript transformation while preserving behavior requires language semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-indirect",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Async callback completion and promise behavior are explicitly covered.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-negative",
+      "selected_skills": [],
+      "brief_reason": "The request is exclusively TypeScript type design, which the JavaScript skill excludes.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-incomplete",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Assessing Iterator.concat availability is a runtime compatibility question despite missing targets.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-boundary",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Preserving concurrent Promise.all behavior requires JavaScript async semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-direct",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Creating a Teams Adaptive Card and webhook delivery wrapper is directly covered.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-indirect",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Repairing the Graph delivery wrapper for a Teams card is explicitly covered.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-negative",
+      "selected_skills": [],
+      "brief_reason": "The target is a Windows notification host, which the Teams card skill excludes.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-incomplete",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "A Teams approval card needs card layout and actions even though transport details are missing.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-boundary",
+      "selected_skills": [
+        "teams-message-formatting"
+      ],
+      "brief_reason": "The task changes only Teams message text; it excludes card migration and structural changes.",
+      "expected_skills": [
+        "teams-message-formatting"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-async-foreach",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Fixing async forEach completion while retaining concurrency is JavaScript promise behavior.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-nullish",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Choosing an operator that preserves falsy values is ECMAScript semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-identity-group",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Object key identity and grouping behavior depend on JavaScript collection semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-prototype-key",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "The special property names indicate JavaScript object and prototype semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-iterator-close",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Iterator cleanup on early exit is JavaScript language behavior.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-regexp-literal",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Literal regex escaping and compatibility involve JavaScript language semantics.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-bounded-pool",
+      "selected_skills": [
+        "modern-javascript"
+      ],
+      "brief_reason": "Scheduling promise-returning jobs with a concurrency limit is JavaScript async behavior.",
+      "expected_skills": [
+        "modern-javascript"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-node-copy",
+      "selected_skills": [],
+      "brief_reason": "Editing a README badge link does not require runtime or language behavior expertise.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-sql-driver",
+      "selected_skills": [
+        "postgres-drizzle"
+      ],
+      "brief_reason": "A PostgreSQL partial unique index is database schema and indexing work.",
+      "expected_skills": [
+        "postgres-drizzle"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-css-grid",
+      "selected_skills": [
+        "modern-css"
+      ],
+      "brief_reason": "Responsive CSS grid layout is directly covered by the CSS skill.",
+      "expected_skills": [
+        "modern-css"
+      ],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-python-async",
+      "selected_skills": [],
+      "brief_reason": "Python asyncio is outside this catalog of JavaScript and other specialized capabilities.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-typescript-interface",
+      "selected_skills": [],
+      "brief_reason": "Explaining a TypeScript interface is type-focused and has no JavaScript runtime behavior.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-npm-script",
+      "selected_skills": [],
+      "brief_reason": "Renaming package metadata does not involve JavaScript language or runtime behavior.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-java-stream",
+      "selected_skills": [],
+      "brief_reason": "Java collection streams are not JavaScript and no Java skill is listed.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "modern-javascript-translation",
+      "selected_skills": [],
+      "brief_reason": "Translating prose while preserving code needs none of the listed technical skills.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-graph-wrapper",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Graph Adaptive Card attachment serialization is a card delivery wrapper issue.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-webhook-actions",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Replacing an unsupported approval action with a URL action is Teams card action repair.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-required-input",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Required card inputs, labels, and action payload data are card form and action schema work.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-execute",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Universal Actions fallback behavior is Teams Adaptive Card action work.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-toggle",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "ToggleVisibility target IDs are part of the Teams card action schema.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-mobile",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Replacing unsupported layout elements for a Teams card version is card compatibility work.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-connector-migration",
+      "selected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "brief_reason": "Migrating MessageCard payloads to Teams Workflows is explicitly covered.",
+      "expected_skills": [
+        "teams-adaptive-cards"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-text-only",
+      "selected_skills": [
+        "teams-message-formatting"
+      ],
+      "brief_reason": "Bold and link markup in a Teams text activity is message formatting only.",
+      "expected_skills": [
+        "teams-message-formatting"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-slack-modal",
+      "selected_skills": [
+        "slack-block-kit"
+      ],
+      "brief_reason": "A Slack modal with inputs requires Block Kit layout and elements.",
+      "expected_skills": [
+        "slack-block-kit"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-non-teams",
+      "selected_skills": [],
+      "brief_reason": "Custom Windows card hosts are expressly excluded from the Teams card capability.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-graph-history",
+      "selected_skills": [],
+      "brief_reason": "Teams conversation retrieval is excluded from the formatting skill and involves no cards.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-calendar",
+      "selected_skills": [],
+      "brief_reason": "Meeting availability needs calendar capabilities absent from this catalog.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-mention-text",
+      "selected_skills": [
+        "teams-message-formatting"
+      ],
+      "brief_reason": "Graph chatMessage HTML and mention metadata are Teams message formatting.",
+      "expected_skills": [
+        "teams-message-formatting"
+      ],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-csv",
+      "selected_skills": [],
+      "brief_reason": "Converting exported member data to CSV does not require any listed skill.",
+      "expected_skills": [],
+      "passed": true
+    },
+    {
+      "id": "teams-adaptive-cards-permissions",
+      "selected_skills": [],
+      "brief_reason": "Graph directory authorization troubleshooting is outside message formatting and card capabilities.",
+      "expected_skills": [],
+      "passed": true
+    }
+  ]
+}

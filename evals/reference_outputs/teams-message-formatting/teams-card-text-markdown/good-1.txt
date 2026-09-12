@@ -1,0 +1,5 @@
+{
+  "type": "TextBlock",
+  "text": "**Release 42**\n[View release](https://example.com/42)",
+  "wrap": true
+}

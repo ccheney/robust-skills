@@ -1,0 +1,3 @@
+{
+  "text": "Deployment 42 failed in production. Owner: Ada. Rollback: https://example.com/rollback/42"
+}

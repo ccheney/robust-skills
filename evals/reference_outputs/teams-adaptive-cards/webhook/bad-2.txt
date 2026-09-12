@@ -1,0 +1,27 @@
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "content": {
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "fallbackText": "Deployment complete",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "Deployment complete",
+            "wrap": true
+          }
+        ],
+        "actions": [
+          {
+            "type": "Action.Submit",
+            "title": "View release",
+            "url": "https://example.com/releases/42"
+          }
+        ]
+      }
+    }
+  ]
+}

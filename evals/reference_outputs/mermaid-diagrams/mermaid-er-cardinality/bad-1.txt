@@ -1,0 +1,9 @@
+erDiagram
+ USER ||--|| ORDER : places
+ USER {
+ uuid id PK
+ }
+ ORDER {
+ uuid id PK
+ uuid user_id FK
+ }

@@ -1,0 +1,5 @@
+flowchart LR
+ subgraph BuildGroup[Build]
+ C[Compile]
+ end
+ C --> D[Done]

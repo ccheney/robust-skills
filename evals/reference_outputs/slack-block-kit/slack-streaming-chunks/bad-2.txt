@@ -1,0 +1,13 @@
+{
+  "channel": "C_RELEASES",
+  "ts": "123.456",
+  "chunks": [
+    {
+      "type": "task_update",
+      "id": "build",
+      "title": "Build package",
+      "status": "complete"
+    }
+  ],
+  "blocks": []
+}

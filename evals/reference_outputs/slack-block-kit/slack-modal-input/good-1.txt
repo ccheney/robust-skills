@@ -1,0 +1,29 @@
+{
+  "trigger_id": "trigger-from-interaction",
+  "view": {
+    "type": "modal",
+    "callback_id": "release_form",
+    "title": {
+      "type": "plain_text",
+      "text": "Release note"
+    },
+    "submit": {
+      "type": "plain_text",
+      "text": "Save"
+    },
+    "blocks": [
+      {
+        "type": "input",
+        "block_id": "note",
+        "label": {
+          "type": "plain_text",
+          "text": "Summary"
+        },
+        "element": {
+          "type": "plain_text_input",
+          "action_id": "summary"
+        }
+      }
+    ]
+  }
+}

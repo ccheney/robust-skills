@@ -1,0 +1,1 @@
+SELECT id,created_at FROM events WHERE (created_at,id)>('2026-01-02'::timestamptz,2) ORDER BY created_at,id LIMIT 2

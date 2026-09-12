@@ -1,0 +1,6 @@
+{
+  "body": {
+    "contentType": "html",
+    "content": "<p>Release 42: View release</p>"
+  }
+}

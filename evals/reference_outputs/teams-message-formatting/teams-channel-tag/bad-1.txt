@@ -1,0 +1,15 @@
+{
+  "type": "message",
+  "text": "<at>On-Call Team</at> please investigate.",
+  "entities": [
+    {
+      "type": "mention",
+      "text": "<at>On-Call Team</at>",
+      "mentioned": {
+        "id": "dGFnLW9uY2FsbA==",
+        "name": "On-Call Team",
+        "type": "user"
+      }
+    }
+  ]
+}

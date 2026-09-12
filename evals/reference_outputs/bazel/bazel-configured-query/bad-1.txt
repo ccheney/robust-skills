@@ -1,0 +1,8 @@
+{
+  "tool": "query",
+  "expression": "deps(//app:server)",
+  "flags": [
+    "--config=ci",
+    "--platforms=//platforms:linux_arm64"
+  ]
+}

@@ -1,0 +1,1 @@
+SELECT o.id,COALESCE((SELECT sum(amount) FROM lines l WHERE l.order_id=o.id),0) AS line_total,COALESCE((SELECT sum(amount) FROM payments p WHERE p.order_id=o.id),0) AS paid_total FROM orders o

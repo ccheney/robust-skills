@@ -1,0 +1,16 @@
+{
+  "package.json": {
+    "dependencies": {
+      "drizzle-orm": "0.45.2"
+    },
+    "devDependencies": {
+      "typescript": "5.9.3"
+    }
+  },
+  "dialect": "PostgreSQL",
+  "tables": [
+    "users",
+    "posts"
+  ],
+  "relation": "posts.author -> users"
+}

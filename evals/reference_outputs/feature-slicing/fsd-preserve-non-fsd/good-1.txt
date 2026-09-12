@@ -1,0 +1,6 @@
+{
+  "target_path": "src/components/Button.tsx",
+  "migrate_to_fsd": false,
+  "install_steiger": false,
+  "rename_folders": []
+}

@@ -1,0 +1,1 @@
+export const escapeHtml=s=>s.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('&','&amp;');

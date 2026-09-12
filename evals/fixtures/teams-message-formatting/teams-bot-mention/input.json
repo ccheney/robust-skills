@@ -1,0 +1,13 @@
+{
+  "type": "message",
+  "text": "<at>Ada</at> please review.",
+  "mentions": [
+    {
+      "id": 0,
+      "mentionText": "Ada"
+    }
+  ],
+  "roster": {
+    "Ada": "29:ada123"
+  }
+}

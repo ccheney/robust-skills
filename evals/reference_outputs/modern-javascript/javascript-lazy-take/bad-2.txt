@@ -1,0 +1,1 @@
+export function* take(source,count){let n=0;for(const v of source){if(n++>=count)return;yield v;}}

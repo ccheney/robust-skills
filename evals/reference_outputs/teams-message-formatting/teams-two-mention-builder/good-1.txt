@@ -1,0 +1,1 @@
+export function buildMentions(users){const esc=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');return {body:{contentType:'html',content:users.map((u,i)=>`<at id="${i}">${esc(u.name)}</at>`).join(', ')},mentions:users.map((u,i)=>({id:i,mentionText:u.name,mentioned:{user:{id:u.id,displayName:u.name,userIdentityType:'aadUser'}}}))};}

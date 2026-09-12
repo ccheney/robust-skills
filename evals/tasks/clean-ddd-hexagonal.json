@@ -1,0 +1,685 @@
+[
+  {
+    "id": "ddd-atomic-transfer",
+    "skill": "clean-ddd-hexagonal",
+    "category": "transaction-boundaries",
+    "group": "clean-ddd-hexagonal/ddd-atomic-transfer",
+    "split": "development",
+    "prompt": "Review the transfer design. Output consistency (atomic or eventual), transaction_members (operation IDs), async_credit (boolean), and presentation_path. Both debit and credit must commit or roll back together; keep the current folders. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-atomic-transfer/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-atomic-transfer/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-atomic-transfer/bad-1.txt",
+        "fails": [
+          "atomic"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-atomic-transfer/bad-2.txt",
+        "fails": [
+          "both-writes"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-atomic-transfer/bad-3.txt",
+        "fails": [
+          "no-async-credit"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "atomic",
+        "op": "equals",
+        "path": [
+          "consistency"
+        ],
+        "value": "atomic"
+      },
+      {
+        "id": "both-writes",
+        "op": "contains_all",
+        "path": [
+          "transaction_members"
+        ],
+        "value": [
+          "debit",
+          "credit"
+        ]
+      },
+      {
+        "id": "no-async-credit",
+        "op": "equals",
+        "path": [
+          "async_credit"
+        ],
+        "value": false
+      },
+      {
+        "id": "preserve-layout",
+        "op": "equals",
+        "path": [
+          "presentation_path"
+        ],
+        "value": "presentation"
+      }
+    ]
+  },
+  {
+    "id": "ddd-outbox-commit",
+    "skill": "clean-ddd-hexagonal",
+    "category": "reliability",
+    "group": "clean-ddd-hexagonal/ddd-outbox-commit",
+    "split": "development",
+    "prompt": "Replace the unsafe dual write with an outbox plan. Output atomic_operations, broker_publish_phase (inside_transaction or after_commit), delivery (at_least_once or exactly_once), and consumer_deduplication. Assume the broker can redeliver messages. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-outbox-commit/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-outbox-commit/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-outbox-commit/bad-1.txt",
+        "fails": [
+          "atomic-outbox"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-outbox-commit/bad-2.txt",
+        "fails": [
+          "delivery-contract"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-outbox-commit/bad-3.txt",
+        "fails": [
+          "idempotent-consumer"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "atomic-outbox",
+        "op": "contains_all",
+        "path": [
+          "atomic_operations"
+        ],
+        "value": [
+          "save_order",
+          "insert_outbox"
+        ]
+      },
+      {
+        "id": "publish-after",
+        "op": "equals",
+        "path": [
+          "broker_publish_phase"
+        ],
+        "value": "after_commit"
+      },
+      {
+        "id": "delivery-contract",
+        "op": "equals",
+        "path": [
+          "delivery"
+        ],
+        "value": "at_least_once"
+      },
+      {
+        "id": "idempotent-consumer",
+        "op": "equals",
+        "path": [
+          "consumer_deduplication"
+        ],
+        "value": true
+      }
+    ]
+  },
+  {
+    "id": "ddd-dependency-direction",
+    "skill": "clean-ddd-hexagonal",
+    "category": "dependency-boundaries",
+    "group": "clean-ddd-hexagonal/ddd-dependency-direction",
+    "split": "development",
+    "prompt": "Assign each supplied concern to domain, application, or infrastructure under our Clean Architecture conventions. Output placements (concern ID to layer) and imports using layer names. The domain must remain independent of the database and HTTP. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-dependency-direction/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-dependency-direction/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-dependency-direction/bad-1.txt",
+        "fails": [
+          "invariant-owner"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-dependency-direction/bad-2.txt",
+        "fails": [
+          "inward-imports"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "invariant-owner",
+        "op": "equals",
+        "path": [
+          "placements",
+          "minimum_balance"
+        ],
+        "value": "domain"
+      },
+      {
+        "id": "orchestration-owner",
+        "op": "equals",
+        "path": [
+          "placements",
+          "transfer"
+        ],
+        "value": "application"
+      },
+      {
+        "id": "sql-owner",
+        "op": "equals",
+        "path": [
+          "placements",
+          "sql_account_repository"
+        ],
+        "value": "infrastructure"
+      },
+      {
+        "id": "port-owner",
+        "op": "equals",
+        "path": [
+          "placements",
+          "account_repository_port"
+        ],
+        "value": "domain"
+      },
+      {
+        "id": "inward-imports",
+        "op": "edges",
+        "path": [
+          "imports"
+        ],
+        "required": [
+          [
+            "application",
+            "domain"
+          ],
+          [
+            "infrastructure",
+            "domain"
+          ]
+        ],
+        "allowed": [
+          [
+            "application",
+            "domain"
+          ],
+          [
+            "infrastructure",
+            "domain"
+          ],
+          [
+            "infrastructure",
+            "application"
+          ]
+        ]
+      },
+      {
+        "id": "acyclic",
+        "op": "acyclic",
+        "path": [
+          "imports"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ddd-context-translation",
+    "skill": "clean-ddd-hexagonal",
+    "category": "integration",
+    "group": "clean-ddd-hexagonal/ddd-context-translation",
+    "split": "holdout",
+    "prompt": "Design the anti-corruption mapping for this carrier API. Output boundary_owner, mappings, and expose_vendor_dto. Use our domain terms and keep vendor changes behind the shipping adapter. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-context-translation/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-context-translation/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-context-translation/bad-1.txt",
+        "fails": [
+          "ready-meaning"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-context-translation/bad-2.txt",
+        "fails": [
+          "no-vendor-leak"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "adapter-boundary",
+        "op": "equals",
+        "path": [
+          "boundary_owner"
+        ],
+        "value": "shipping_adapter"
+      },
+      {
+        "id": "ready-meaning",
+        "op": "equals",
+        "path": [
+          "mappings",
+          "READY"
+        ],
+        "value": "ready_to_dispatch"
+      },
+      {
+        "id": "moving-meaning",
+        "op": "equals",
+        "path": [
+          "mappings",
+          "MOVING"
+        ],
+        "value": "in_transit"
+      },
+      {
+        "id": "done-meaning",
+        "op": "equals",
+        "path": [
+          "mappings",
+          "DONE"
+        ],
+        "value": "delivered"
+      },
+      {
+        "id": "no-vendor-leak",
+        "op": "equals",
+        "path": [
+          "expose_vendor_dto"
+        ],
+        "value": false
+      }
+    ]
+  },
+  {
+    "id": "ddd-read-model",
+    "skill": "clean-ddd-hexagonal",
+    "category": "complexity-selection",
+    "group": "clean-ddd-hexagonal/ddd-read-model",
+    "split": "development",
+    "prompt": "Choose a proportionate solution for the dashboard. Output read_strategy (projection or reporting_view), write_source, event_sourcing, and new_microservices. We can use a SQL reporting view or maintained projection; keep authoritative writes in the existing database. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-read-model/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-read-model/good-1.txt",
+      "reference_outputs/clean-ddd-hexagonal/ddd-read-model/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-read-model/bad-1.txt",
+        "fails": [
+          "no-event-sourcing"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-read-model/bad-2.txt",
+        "fails": [
+          "scope"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "read-model",
+        "op": "one_of",
+        "path": [
+          "read_strategy"
+        ],
+        "value": [
+          "projection",
+          "reporting_view"
+        ]
+      },
+      {
+        "id": "source-of-truth",
+        "op": "equals",
+        "path": [
+          "write_source"
+        ],
+        "value": "postgresql"
+      },
+      {
+        "id": "no-event-sourcing",
+        "op": "equals",
+        "path": [
+          "event_sourcing"
+        ],
+        "value": false
+      },
+      {
+        "id": "scope",
+        "op": "set_equals",
+        "path": [
+          "new_microservices"
+        ],
+        "value": []
+      }
+    ]
+  },
+  {
+    "id": "ddd-event-replay",
+    "skill": "clean-ddd-hexagonal",
+    "category": "temporal-modeling",
+    "group": "clean-ddd-hexagonal/ddd-event-replay",
+    "split": "holdout",
+    "prompt": "We have chosen event sourcing for audit and historical reconstruction. Output authoritative_store, event_update_policy, projection_rebuildable, and schema_evolution (upcast or versioned_handlers). Existing recorded events must remain immutable. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-event-replay/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-event-replay/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-event-replay/bad-1.txt",
+        "fails": [
+          "event-authority"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-event-replay/bad-2.txt",
+        "fails": [
+          "immutable-history"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "event-authority",
+        "op": "equals",
+        "path": [
+          "authoritative_store"
+        ],
+        "value": "append_only_event_log"
+      },
+      {
+        "id": "immutable-history",
+        "op": "equals",
+        "path": [
+          "event_update_policy"
+        ],
+        "value": "append_only"
+      },
+      {
+        "id": "rebuild",
+        "op": "equals",
+        "path": [
+          "projection_rebuildable"
+        ],
+        "value": true
+      },
+      {
+        "id": "evolution",
+        "op": "one_of",
+        "path": [
+          "schema_evolution"
+        ],
+        "value": [
+          "upcast",
+          "versioned_handlers"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ddd-aggregate-size",
+    "skill": "clean-ddd-hexagonal",
+    "category": "scope-preservation",
+    "group": "clean-ddd-hexagonal/ddd-aggregate-size",
+    "split": "development",
+    "prompt": "Review whether entity count forces a split. Output forced_split_by_count, atomic_members, and consistency. The twelve line items must confirm atomically. There is no measured contention. Do not introduce eventual consistency merely because there are more than ten children. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-aggregate-size/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-aggregate-size/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-aggregate-size/bad-1.txt",
+        "fails": [
+          "no-count-threshold"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-aggregate-size/bad-2.txt",
+        "fails": [
+          "atomicity"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "no-count-threshold",
+        "op": "equals",
+        "path": [
+          "forced_split_by_count"
+        ],
+        "value": false
+      },
+      {
+        "id": "all-members",
+        "op": "set_equals",
+        "path": [
+          "atomic_members"
+        ],
+        "value": [
+          "line-1",
+          "line-2",
+          "line-3",
+          "line-4",
+          "line-5",
+          "line-6",
+          "line-7",
+          "line-8",
+          "line-9",
+          "line-10",
+          "line-11",
+          "line-12"
+        ]
+      },
+      {
+        "id": "atomicity",
+        "op": "equals",
+        "path": [
+          "consistency"
+        ],
+        "value": "atomic"
+      }
+    ]
+  },
+  {
+    "id": "ddd-missing-refund-rule",
+    "skill": "clean-ddd-hexagonal",
+    "category": "missing-context",
+    "group": "clean-ddd-hexagonal/ddd-missing-refund-rule",
+    "split": "development",
+    "prompt": "Prepare the refund use case without inventing policy. Output needs_input using the missing input identifiers, ready_steps, and execute_refund. The refund policy is required before choosing eligibility or fees. Customer and order lookup can be prepared now. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-missing-refund-rule/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-missing-refund-rule/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-missing-refund-rule/bad-1.txt",
+        "fails": [
+          "missing-policy"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-missing-refund-rule/bad-2.txt",
+        "fails": [
+          "no-external-action"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "missing-policy",
+        "op": "set_equals",
+        "path": [
+          "needs_input"
+        ],
+        "value": [
+          "refund_policy"
+        ]
+      },
+      {
+        "id": "independent-work",
+        "op": "contains_all",
+        "path": [
+          "ready_steps"
+        ],
+        "value": [
+          "load_order",
+          "load_customer"
+        ]
+      },
+      {
+        "id": "no-external-action",
+        "op": "equals",
+        "path": [
+          "execute_refund"
+        ],
+        "value": false
+      },
+      {
+        "id": "no-invented-window",
+        "op": "absent",
+        "path": [
+          "refund_days"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ddd-money-value-object",
+    "skill": "clean-ddd-hexagonal",
+    "category": "domain-behavior",
+    "group": "clean-ddd-hexagonal/ddd-money-value-object",
+    "split": "development",
+    "prompt": "Implement export class Money with constructor(cents,currency), read-only cents/currency, and add(other). Amounts are nonnegative safe integers in cents; currency is a nonempty string. Reject invalid amounts or mixed-currency addition. Addition returns a new Money and does not mutate either operand. Return one JavaScript module for Node 24.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-money-value-object/input.json"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-money-value-object/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-money-value-object/bad-1.txt",
+        "fails": [
+          "validates-minor-units",
+          "currency",
+          "immutable"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-money-value-object/bad-2.txt",
+        "fails": [
+          "nonmutating-add"
+        ]
+      }
+    ],
+    "test": "assertions/clean-ddd-hexagonal/ddd-money-value-object.mjs",
+    "exports": [
+      "Money"
+    ],
+    "assertion_ids": [
+      "validates-minor-units",
+      "currency",
+      "immutable",
+      "nonmutating-add",
+      "overflow"
+    ]
+  },
+  {
+    "id": "ddd-order-confirm",
+    "skill": "clean-ddd-hexagonal",
+    "category": "domain-behavior",
+    "group": "clean-ddd-hexagonal/ddd-order-confirm",
+    "split": "holdout",
+    "prompt": "Implement export class Order(id,items). Each item has quantity and priceCents, both safe integers; quantity is positive and price is nonnegative. Copy input items so later caller mutation cannot change the order. Expose status initially DRAFT, events initially [], and a totalCents getter summing quantity times priceCents. confirm() rejects empty or already confirmed orders, otherwise changes status to CONFIRMED and records one {type:\"OrderConfirmed\",orderId:id} event. Return one JavaScript module for Node 24.",
+    "inputs": [
+      "fixtures/clean-ddd-hexagonal/ddd-order-confirm/input.json"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/clean-ddd-hexagonal/ddd-order-confirm/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-order-confirm/bad-1.txt",
+        "fails": [
+          "empty-rejected",
+          "single-transition",
+          "valid-items"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-order-confirm/bad-2.txt",
+        "fails": [
+          "records-fact"
+        ]
+      },
+      {
+        "path": "reference_outputs/clean-ddd-hexagonal/ddd-order-confirm/bad-3.txt",
+        "fails": [
+          "input-isolation",
+          "total"
+        ]
+      }
+    ],
+    "test": "assertions/clean-ddd-hexagonal/ddd-order-confirm.mjs",
+    "exports": [
+      "Order"
+    ],
+    "assertion_ids": [
+      "empty-rejected",
+      "single-transition",
+      "records-fact",
+      "valid-items",
+      "total",
+      "input-isolation"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "concerns": {
+    "minimum_balance": "business invariant",
+    "transfer": "coordinates debit and credit",
+    "sql_account_repository": "talks to PostgreSQL",
+    "account_repository_port": "interface used by the aggregate"
+  },
+  "port_convention": "aggregate repository interfaces live in domain"
+}

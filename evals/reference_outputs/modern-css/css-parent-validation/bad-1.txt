@@ -1,0 +1,1 @@
+.field{border:1px solid rgb(128 128 128)}.field:has(input){border-color:rgb(220 0 0)}

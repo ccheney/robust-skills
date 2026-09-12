@@ -1,0 +1,1 @@
+export function groupByName(rows){return {...Object.groupBy(rows,r=>r.name)};}

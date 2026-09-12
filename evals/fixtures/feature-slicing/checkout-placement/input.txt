@@ -1,0 +1,7 @@
+Existing Feature-Sliced Design tree:
+src/app/providers
+src/pages/checkout/ui
+src/pages/catalog/ui
+src/shared/ui/button
+Only checkout uses the new form and validation. Both pages use the button.
+

@@ -1,0 +1,13 @@
+{
+  "caption": "Service latency",
+  "rows": [
+    [
+      "API",
+      12
+    ],
+    [
+      "Worker",
+      8
+    ]
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "status": "needs_identity",
+  "missing": [
+    "entra_user_id"
+  ],
+  "body": {
+    "contentType": "text",
+    "content": "Ada please review."
+  },
+  "mentions": []
+}

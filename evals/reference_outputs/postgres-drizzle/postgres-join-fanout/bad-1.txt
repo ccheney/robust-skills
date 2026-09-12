@@ -1,0 +1,1 @@
+SELECT o.id,sum(l.amount) AS line_total,sum(p.amount) AS paid_total FROM orders o JOIN lines l ON l.order_id=o.id JOIN payments p ON p.order_id=o.id GROUP BY o.id

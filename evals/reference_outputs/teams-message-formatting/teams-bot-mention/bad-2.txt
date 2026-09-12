@@ -1,0 +1,14 @@
+{
+  "type": "message",
+  "text": "<at>Ada</at> please review.",
+  "entities": [
+    {
+      "type": "mention",
+      "text": "<at>Ada</at>",
+      "mentioned": {
+        "id": "Ada",
+        "name": "Ada"
+      }
+    }
+  ]
+}

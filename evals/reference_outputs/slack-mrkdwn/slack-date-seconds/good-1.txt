@@ -1,0 +1,1 @@
+export const dateToken=(date,fallback)=>`<!date^${Math.floor(date.getTime()/1000)}^{date_num} {time}|${fallback}>`;

@@ -1,0 +1,1 @@
+CREATE TABLE events(id integer PRIMARY KEY,created_at timestamptz NOT NULL); INSERT INTO events VALUES(1,'2026-01-01'),(2,'2026-01-02'),(3,'2026-01-02'),(4,'2026-01-03');

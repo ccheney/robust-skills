@@ -1,0 +1,12 @@
+{
+  "text": "API deployment passed.",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*API deployment passed*\nVersion 4.0.0\nDuration 8 minutes"
+      }
+    }
+  ]
+}

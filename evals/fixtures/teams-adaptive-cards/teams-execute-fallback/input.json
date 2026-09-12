@@ -1,0 +1,27 @@
+{
+  "card": {
+    "type": "AdaptiveCard",
+    "version": "1.2",
+    "body": [
+      {
+        "type": "TextBlock",
+        "text": "Approve REQ-42",
+        "wrap": true
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.Execute",
+        "title": "Approve",
+        "verb": "approveRequest",
+        "data": {
+          "requestId": "REQ-42"
+        }
+      }
+    ]
+  },
+  "legacy_contract": {
+    "action": "approve",
+    "requestId": "REQ-42"
+  }
+}

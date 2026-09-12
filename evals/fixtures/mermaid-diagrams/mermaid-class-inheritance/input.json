@@ -1,0 +1,15 @@
+{
+  "classes": {
+    "Customer": {
+      "attributes": [
+        "+String name"
+      ],
+      "methods": [
+        "+tier() String"
+      ]
+    },
+    "VIP": {
+      "extends": "Customer"
+    }
+  }
+}

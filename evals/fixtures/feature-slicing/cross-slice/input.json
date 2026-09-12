@@ -1,0 +1,9 @@
+{
+  "imports": [
+    {
+      "from": "src/features/checkout/ui/index.ts",
+      "to": "src/features/cart/model/index.ts"
+    }
+  ],
+  "available_composition_owner": "src/pages/checkout/ui/page.ts"
+}

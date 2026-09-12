@@ -1,0 +1,6 @@
+{
+  "component": "src/entities/user/ui/Card.tsx",
+  "current_component_import": "@/entities/user",
+  "model": "src/entities/user/model/state.ts",
+  "outside_consumer": "src/pages/profile/ui/Page.tsx"
+}

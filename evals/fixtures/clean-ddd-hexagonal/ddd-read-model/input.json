@@ -1,0 +1,9 @@
+{
+  "need": "Dashboard joins many tables and differs from the aggregate write shape.",
+  "requirements": [
+    "separate read representation",
+    "no historical replay requirement",
+    "existing monolith is retained"
+  ],
+  "write_store": "postgresql"
+}

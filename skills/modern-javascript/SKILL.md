@@ -1,6 +1,6 @@
 ---
 name: modern-javascript
-description: Write, modernize, or review JavaScript language features and async code. Use for ECMAScript semantics, runtime compatibility, or polyfill/transform decisions; not unrelated framework or TypeScript type design.
+description: Implement or debug JavaScript language behavior, including promise completion, async iteration, mutation, and runtime compatibility. Use for ECMAScript semantics or polyfill/transform choices; not unrelated framework or TypeScript type design.
 ---
 
 # Modern JavaScript

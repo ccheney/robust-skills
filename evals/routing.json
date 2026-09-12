@@ -1,0 +1,2560 @@
+[
+  {
+    "id": "bazel-direct",
+    "owner": "bazel",
+    "kind": "direct",
+    "prompt": "Fix the missing dependency in this Bazel BUILD.bazel target.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/bazel-direct",
+    "rationale": "Original direct regression for bazel."
+  },
+  {
+    "id": "bazel-indirect",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Our Bazel test passes locally but cannot find its data file under remote execution. Diagnose the graph.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/bazel-indirect",
+    "rationale": "Original indirect regression for bazel."
+  },
+  {
+    "id": "bazel-negative",
+    "owner": "bazel",
+    "kind": "negative",
+    "prompt": "Fix a GitHub Actions timeout in this npm-only repository; it does not use Bazel.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/bazel-negative",
+    "rationale": "Original negative regression for bazel."
+  },
+  {
+    "id": "bazel-incomplete",
+    "owner": "bazel",
+    "kind": "incomplete",
+    "prompt": "Our Bazel build fails in CI. Help diagnose it.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/bazel-incomplete",
+    "rationale": "Original incomplete regression for bazel."
+  },
+  {
+    "id": "bazel-boundary",
+    "owner": "bazel",
+    "kind": "boundary",
+    "prompt": "We use Bazel 8. Fix the visibility of //lib/auth:auth without upgrading Bazel.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/bazel-boundary",
+    "rationale": "Original boundary regression for bazel."
+  },
+  {
+    "id": "clean-ddd-hexagonal-direct",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "direct",
+    "prompt": "Review our DDD aggregate boundaries for order confirmation and inventory reservation.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/clean-ddd-hexagonal-direct",
+    "rationale": "Original direct regression for clean-ddd-hexagonal."
+  },
+  {
+    "id": "clean-ddd-hexagonal-indirect",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Our domain model imports the HTTP client and ORM. Separate those dependencies behind ports and adapters.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/clean-ddd-hexagonal-indirect",
+    "rationale": "Original indirect regression for clean-ddd-hexagonal."
+  },
+  {
+    "id": "clean-ddd-hexagonal-negative",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "negative",
+    "prompt": "Add a health endpoint to this simple CRUD API; keep the current controller/service structure.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/clean-ddd-hexagonal-negative",
+    "rationale": "Original negative regression for clean-ddd-hexagonal."
+  },
+  {
+    "id": "clean-ddd-hexagonal-incomplete",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "incomplete",
+    "prompt": "Model the consistency boundary for order approval; the business rules have not been supplied.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/clean-ddd-hexagonal-incomplete",
+    "rationale": "Original incomplete regression for clean-ddd-hexagonal."
+  },
+  {
+    "id": "clean-ddd-hexagonal-boundary",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "boundary",
+    "prompt": "Use Clean Architecture, but keep the existing presentation folder and the required atomic update across two aggregates.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/clean-ddd-hexagonal-boundary",
+    "rationale": "Original boundary regression for clean-ddd-hexagonal."
+  },
+  {
+    "id": "feature-slicing-direct",
+    "owner": "feature-slicing",
+    "kind": "direct",
+    "prompt": "Fix this FSD cross-slice import between features/cart and features/checkout.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/feature-slicing-direct",
+    "rationale": "Original direct regression for feature-slicing."
+  },
+  {
+    "id": "feature-slicing-indirect",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "This frontend already uses Feature-Sliced Design. Where should the checkout-only form live?",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/feature-slicing-indirect",
+    "rationale": "Original indirect regression for feature-slicing."
+  },
+  {
+    "id": "feature-slicing-negative",
+    "owner": "feature-slicing",
+    "kind": "negative",
+    "prompt": "Add a React button in our existing components folder. Do not introduce Feature-Sliced Design.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "feature-slicing/feature-slicing-negative",
+    "rationale": "Original negative regression for feature-slicing."
+  },
+  {
+    "id": "feature-slicing-incomplete",
+    "owner": "feature-slicing",
+    "kind": "incomplete",
+    "prompt": "Help migrate our frontend to FSD; the framework and current file tree are not available yet.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/feature-slicing-incomplete",
+    "rationale": "Original incomplete regression for feature-slicing."
+  },
+  {
+    "id": "feature-slicing-boundary",
+    "owner": "feature-slicing",
+    "kind": "boundary",
+    "prompt": "In our Next.js FSD app, expose a client-safe public API without moving framework route directories.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/feature-slicing-boundary",
+    "rationale": "Original boundary regression for feature-slicing."
+  },
+  {
+    "id": "modern-css-direct",
+    "owner": "modern-css",
+    "kind": "direct",
+    "prompt": "Implement this responsive layout with CSS Grid and container queries.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/modern-css-direct",
+    "rationale": "Original direct regression for modern-css."
+  },
+  {
+    "id": "modern-css-indirect",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "The modal stylesheet loses its theme overrides after we introduced cascade layers. Find the precedence issue.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/modern-css-indirect",
+    "rationale": "Original indirect regression for modern-css."
+  },
+  {
+    "id": "modern-css-negative",
+    "owner": "modern-css",
+    "kind": "negative",
+    "prompt": "Update a React query cache key. No styles or layout change.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/modern-css-negative",
+    "rationale": "Original negative regression for modern-css."
+  },
+  {
+    "id": "modern-css-incomplete",
+    "owner": "modern-css",
+    "kind": "incomplete",
+    "prompt": "Replace our tooltip positioning with CSS anchor positioning; I have not specified supported browsers.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/modern-css-incomplete",
+    "rationale": "Original incomplete regression for modern-css."
+  },
+  {
+    "id": "modern-css-boundary",
+    "owner": "modern-css",
+    "kind": "boundary",
+    "prompt": "Fix a hover color in our Sass project. Keep Sass and do not add global resets.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/modern-css-boundary",
+    "rationale": "Original boundary regression for modern-css."
+  },
+  {
+    "id": "modern-javascript-direct",
+    "owner": "modern-javascript",
+    "kind": "direct",
+    "prompt": "Modernize this JavaScript array transformation while preserving its observable behavior.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/modern-javascript-direct",
+    "rationale": "Original direct regression for modern-javascript."
+  },
+  {
+    "id": "modern-javascript-indirect",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "This JavaScript forEach starts async saves but returns before they finish. Fix the completion behavior.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/modern-javascript-indirect",
+    "rationale": "Original indirect regression for modern-javascript."
+  },
+  {
+    "id": "modern-javascript-negative",
+    "owner": "modern-javascript",
+    "kind": "negative",
+    "prompt": "Design a TypeScript conditional type that extracts route parameters; there is no runtime code change.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/modern-javascript-negative",
+    "rationale": "Original negative regression for modern-javascript."
+  },
+  {
+    "id": "modern-javascript-incomplete",
+    "owner": "modern-javascript",
+    "kind": "incomplete",
+    "prompt": "Can we use Iterator.concat in this JavaScript project? Runtime targets are not available.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/modern-javascript-incomplete",
+    "rationale": "Original incomplete regression for modern-javascript."
+  },
+  {
+    "id": "modern-javascript-boundary",
+    "owner": "modern-javascript",
+    "kind": "boundary",
+    "prompt": "Keep the intentional concurrent Promise.all behavior while refactoring this JavaScript; do not upgrade the runtime.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/modern-javascript-boundary",
+    "rationale": "Original boundary regression for modern-javascript."
+  },
+  {
+    "id": "postgres-drizzle-direct",
+    "owner": "postgres-drizzle",
+    "kind": "direct",
+    "prompt": "Add a PostgreSQL foreign key and Drizzle relation for orders belonging to customers.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/postgres-drizzle-direct",
+    "rationale": "Original direct regression for postgres-drizzle."
+  },
+  {
+    "id": "postgres-drizzle-indirect",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Our Postgres endpoint loads each user's posts in a loop. Rewrite the Drizzle query to avoid N+1.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/postgres-drizzle-indirect",
+    "rationale": "Original indirect regression for postgres-drizzle."
+  },
+  {
+    "id": "postgres-drizzle-negative",
+    "owner": "postgres-drizzle",
+    "kind": "negative",
+    "prompt": "Optimize this MongoDB aggregation pipeline; the service does not use PostgreSQL or Drizzle.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/postgres-drizzle-negative",
+    "rationale": "Original negative regression for postgres-drizzle."
+  },
+  {
+    "id": "postgres-drizzle-incomplete",
+    "owner": "postgres-drizzle",
+    "kind": "incomplete",
+    "prompt": "Write a Drizzle relational query, but the installed version and schema are missing.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/postgres-drizzle-incomplete",
+    "rationale": "Original incomplete regression for postgres-drizzle."
+  },
+  {
+    "id": "postgres-drizzle-boundary",
+    "owner": "postgres-drizzle",
+    "kind": "boundary",
+    "prompt": "Review this Postgres migration SQL only. Do not connect to or change a database.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/postgres-drizzle-boundary",
+    "rationale": "Original boundary regression for postgres-drizzle."
+  },
+  {
+    "id": "mermaid-diagrams-direct",
+    "owner": "mermaid-diagrams",
+    "kind": "direct",
+    "prompt": "Create a Mermaid sequence diagram showing a client, API, and database request.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/mermaid-diagrams-direct",
+    "rationale": "Original direct regression for mermaid-diagrams."
+  },
+  {
+    "id": "mermaid-diagrams-indirect",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Our Markdown docs contain a flowchart that fails because node IDs collide with a subgraph. Repair the Mermaid syntax.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/mermaid-diagrams-indirect",
+    "rationale": "Original indirect regression for mermaid-diagrams."
+  },
+  {
+    "id": "mermaid-diagrams-negative",
+    "owner": "mermaid-diagrams",
+    "kind": "negative",
+    "prompt": "Make a publication-ready scatter plot from these measurements using matplotlib.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/mermaid-diagrams-negative",
+    "rationale": "Original negative regression for mermaid-diagrams."
+  },
+  {
+    "id": "mermaid-diagrams-incomplete",
+    "owner": "mermaid-diagrams",
+    "kind": "incomplete",
+    "prompt": "Draw a Mermaid ER diagram for our database, but I have not provided its tables or relationships.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/mermaid-diagrams-incomplete",
+    "rationale": "Original incomplete regression for mermaid-diagrams."
+  },
+  {
+    "id": "mermaid-diagrams-boundary",
+    "owner": "mermaid-diagrams",
+    "kind": "boundary",
+    "prompt": "Repair this Mermaid flowchart for an older renderer; preserve the supplied nodes and do not switch to architecture-beta.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/mermaid-diagrams-boundary",
+    "rationale": "Original boundary regression for mermaid-diagrams."
+  },
+  {
+    "id": "slack-block-kit-direct",
+    "owner": "slack-block-kit",
+    "kind": "direct",
+    "prompt": "Build a Slack Block Kit modal with a text input and a submit button.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/slack-block-kit-direct",
+    "rationale": "Original direct regression for slack-block-kit."
+  },
+  {
+    "id": "slack-block-kit-indirect",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Our Slack message JSON is rejected because it uses an alert block. Repair the layout for a message surface.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/slack-block-kit-indirect",
+    "rationale": "Original indirect regression for slack-block-kit."
+  },
+  {
+    "id": "slack-block-kit-negative",
+    "owner": "slack-block-kit",
+    "kind": "negative",
+    "prompt": "Search our Slack history for the latest release announcement; do not compose a payload.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-block-kit/slack-block-kit-negative",
+    "rationale": "Original negative regression for slack-block-kit."
+  },
+  {
+    "id": "slack-block-kit-incomplete",
+    "owner": "slack-block-kit",
+    "kind": "incomplete",
+    "prompt": "Build a Slack Block Kit form; I have not chosen whether it will be a modal or a message.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/slack-block-kit-incomplete",
+    "rationale": "Original incomplete regression for slack-block-kit."
+  },
+  {
+    "id": "slack-block-kit-boundary",
+    "owner": "slack-block-kit",
+    "kind": "boundary",
+    "prompt": "Generate a Slack Block Kit message JSON with a complete text fallback. Do not post it.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/slack-block-kit-boundary",
+    "rationale": "Original boundary regression for slack-block-kit."
+  },
+  {
+    "id": "slack-mrkdwn-direct",
+    "owner": "slack-mrkdwn",
+    "kind": "direct",
+    "prompt": "Format this Slack mrkdwn text with a bold heading and a labeled link.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-mrkdwn-direct",
+    "rationale": "Original direct regression for slack-mrkdwn."
+  },
+  {
+    "id": "slack-mrkdwn-indirect",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "The link [runbook](https://example.com) renders incorrectly in our Slack message text field. Correct the text syntax.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-mrkdwn-indirect",
+    "rationale": "Original indirect regression for slack-mrkdwn."
+  },
+  {
+    "id": "slack-mrkdwn-negative",
+    "owner": "slack-mrkdwn",
+    "kind": "negative",
+    "prompt": "Read my Slack unread messages without drafting or formatting a reply.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-mrkdwn-negative",
+    "rationale": "Original negative regression for slack-mrkdwn."
+  },
+  {
+    "id": "slack-mrkdwn-incomplete",
+    "owner": "slack-mrkdwn",
+    "kind": "incomplete",
+    "prompt": "Create ready-to-send Slack text mentioning Ada, but I do not know her Slack user ID.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-mrkdwn-incomplete",
+    "rationale": "Original incomplete regression for slack-mrkdwn."
+  },
+  {
+    "id": "slack-mrkdwn-boundary",
+    "owner": "slack-mrkdwn",
+    "kind": "boundary",
+    "prompt": "Format a Work Object string field with format markdown for Slack. Preserve standard Markdown bold and links.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-mrkdwn-boundary",
+    "rationale": "Original boundary regression for slack-mrkdwn."
+  },
+  {
+    "id": "teams-adaptive-cards-direct",
+    "owner": "teams-adaptive-cards",
+    "kind": "direct",
+    "prompt": "Create a Microsoft Teams Adaptive Card for a Workflows webhook notification.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/teams-adaptive-cards-direct",
+    "rationale": "Original direct regression for teams-adaptive-cards."
+  },
+  {
+    "id": "teams-adaptive-cards-indirect",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Our Teams card attachment sent through Graph has object content and no HTML placeholder. Fix the wrapper.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/teams-adaptive-cards-indirect",
+    "rationale": "Original indirect regression for teams-adaptive-cards."
+  },
+  {
+    "id": "teams-adaptive-cards-negative",
+    "owner": "teams-adaptive-cards",
+    "kind": "negative",
+    "prompt": "Build an Adaptive Card for a Windows notification host, not Microsoft Teams.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-adaptive-cards/teams-adaptive-cards-negative",
+    "rationale": "Original negative regression for teams-adaptive-cards."
+  },
+  {
+    "id": "teams-adaptive-cards-incomplete",
+    "owner": "teams-adaptive-cards",
+    "kind": "incomplete",
+    "prompt": "Create an approval card for Microsoft Teams, but the delivery transport and action backend are unspecified.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/teams-adaptive-cards-incomplete",
+    "rationale": "Original incomplete regression for teams-adaptive-cards."
+  },
+  {
+    "id": "teams-adaptive-cards-boundary",
+    "owner": "teams-adaptive-cards",
+    "kind": "boundary",
+    "prompt": "Fix the text in this legacy MessageCard delivered through a working Teams Workflow. Do not migrate the payload.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/teams-adaptive-cards-boundary",
+    "rationale": "Original boundary regression for teams-adaptive-cards."
+  },
+  {
+    "id": "teams-message-formatting-direct",
+    "owner": "teams-message-formatting",
+    "kind": "direct",
+    "prompt": "Format this Microsoft Teams bot message using textFormat xml.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/teams-message-formatting-direct",
+    "rationale": "Original direct regression for teams-message-formatting."
+  },
+  {
+    "id": "teams-message-formatting-indirect",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Our Teams Graph mention appears as plain text. Fix its body markup and mentions metadata.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/teams-message-formatting-indirect",
+    "rationale": "Original indirect regression for teams-message-formatting."
+  },
+  {
+    "id": "teams-message-formatting-negative",
+    "owner": "teams-message-formatting",
+    "kind": "negative",
+    "prompt": "Find yesterday's messages in our Teams channel; do not format or send a response there.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-message-formatting/teams-message-formatting-negative",
+    "rationale": "Original negative regression for teams-message-formatting."
+  },
+  {
+    "id": "teams-message-formatting-incomplete",
+    "owner": "teams-message-formatting",
+    "kind": "incomplete",
+    "prompt": "Format this Teams notification, but I have not said whether it is bot text, card text, or a Graph body.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/teams-message-formatting-incomplete",
+    "rationale": "Original incomplete regression for teams-message-formatting."
+  },
+  {
+    "id": "teams-message-formatting-boundary",
+    "owner": "teams-message-formatting",
+    "kind": "boundary",
+    "prompt": "Fix bold text in an existing Teams Graph HTML body without replacing it with an Adaptive Card.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/teams-message-formatting-boundary",
+    "rationale": "Original boundary regression for teams-message-formatting."
+  },
+  {
+    "id": "bazel-bzlmod",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "MODULE.bazel declares rules_python but @pip is invisible. Fix the extension and use_repo wiring.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/bzlmod",
+    "rationale": "Requires bazel guidance for bzlmod."
+  },
+  {
+    "id": "bazel-configured-query-routing",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Which deps does //app:server actually use with --define=ssl=true? Give me the configured graph query.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/configured-query",
+    "rationale": "Requires bazel guidance for configured-query."
+  },
+  {
+    "id": "bazel-hermetic-tools",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "A genrule runs /usr/local/bin/protoc and fails on a clean remote worker. Repair its declared tools.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "holdout",
+    "group": "bazel/hermetic-tools",
+    "rationale": "Requires bazel guidance for hermetic-tools."
+  },
+  {
+    "id": "bazel-cache-input",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Changing a generated config file never invalidates our Bazel action cache. Inspect its inputs.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/cache-input",
+    "rationale": "Requires bazel guidance for cache-input."
+  },
+  {
+    "id": "bazel-platform-select",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Our BUILD uses select for Linux and macOS. Add the missing Linux-only library without changing the default branch.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/platform-select",
+    "rationale": "Requires bazel guidance for platform-select."
+  },
+  {
+    "id": "bazel-visibility",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Only //services/payments should depend on //lib/ledger:internal. Express that visibility boundary.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "holdout",
+    "group": "bazel/visibility",
+    "rationale": "Requires bazel guidance for visibility."
+  },
+  {
+    "id": "bazel-starlark-macro",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "This .bzl macro drops the caller-supplied tags before creating cc_test targets. Fix propagation.",
+    "expected_skills": [
+      "bazel"
+    ],
+    "split": "development",
+    "group": "bazel/starlark-macro",
+    "rationale": "Requires bazel guidance for starlark-macro."
+  },
+  {
+    "id": "bazel-cmake",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "CMake cannot find OpenSSL in this C++ project. Fix CMakeLists.txt; Bazel is not installed.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/cmake",
+    "rationale": "The requested operation is cmake; bazel does not own that task."
+  },
+  {
+    "id": "bazel-nix",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "Explain why this Nix derivation rebuilds when its source changes.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/nix",
+    "rationale": "The requested operation is nix; bazel does not own that task."
+  },
+  {
+    "id": "bazel-npm-install",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "npm ci fails because package-lock.json disagrees with package.json. Diagnose the lockfile.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "bazel/npm-install",
+    "rationale": "The requested operation is npm-install; bazel does not own that task."
+  },
+  {
+    "id": "bazel-spelling",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "Correct the spelling in the sentence: Bazel bilds are fast.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/spelling",
+    "rationale": "The requested operation is spelling; bazel does not own that task."
+  },
+  {
+    "id": "bazel-readme-link",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "Change the README hyperlink label from Bazel docs to Build documentation; preserve its URL.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/readme-link",
+    "rationale": "The requested operation is readme-link; bazel does not own that task."
+  },
+  {
+    "id": "bazel-maven",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "Maven cannot resolve a private dependency. Help configure settings.xml credentials.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "bazel/maven",
+    "rationale": "The requested operation is maven; bazel does not own that task."
+  },
+  {
+    "id": "bazel-rust-cargo",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "Cargo reports a cyclic crate dependency. Explain this Cargo.toml graph.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/rust-cargo",
+    "rationale": "The requested operation is rust-cargo; bazel does not own that task."
+  },
+  {
+    "id": "bazel-makefile",
+    "owner": "bazel",
+    "kind": "near-miss",
+    "prompt": "This repository uses GNU Make only. Add a clean target that removes build/output.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "bazel/makefile",
+    "rationale": "The requested operation is makefile; bazel does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-atomic-invariant",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Two wallet balances must change atomically. Model the transfer use case and transaction port without importing the database into the domain.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/atomic-invariant",
+    "rationale": "Requires clean-ddd-hexagonal guidance for atomic-invariant."
+  },
+  {
+    "id": "clean-ddd-hexagonal-outbox",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Order confirmation commits, but publishing its event sometimes fails. Design the transaction and outbox boundary.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/outbox",
+    "rationale": "Requires clean-ddd-hexagonal guidance for outbox."
+  },
+  {
+    "id": "clean-ddd-hexagonal-context-language",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Sales calls a subscription active while Billing calls it collectible. Design an anti-corruption layer between these bounded contexts.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "holdout",
+    "group": "clean-ddd-hexagonal/context-language",
+    "rationale": "Requires clean-ddd-hexagonal guidance for context-language."
+  },
+  {
+    "id": "clean-ddd-hexagonal-aggregate-scope",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Our Customer aggregate loads ten years of invoices to rename the customer. Reconsider the consistency boundary.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/aggregate-scope",
+    "rationale": "Requires clean-ddd-hexagonal guidance for aggregate-scope."
+  },
+  {
+    "id": "clean-ddd-hexagonal-domain-rule",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Refund eligibility lives partly in a controller and partly in an ORM hook. Put the policy behind an explicit domain/use-case boundary.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/domain-rule",
+    "rationale": "Requires clean-ddd-hexagonal guidance for domain-rule."
+  },
+  {
+    "id": "clean-ddd-hexagonal-replay",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Replaying stored OrderConfirmed events sends real customer emails again. Separate replay from external effects.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "holdout",
+    "group": "clean-ddd-hexagonal/replay",
+    "rationale": "Requires clean-ddd-hexagonal guidance for replay."
+  },
+  {
+    "id": "clean-ddd-hexagonal-read-side",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "A revenue dashboard joins five aggregates. Design a read model without forcing these into one aggregate.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/read-side",
+    "rationale": "Requires clean-ddd-hexagonal guidance for read-side."
+  },
+  {
+    "id": "clean-ddd-hexagonal-simple-crud",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Add a last_login_at field to this ordinary CRUD response DTO. Keep the existing architecture.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/simple-crud",
+    "rationale": "The requested operation is simple-crud; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-rest-handler",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Rename the health endpoint from /healthcheck to /health. No domain logic changes.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/rest-handler",
+    "rationale": "The requested operation is rest-handler; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-ddd-definition-quote",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Proofread this README paragraph without changing its meaning: We adopted Domain Driven Design last year.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "clean-ddd-hexagonal/ddd-definition-quote",
+    "rationale": "The requested operation is ddd-definition-quote; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-css-noun",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "The class is named aggregate-summary. Fix its CSS overflow at narrow widths.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/css-noun",
+    "rationale": "The requested operation is css-noun; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-schema-pg",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Add an index to a PostgreSQL lookup on events(tenant_id, created_at).",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/schema-pg",
+    "rationale": "The requested operation is schema-pg; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-literal-ports",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Why does the operating system say port 8080 is already in use?",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "clean-ddd-hexagonal/literal-ports",
+    "rationale": "The requested operation is literal-ports; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-smtp",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Configure the SMTP hostname and port for our existing mail sender.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/smtp",
+    "rationale": "The requested operation is smtp; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "clean-ddd-hexagonal-go-format",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "near-miss",
+    "prompt": "Run formatting on this Go file; make no semantic or architectural changes.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "clean-ddd-hexagonal/go-format",
+    "rationale": "The requested operation is go-format; clean-ddd-hexagonal does not own that task."
+  },
+  {
+    "id": "feature-slicing-page-owned",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "In our FSD application, an address form is used only on checkout. Decide its slice and segment without creating an unnecessary feature.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/page-owned",
+    "rationale": "Requires feature-slicing guidance for page-owned."
+  },
+  {
+    "id": "feature-slicing-public-api",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "Our FSD page imports entities/user/model/private.ts. Repair the dependency through the entity public API.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/public-api",
+    "rationale": "Requires feature-slicing guidance for public-api."
+  },
+  {
+    "id": "feature-slicing-feature-peer",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "A feature imports another feature in our FSD app. Move their composition to the existing dashboard page.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "holdout",
+    "group": "feature-slicing/feature-peer",
+    "rationale": "Requires feature-slicing guidance for feature-peer."
+  },
+  {
+    "id": "feature-slicing-entity-x",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "In FSD, an order entity needs the user summary type. Show a narrow explicit cross-entity API.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/entity-x",
+    "rationale": "Requires feature-slicing guidance for entity-x."
+  },
+  {
+    "id": "feature-slicing-barrel-cycle",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "Our FSD slice imports its own index.ts internally, producing a circular import. Repair the slice API boundaries.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/barrel-cycle",
+    "rationale": "Requires feature-slicing guidance for barrel-cycle."
+  },
+  {
+    "id": "feature-slicing-shared-purpose",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "The FSD shared folder contains slices called helpers and utils. Organize the new date formatting code by technical purpose.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "holdout",
+    "group": "feature-slicing/shared-purpose",
+    "rationale": "Requires feature-slicing guidance for shared-purpose."
+  },
+  {
+    "id": "feature-slicing-server-client",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "An FSD barrel exports server-only database code beside a client hook. Split public exports so the browser cannot pull in the server module.",
+    "expected_skills": [
+      "feature-slicing"
+    ],
+    "split": "development",
+    "group": "feature-slicing/server-client",
+    "rationale": "Requires feature-slicing guidance for server-client."
+  },
+  {
+    "id": "feature-slicing-non-fsd",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Add a settings component to our existing feature-folder app. It does not use FSD and we are keeping its layout.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "feature-slicing/non-fsd",
+    "rationale": "The requested operation is non-fsd; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-array-slice",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Explain why array.slice returns a new array while splice mutates the original.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "feature-slicing/array-slice",
+    "rationale": "The requested operation is array-slice; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-food",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Slice this recipe into preparation, cooking, and serving steps.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "feature-slicing/food",
+    "rationale": "The requested operation is food; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-text-edit",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Replace the words Feature-Sliced Design with FSD in this glossary only.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "feature-slicing/text-edit",
+    "rationale": "The requested operation is text-edit; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-react-memo",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "A React component rerenders too often. Investigate memoization without reorganizing the source tree.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "feature-slicing/react-memo",
+    "rationale": "The requested operation is react-memo; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-routing-url",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Change our React Router URL from /prefs to /settings. Keep every file in place.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "feature-slicing/routing-url",
+    "rationale": "The requested operation is routing-url; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-python-package",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Create an __init__.py for this existing Python package.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "feature-slicing/python-package",
+    "rationale": "The requested operation is python-package; feature-slicing does not own that task."
+  },
+  {
+    "id": "feature-slicing-backend-boundary",
+    "owner": "feature-slicing",
+    "kind": "near-miss",
+    "prompt": "Design aggregate consistency boundaries for our payments domain using ports and adapters.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "feature-slicing/backend-boundary",
+    "rationale": "The requested operation is backend-boundary; feature-slicing does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-reserved-node",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "This Mermaid flowchart stops parsing at a node named end. Repair the syntax without changing its label or edges.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/reserved-node",
+    "rationale": "Requires mermaid-diagrams guidance for reserved-node."
+  },
+  {
+    "id": "mermaid-diagrams-sequence-alias",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Draw a Mermaid sequence diagram with Browser and Payments API labels, request then response.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/sequence-alias",
+    "rationale": "Requires mermaid-diagrams guidance for sequence-alias."
+  },
+  {
+    "id": "mermaid-diagrams-er-optional",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Represent optional one-to-one profile ownership in a Mermaid ER diagram, with the correct cardinalities.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "holdout",
+    "group": "mermaid-diagrams/er-optional",
+    "rationale": "Requires mermaid-diagrams guidance for er-optional."
+  },
+  {
+    "id": "mermaid-diagrams-state-retry",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Write a Mermaid state diagram for Running, Failed, retry back to Running, and terminal Completed.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/state-retry",
+    "rationale": "Requires mermaid-diagrams guidance for state-retry."
+  },
+  {
+    "id": "mermaid-diagrams-gantt-after",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Fix this Mermaid Gantt so implementation starts after design finishes instead of on a hardcoded date.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/gantt-after",
+    "rationale": "Requires mermaid-diagrams guidance for gantt-after."
+  },
+  {
+    "id": "mermaid-diagrams-class-arrow",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "My Mermaid class diagram makes Customer inherit from VIP. Reverse the inheritance correctly.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "holdout",
+    "group": "mermaid-diagrams/class-arrow",
+    "rationale": "Requires mermaid-diagrams guidance for class-arrow."
+  },
+  {
+    "id": "mermaid-diagrams-subgraph",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "A Mermaid subgraph and an internal node reuse the same identifier. Repair the collision.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/subgraph",
+    "rationale": "Requires mermaid-diagrams guidance for subgraph."
+  },
+  {
+    "id": "mermaid-diagrams-svg",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Draw a small architecture diagram as an editable SVG file. Do not use Mermaid.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/svg",
+    "rationale": "The requested operation is svg; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-ascii",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Show the directory hierarchy as plain ASCII text.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/ascii",
+    "rationale": "The requested operation is ascii; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-plantuml",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Repair the actor declaration in this PlantUML sequence diagram.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "mermaid-diagrams/plantuml",
+    "rationale": "The requested operation is plantuml; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-sql",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Inspect PostgreSQL foreign keys to diagnose orphaned rows.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "mermaid-diagrams/sql",
+    "rationale": "The requested operation is sql; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-markdown-link",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Fix the relative path of the image link in README.md. Leave its Mermaid blocks untouched.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/markdown-link",
+    "rationale": "The requested operation is markdown-link; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-art",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Write a short story about a mermaid learning to sail.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "mermaid-diagrams/art",
+    "rationale": "The requested operation is art; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-chart",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Plot these temperature measurements using matplotlib and export a PNG.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/chart",
+    "rationale": "The requested operation is chart; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "mermaid-diagrams-json-tree",
+    "owner": "mermaid-diagrams",
+    "kind": "near-miss",
+    "prompt": "Convert this nested JSON object to YAML, preserving its structure.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "mermaid-diagrams/json-tree",
+    "rationale": "The requested operation is json-tree; mermaid-diagrams does not own that task."
+  },
+  {
+    "id": "modern-css-container",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Cards embedded in a narrow sidebar should stack based on container width, even on wide screens. Implement the CSS.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/container",
+    "rationale": "Requires modern-css guidance for container."
+  },
+  {
+    "id": "modern-css-logical",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Fix the padding and icon placement so the component mirrors correctly in RTL.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/logical",
+    "rationale": "Requires modern-css guidance for logical."
+  },
+  {
+    "id": "modern-css-motion",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Respect prefers-reduced-motion in this CSS transition while preserving the normal animation.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "holdout",
+    "group": "modern-css/motion",
+    "rationale": "Requires modern-css guidance for motion."
+  },
+  {
+    "id": "modern-css-layers",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Vendor styles override our theme unexpectedly. Fix the CSS cascade using deliberate layer order.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/layers",
+    "rationale": "Requires modern-css guidance for layers."
+  },
+  {
+    "id": "modern-css-focus",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Keyboard users cannot see which button has focus. Add a visible focus treatment in CSS.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/focus",
+    "rationale": "Requires modern-css guidance for focus."
+  },
+  {
+    "id": "modern-css-min-width",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "The flex child containing a long URL pushes the page wider than the viewport. Repair its CSS sizing.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "holdout",
+    "group": "modern-css/min-width",
+    "rationale": "Requires modern-css guidance for min-width."
+  },
+  {
+    "id": "modern-css-subgrid",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "Align labels and values across nested grid rows using the shared parent tracks.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "development",
+    "group": "modern-css/subgrid",
+    "rationale": "Requires modern-css guidance for subgrid."
+  },
+  {
+    "id": "modern-css-click-handler",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "The button onclick never fires because the handler was not registered. Fix only the event wiring.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/click-handler",
+    "rationale": "The requested operation is click-handler; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-copy",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Change the heading text to Your projects. Keep its styles unchanged.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/copy",
+    "rationale": "The requested operation is copy; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-swift",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Fix this SwiftUI HStack spacing modifier.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "modern-css/swift",
+    "rationale": "The requested operation is swift; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-sql-select",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Select the latest PostgreSQL record per customer.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "modern-css/sql-select",
+    "rationale": "The requested operation is sql-select; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-css-glossary",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Alphabetize this glossary of CSS property names; do not change definitions or code.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/css-glossary",
+    "rationale": "The requested operation is css-glossary; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-token-json",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Rename the JSON configuration key themeName to themeId, preserving its value.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "modern-css/token-json",
+    "rationale": "The requested operation is token-json; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-photo",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Crop this photograph into a square image.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/photo",
+    "rationale": "The requested operation is photo; modern-css does not own that task."
+  },
+  {
+    "id": "modern-css-typescript",
+    "owner": "modern-css",
+    "kind": "near-miss",
+    "prompt": "Fix an incorrect TypeScript discriminated union narrowing in a reducer.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-css/typescript",
+    "rationale": "The requested operation is typescript; modern-css does not own that task."
+  },
+  {
+    "id": "modern-javascript-async-foreach",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "The function resolves before any writes finish because it uses async callbacks inside forEach. Repair it while preserving concurrent execution.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/async-foreach",
+    "rationale": "Requires modern-javascript guidance for async-foreach."
+  },
+  {
+    "id": "modern-javascript-nullish",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "Our JavaScript defaults replace legitimate zero, false and empty-string values. Fix the operator choice.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/nullish",
+    "rationale": "Requires modern-javascript guidance for nullish."
+  },
+  {
+    "id": "modern-javascript-identity-group",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "Group JavaScript records by object-valued keys while preserving key identity.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "holdout",
+    "group": "modern-javascript/identity-group",
+    "rationale": "Requires modern-javascript guidance for identity-group."
+  },
+  {
+    "id": "modern-javascript-prototype-key",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "Our grouping helper loses records whose keys are __proto__ or constructor. Make the grouping safe.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/prototype-key",
+    "rationale": "Requires modern-javascript guidance for prototype-key."
+  },
+  {
+    "id": "modern-javascript-iterator-close",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "A JavaScript iterator keeps a resource open after the consumer stops early. Repair cleanup semantics.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/iterator-close",
+    "rationale": "Requires modern-javascript guidance for iterator-close."
+  },
+  {
+    "id": "modern-javascript-regexp-literal",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "Turn arbitrary user input into a literal JavaScript regex pattern without treating punctuation as operators.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "holdout",
+    "group": "modern-javascript/regexp-literal",
+    "rationale": "Requires modern-javascript guidance for regexp-literal."
+  },
+  {
+    "id": "modern-javascript-bounded-pool",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "Implement bounded concurrency for these promise-returning JavaScript jobs without starting more than three at once.",
+    "expected_skills": [
+      "modern-javascript"
+    ],
+    "split": "development",
+    "group": "modern-javascript/bounded-pool",
+    "rationale": "Requires modern-javascript guidance for bounded-pool."
+  },
+  {
+    "id": "modern-javascript-node-copy",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Update the Node version badge link in README.md only.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/node-copy",
+    "rationale": "The requested operation is node-copy; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-sql-driver",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Our PostgreSQL query needs a partial unique index for active memberships.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "modern-javascript/sql-driver",
+    "rationale": "The requested operation is sql-driver; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-css-grid",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Fix CSS grid columns at mobile and desktop widths.",
+    "expected_skills": [
+      "modern-css"
+    ],
+    "split": "holdout",
+    "group": "modern-javascript/css-grid",
+    "rationale": "The requested operation is css-grid; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-python-async",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Fix the asyncio.gather call in this Python service.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/python-async",
+    "rationale": "The requested operation is python-async; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-typescript-interface",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Describe this TypeScript interface and its optional properties; no runtime behavior changes.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/typescript-interface",
+    "rationale": "The requested operation is typescript-interface; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-npm-script",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Rename the npm script test:unit to unit in package.json.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "modern-javascript/npm-script",
+    "rationale": "The requested operation is npm-script; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-java-stream",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Convert this Java collection to a stream with a filter.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/java-stream",
+    "rationale": "The requested operation is java-stream; modern-javascript does not own that task."
+  },
+  {
+    "id": "modern-javascript-translation",
+    "owner": "modern-javascript",
+    "kind": "near-miss",
+    "prompt": "Translate this JavaScript tutorial heading into Spanish; leave code samples unchanged.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "modern-javascript/translation",
+    "rationale": "The requested operation is translation; modern-javascript does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-nullable-fk",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Add a nullable author reference in PostgreSQL, preserving existing posts and enforcing future foreign keys.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/nullable-fk",
+    "rationale": "Requires postgres-drizzle guidance for nullable-fk."
+  },
+  {
+    "id": "postgres-drizzle-backfill",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Migrate an existing populated PostgreSQL table to a required tenant_id without losing rows.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/backfill",
+    "rationale": "Requires postgres-drizzle guidance for backfill."
+  },
+  {
+    "id": "postgres-drizzle-partial-unique",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Enforce one active membership per user and team, while allowing multiple inactive memberships in Postgres.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "holdout",
+    "group": "postgres-drizzle/partial-unique",
+    "rationale": "Requires postgres-drizzle guidance for partial-unique."
+  },
+  {
+    "id": "postgres-drizzle-keyset",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Our Postgres keyset pagination skips rows tied on created_at. Add a deterministic tie breaker.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/keyset",
+    "rationale": "Requires postgres-drizzle guidance for keyset."
+  },
+  {
+    "id": "postgres-drizzle-rls",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Repair PostgreSQL row-level policies so app_user can only see and write its current tenant.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/rls",
+    "rationale": "Requires postgres-drizzle guidance for rls."
+  },
+  {
+    "id": "postgres-drizzle-drizzle-relations",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Fix the Drizzle ORM relation and real foreign key for posts.authorId while preserving database names.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "holdout",
+    "group": "postgres-drizzle/drizzle-relations",
+    "rationale": "Requires postgres-drizzle guidance for drizzle-relations."
+  },
+  {
+    "id": "postgres-drizzle-atomic-stock",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Reserve stock atomically in PostgreSQL so simultaneous purchases cannot oversell.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/atomic-stock",
+    "rationale": "Requires postgres-drizzle guidance for atomic-stock."
+  },
+  {
+    "id": "postgres-drizzle-mysql",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Optimize this MySQL query using EXPLAIN. The database is MySQL 8, not PostgreSQL.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/mysql",
+    "rationale": "The requested operation is mysql; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-sqlite",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Add a SQLite migration for our offline mobile database.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/sqlite",
+    "rationale": "The requested operation is sqlite; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-mongo",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Design a MongoDB aggregation pipeline for monthly totals.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "postgres-drizzle/mongo",
+    "rationale": "The requested operation is mongo; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-weather-word",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Write a weather forecast mentioning light drizzle in the morning.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/weather-word",
+    "rationale": "The requested operation is weather-word; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-readme-db",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Correct the spelling of PostgreSQL in the README only.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/readme-db",
+    "rationale": "The requested operation is readme-db; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-http-timeout",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Tune the HTTP client timeout in our database-independent API gateway.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "postgres-drizzle/http-timeout",
+    "rationale": "The requested operation is http-timeout; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-redis",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Set a Redis TTL on cached session keys.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "postgres-drizzle/redis",
+    "rationale": "The requested operation is redis; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "postgres-drizzle-ddd-scope",
+    "owner": "postgres-drizzle",
+    "kind": "near-miss",
+    "prompt": "Review aggregate boundaries and domain ports for refunds. Do not change storage schemas.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ],
+    "split": "development",
+    "group": "postgres-drizzle/ddd-scope",
+    "rationale": "The requested operation is ddd-scope; postgres-drizzle does not own that task."
+  },
+  {
+    "id": "slack-block-kit-modal-input",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Build a Slack modal with an approval reason input and stable block_id/action_id values.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/modal-input",
+    "rationale": "Requires slack-block-kit guidance for modal-input."
+  },
+  {
+    "id": "slack-block-kit-surface-alert",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "This Slack message contains an alert block that only works in modals. Repair the message layout.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/surface-alert",
+    "rationale": "Requires slack-block-kit guidance for surface-alert."
+  },
+  {
+    "id": "slack-block-kit-table-shape",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Slack rejects our table block because we used columns instead of rows. Repair the payload.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "holdout",
+    "group": "slack-block-kit/table-shape",
+    "rationale": "Requires slack-block-kit guidance for table-shape."
+  },
+  {
+    "id": "slack-block-kit-sortable",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Create a sortable Slack data_table with a caption, header row and numeric cells.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/sortable",
+    "rationale": "Requires slack-block-kit guidance for sortable."
+  },
+  {
+    "id": "slack-block-kit-rich-list",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Build a true bullet list using nested Slack rich_text elements, not a string pretending to be a list.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/rich-list",
+    "rationale": "Requires slack-block-kit guidance for rich-list."
+  },
+  {
+    "id": "slack-block-kit-streaming",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Repair the task_update chunk shape in our chat.appendStream request.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "holdout",
+    "group": "slack-block-kit/streaming",
+    "rationale": "Requires slack-block-kit guidance for streaming."
+  },
+  {
+    "id": "slack-block-kit-block-limit",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Split a 60-section Slack notification into valid message payloads without dropping any sections.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/block-limit",
+    "rationale": "Requires slack-block-kit guidance for block-limit."
+  },
+  {
+    "id": "slack-block-kit-history",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Find my unread Slack messages from the release channel.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-block-kit/history",
+    "rationale": "The requested operation is history; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-text-only",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Fix Slack link syntax in this single message text string; do not add or edit blocks.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/text-only",
+    "rationale": "The requested operation is text-only; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-oauth",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Which Slack OAuth scopes does conversations.history need?",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "slack-block-kit/oauth",
+    "rationale": "The requested operation is oauth; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-ordinary-message",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Send the already-approved exact text Hello team to the specified Slack channel.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-block-kit/ordinary-message",
+    "rationale": "The requested operation is ordinary-message; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-teams-card",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Build a Teams Adaptive Card with an approval form.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "slack-block-kit/teams-card",
+    "rationale": "The requested operation is teams-card; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-mentions-only",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Escape untrusted Slack mrkdwn so a pasted <!channel> token remains literal.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "holdout",
+    "group": "slack-block-kit/mentions-only",
+    "rationale": "The requested operation is mentions-only; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-logo",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Create a Slack-style notification sound as a WAV file.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-block-kit/logo",
+    "rationale": "The requested operation is logo; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-block-kit-csv",
+    "owner": "slack-block-kit",
+    "kind": "near-miss",
+    "prompt": "Export these supplied channel names to CSV in alphabetical order.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-block-kit/csv",
+    "rationale": "The requested operation is csv; slack-block-kit does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-renderers",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Why does [View build](https://example.com) show literally in my Slack message text? Fix just the string.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/renderers",
+    "rationale": "Requires slack-mrkdwn guidance for renderers."
+  },
+  {
+    "id": "slack-mrkdwn-escape",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Format untrusted Slack mrkdwn content containing angle brackets and ampersands without creating mentions.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/escape",
+    "rationale": "Requires slack-mrkdwn guidance for escape."
+  },
+  {
+    "id": "slack-mrkdwn-date",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Build a Slack date token with Unix seconds and a fallback that includes UTC.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "holdout",
+    "group": "slack-mrkdwn/date",
+    "rationale": "Requires slack-mrkdwn guidance for date."
+  },
+  {
+    "id": "slack-mrkdwn-verbatim",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Does verbatim:true neutralize an explicit <!here> control in a Slack mrkdwn text object? Repair the object.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/verbatim",
+    "rationale": "Requires slack-mrkdwn guidance for verbatim."
+  },
+  {
+    "id": "slack-mrkdwn-missing-id",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Prepare a personal Slack mention for Ada but only her display name is available. Identify what is missing.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/missing-id",
+    "rationale": "Requires slack-mrkdwn guidance for missing-id."
+  },
+  {
+    "id": "slack-mrkdwn-markdown-field",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Convert the supplied Slack mrkdwn string for the standard-Markdown markdown_text field.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "holdout",
+    "group": "slack-mrkdwn/markdown-field",
+    "rationale": "Requires slack-mrkdwn guidance for markdown-field."
+  },
+  {
+    "id": "slack-mrkdwn-fallback",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "Repair the Slack message fallback text so a screen reader receives the full displayed status and link.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/fallback",
+    "rationale": "Requires slack-mrkdwn guidance for fallback."
+  },
+  {
+    "id": "slack-mrkdwn-layout",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Reorder these existing Slack blocks and repair their block_id values without changing their text.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/layout",
+    "rationale": "The requested operation is layout; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-search",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Search Slack for last week\u2019s release notes.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-mrkdwn/search",
+    "rationale": "The requested operation is search; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-auth",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Fix invalid_auth in our Slack OAuth token exchange.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "slack-mrkdwn/auth",
+    "rationale": "The requested operation is auth; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-teams-html",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Repair a Teams Graph HTML body and matching mentions metadata.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "slack-mrkdwn/teams-html",
+    "rationale": "The requested operation is teams-html; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-discord",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Format this Discord message with a role mention.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-mrkdwn/discord",
+    "rationale": "The requested operation is discord; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-readme",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Format this GitHub README using standard Markdown.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "slack-mrkdwn/readme",
+    "rationale": "The requested operation is readme; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-slack-csv",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Count how many rows are in this exported Slack channel CSV.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-mrkdwn/slack-csv",
+    "rationale": "The requested operation is slack-csv; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "slack-mrkdwn-notification-setting",
+    "owner": "slack-mrkdwn",
+    "kind": "near-miss",
+    "prompt": "Explain how to mute a Slack channel in the desktop app.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "slack-mrkdwn/notification-setting",
+    "rationale": "The requested operation is notification-setting; slack-mrkdwn does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-graph-wrapper",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Graph rejects an Adaptive Card attachment because content is an object instead of a serialized string. Repair its wrapper.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/graph-wrapper",
+    "rationale": "Requires teams-adaptive-cards guidance for graph-wrapper."
+  },
+  {
+    "id": "teams-adaptive-cards-webhook-actions",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Our notification-only Teams webhook has an approval Submit button that cannot work. Repair the card using the supplied approval page URL.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/webhook-actions",
+    "rationale": "Requires teams-adaptive-cards guidance for webhook-actions."
+  },
+  {
+    "id": "teams-adaptive-cards-required-input",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Build a Teams bot card with labelled required inputs and an action carrying its request ID.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "holdout",
+    "group": "teams-adaptive-cards/required-input",
+    "rationale": "Requires teams-adaptive-cards guidance for required-input."
+  },
+  {
+    "id": "teams-adaptive-cards-execute",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Add a functional Submit fallback to this Teams Universal Actions Execute card.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/execute",
+    "rationale": "Requires teams-adaptive-cards guidance for execute."
+  },
+  {
+    "id": "teams-adaptive-cards-toggle",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Fix the targetElements IDs in a Teams card\u2019s ToggleVisibility action.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/toggle",
+    "rationale": "Requires teams-adaptive-cards guidance for toggle."
+  },
+  {
+    "id": "teams-adaptive-cards-mobile",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Replace the Table in this Teams card for clients limited to Adaptive Card 1.2.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "holdout",
+    "group": "teams-adaptive-cards/mobile",
+    "rationale": "Requires teams-adaptive-cards guidance for mobile."
+  },
+  {
+    "id": "teams-adaptive-cards-connector-migration",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Convert this legacy MessageCard connector payload to a Teams Workflows notification.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/connector-migration",
+    "rationale": "Requires teams-adaptive-cards guidance for connector-migration."
+  },
+  {
+    "id": "teams-adaptive-cards-text-only",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Fix bold and link markup in this Teams bot text activity; no card is needed.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/text-only",
+    "rationale": "The requested operation is text-only; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-slack-modal",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Build a Slack Block Kit modal with two inputs.",
+    "expected_skills": [
+      "slack-block-kit"
+    ],
+    "split": "development",
+    "group": "teams-adaptive-cards/slack-modal",
+    "rationale": "The requested operation is slack-modal; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-non-teams",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Build an Adaptive Card for a custom Windows host; this app does not use Teams.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "teams-adaptive-cards/non-teams",
+    "rationale": "The requested operation is non-teams; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-graph-history",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "List messages from the Teams channel using Graph.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-adaptive-cards/graph-history",
+    "rationale": "The requested operation is graph-history; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-calendar",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Find a free half-hour in our Teams meeting schedule.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-adaptive-cards/calendar",
+    "rationale": "The requested operation is calendar; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-mention-text",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Repair only the Graph chatMessage HTML user mention and mentions array; there are no attachments.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "holdout",
+    "group": "teams-adaptive-cards/mention-text",
+    "rationale": "The requested operation is mention-text; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-csv",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Convert this exported list of Teams members to CSV.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-adaptive-cards/csv",
+    "rationale": "The requested operation is csv; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-adaptive-cards-permissions",
+    "owner": "teams-adaptive-cards",
+    "kind": "near-miss",
+    "prompt": "Explain why Microsoft Graph directory access returns 403. No messages or cards are involved.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-adaptive-cards/permissions",
+    "rationale": "The requested operation is permissions; teams-adaptive-cards does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-graph-html",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Convert the supplied sentence to a Teams Graph HTML body with a bold heading and labelled link.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/graph-html",
+    "rationale": "Requires teams-message-formatting guidance for graph-html."
+  },
+  {
+    "id": "teams-message-formatting-graph-mention",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Repair mismatched <at id> and mentions entries in a Teams Graph message.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/graph-mention",
+    "rationale": "Requires teams-message-formatting guidance for graph-mention."
+  },
+  {
+    "id": "teams-message-formatting-bot-entities",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "The visible <at>Ada</at> in our Teams bot text does not notify her. Fix its activity entity metadata.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "holdout",
+    "group": "teams-message-formatting/bot-entities",
+    "rationale": "Requires teams-message-formatting guidance for bot-entities."
+  },
+  {
+    "id": "teams-message-formatting-card-text",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Fix the unsupported HTML in this existing Adaptive Card TextBlock while preserving the text and link.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/card-text",
+    "rationale": "Requires teams-message-formatting guidance for card-text."
+  },
+  {
+    "id": "teams-message-formatting-tag-mention",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Repair a requested Teams bot tag mention in a standard channel using its resolved tag ID.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/tag-mention",
+    "rationale": "Requires teams-message-formatting guidance for tag-mention."
+  },
+  {
+    "id": "teams-message-formatting-escape-html",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Escape external text before inserting it into a Teams Graph HTML paragraph.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "holdout",
+    "group": "teams-message-formatting/escape-html",
+    "rationale": "Requires teams-message-formatting guidance for escape-html."
+  },
+  {
+    "id": "teams-message-formatting-literal-title",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Our Teams hero card title shows markup literally. Fix title formatting without changing its layout.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/literal-title",
+    "rationale": "Requires teams-message-formatting guidance for literal-title."
+  },
+  {
+    "id": "teams-message-formatting-card-inputs",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Repair duplicate input IDs and Submit correlation data in this Teams Adaptive Card.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/card-inputs",
+    "rationale": "The requested operation is card-inputs; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-slack-text",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Format the supplied Slack text with a user mention and a date token.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ],
+    "split": "development",
+    "group": "teams-message-formatting/slack-text",
+    "rationale": "The requested operation is slack-text; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-history",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Find the last message Ada sent in the Teams channel.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "teams-message-formatting/history",
+    "rationale": "The requested operation is history; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-meeting",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Schedule a Teams meeting with the supplied participants.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-message-formatting/meeting",
+    "rationale": "The requested operation is meeting; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-plain-edit",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Correct the word deplyment to deployment in this JSON string only; preserve all formatting.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-message-formatting/plain-edit",
+    "rationale": "The requested operation is plain-edit; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-email",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Format an HTML email with an Outlook-safe table layout.",
+    "expected_skills": [],
+    "split": "holdout",
+    "group": "teams-message-formatting/email",
+    "rationale": "The requested operation is email; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-teams-graph-file",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Download a Teams channel file using its SharePoint drive item ID.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-message-formatting/teams-graph-file",
+    "rationale": "The requested operation is teams-graph-file; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "teams-message-formatting-push-token",
+    "owner": "teams-message-formatting",
+    "kind": "near-miss",
+    "prompt": "Fix mobile push token registration in our iOS application.",
+    "expected_skills": [],
+    "split": "development",
+    "group": "teams-message-formatting/push-token",
+    "rationale": "The requested operation is push-token; teams-message-formatting does not own that task."
+  },
+  {
+    "id": "mixed-postgres-domain",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "mixed",
+    "prompt": "Design the domain transaction port for transfers and implement the corresponding atomic PostgreSQL debit/credit SQL.",
+    "expected_skills": [
+      "clean-ddd-hexagonal",
+      "postgres-drizzle"
+    ],
+    "split": "holdout",
+    "group": "mixed/postgres-domain",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  },
+  {
+    "id": "mixed-css-js",
+    "owner": "modern-javascript",
+    "kind": "mixed",
+    "prompt": "Build an accessible animated disclosure: fix its JavaScript iterator cleanup and implement a reduced-motion CSS state.",
+    "expected_skills": [
+      "modern-javascript",
+      "modern-css"
+    ],
+    "split": "holdout",
+    "group": "mixed/css-js",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  },
+  {
+    "id": "mixed-fsd-css",
+    "owner": "feature-slicing",
+    "kind": "mixed",
+    "prompt": "In our FSD app, choose ownership for a checkout-only form, then fix its responsive CSS layout.",
+    "expected_skills": [
+      "feature-slicing",
+      "modern-css"
+    ],
+    "split": "holdout",
+    "group": "mixed/fsd-css",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  },
+  {
+    "id": "mixed-diagram-domain",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "mixed",
+    "prompt": "Review order aggregate boundaries, then express the final dependency architecture as a Mermaid flowchart.",
+    "expected_skills": [
+      "clean-ddd-hexagonal",
+      "mermaid-diagrams"
+    ],
+    "split": "holdout",
+    "group": "mixed/diagram-domain",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  },
+  {
+    "id": "mixed-slack-two-parts",
+    "owner": "slack-block-kit",
+    "kind": "mixed",
+    "prompt": "Build a Slack modal layout, and separately fix this mrkdwn string\u2019s user mention and date control.",
+    "expected_skills": [
+      "slack-block-kit",
+      "slack-mrkdwn"
+    ],
+    "split": "holdout",
+    "group": "mixed/slack-two-parts",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  },
+  {
+    "id": "mixed-teams-two-parts",
+    "owner": "teams-adaptive-cards",
+    "kind": "mixed",
+    "prompt": "Build a Teams approval card with required inputs, and separately repair a Graph text-only mention message.",
+    "expected_skills": [
+      "teams-adaptive-cards",
+      "teams-message-formatting"
+    ],
+    "split": "holdout",
+    "group": "mixed/teams-two-parts",
+    "rationale": "The two explicitly requested operations require separate skill capabilities."
+  }
+]
