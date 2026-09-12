@@ -1,5 +1,5 @@
 # Quick Reference Cheatsheet
-> See [SKILL.md](../SKILL.md#sources) for full source list.
+> See [SKILL.md](../SKILL.md#references) for topic-specific references and their sources.
 
 ## Contents
 

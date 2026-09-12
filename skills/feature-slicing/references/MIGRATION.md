@@ -27,7 +27,10 @@ Consider migrating to FSD if:
 - Circular dependencies are common
 - Code ownership is unclear
 
-**Don't migrate if** the current architecture works well for your team — and don't switch to FSD against the will of your teammates. Migration succeeds as a team decision.
+Use this workflow for a requested migration. If the current architecture already
+solves the problem, explain that tradeoff; do not infer a migration from an
+ordinary feature edit or require a separate team-approval step after the user
+has authorized the change.
 
 ---
 

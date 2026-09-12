@@ -349,7 +349,7 @@ class RabbitMQEventPublisher implements IEventPublisherPort:
 
 ### Project Structure
 
-Use this structure when you want all Hexagonal ports grouped by direction. If the codebase follows the DDD-centered default from `SKILL.md`, keep aggregate repositories in `domain/{aggregate}/repository` and reserve `application/ports/driven/` for application-owned dependencies such as payment gateways, notification gateways, clocks, or event publishers.
+Use this structure when you want all Hexagonal ports grouped by direction. If the codebase uses a DDD-centered layout, keep aggregate repositories in `domain/{aggregate}/repository` and reserve `application/ports/driven/` for application-owned dependencies such as payment gateways, notification gateways, clocks, or event publishers.
 
 ```
 src/

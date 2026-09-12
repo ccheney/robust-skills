@@ -1,6 +1,6 @@
 # Quick Reference Cheatsheet
 
-> See [SKILL.md](../SKILL.md#sources) for full source list.
+> See [SKILL.md](../SKILL.md#references) for primary foundations and topic-specific references.
 
 This cheatsheet summarizes an opinionated synthesis, not a single canonical architecture. Use DDD, Hexagonal, Clean Architecture, Onion Architecture, CQRS, and Event Sourcing independently when only one pattern fits the problem.
 
@@ -300,7 +300,7 @@ Repository port placement varies by school: DDD-centered code often keeps aggreg
 | Fat Use Cases | Business logic in handlers | Move to domain |
 | Leaky Abstraction | Domain depends on ORM | Keep domain pure |
 | God Aggregate | One massive aggregate | Split into smaller ones |
-| Cross-Aggregate TX | Modifying multiple in one TX | Use domain events |
+| Unexamined cross-aggregate TX | Coupling and contention | Check atomicity requirements; use events when eventual consistency fits |
 | Direct Layer Skip | Controller -> Repository in this architecture style | Route through application use case |
 | Premature CQRS | Adding complexity early | Start simple, evolve |
 | Event Proliferation | Too many fine-grained events | May signal context boundary |
@@ -364,7 +364,7 @@ flowchart LR
 
 - ✅ Complex business domain with many rules
 - ✅ Long-lived system (years of maintenance)
-- ✅ Large team (5+ developers)
+- ✅ Domain/dependency boundaries that help the team maintain the system
 - ✅ Need to swap infrastructure (DB, broker, etc.)
 - ✅ High test coverage required
 - ✅ Multiple entry points (API, CLI, events, scheduled jobs)
@@ -373,7 +373,6 @@ flowchart LR
 
 - ❌ Simple CRUD application (most applications)
 - ❌ Prototype / MVP / throwaway code
-- ❌ Small team (1-2 devs)
 - ❌ Short-lived project
 - ❌ Trivial business logic
 
@@ -391,7 +390,8 @@ Level 4: CQRS (Separate read/write models)
 Level 5: Event Sourcing (Store events, derive state)
 ```
 
-**Don't skip levels.** Each level adds complexity. Move up only when you've proven the current level insufficient.
+These are independent design options, not mandatory stages. Choose the patterns
+that address demonstrated requirements; team size alone is not a deciding factor.
 
 ---
 

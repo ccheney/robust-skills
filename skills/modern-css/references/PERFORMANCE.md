@@ -266,7 +266,9 @@ Logical properties replace physical direction properties (`left`, `right`, `top`
 
 ### The Rule
 
-**Always use logical properties in new code.** No downside — identical behavior in LTR horizontal text, automatic RTL and vertical writing mode support. Physical properties are legacy.
+Prefer logical properties for writing-direction-relative layout. Keep physical
+properties when the intended behavior is tied to a physical edge; changing them
+mechanically can change vertical-writing or mixed-direction layouts.
 
 ### Full Mapping Table
 

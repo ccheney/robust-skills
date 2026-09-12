@@ -29,7 +29,7 @@
 | **Infrastructure** | External systems, frameworks | Application, Domain |
 | **Presentation** | API/UI entry points | Application |
 
-**Presentation is optional as a separate layer.** In the 3-layer default from `SKILL.md`, controllers and other driver adapters live under `infrastructure/http/`. This file also shows the 4-layer variant where they get their own top-level `presentation/` folder. Choose one home for controllers per codebase — never both.
+**Presentation is optional as a separate layer.** A 3-layer layout can put controllers and other driver adapters under `infrastructure/http/`. This file also shows a 4-layer variant with a top-level `presentation/` folder. Follow the project's convention rather than creating a second home for the same controllers.
 
 This reference uses a DDD-centered variant: aggregate repository interfaces live in the Domain layer, while use-case ports and application-owned outbound ports live in the Application layer. A stricter Hexagonal layout may put all driven ports under `application/ports/driven/` instead. Both are acceptable when dependencies still point inward and infrastructure implements, rather than owns, the abstractions.
 

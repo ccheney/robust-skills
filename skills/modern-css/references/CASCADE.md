@@ -52,7 +52,9 @@ Memorize: **Transitions > Importance > Layers > Specificity > Proximity > Source
 
 ## 1. Native CSS Nesting
 
-Use native nesting to co-locate related rules. Baseline in all modern browsers. Stop using preprocessor nesting for new projects.
+Use native nesting to co-locate related rules when supported by the project's
+browser targets. Preserve an existing preprocessor unless its removal is part
+of the task; native and preprocessor nesting are not interchangeable syntax.
 
 **Rules:**
 - Nested rules implicitly start with `&` (the parent selector).
@@ -349,7 +351,9 @@ Combine donut scoping with custom properties to prevent theme bleed-through:
 
 ## 4. `@supports` — Feature Queries
 
-Use `@supports` for features not yet Baseline. Do not wrap Baseline features in `@supports` — it adds unnecessary complexity.
+Use `@supports` when a supported target may lack the feature. Baseline status
+does not cover every older browser or embedded WebView; omit detection when
+the project's actual targets support the feature and no fallback is needed.
 
 ### Feature Detection Patterns
 

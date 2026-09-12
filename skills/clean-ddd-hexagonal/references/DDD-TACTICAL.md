@@ -167,18 +167,15 @@ A cluster of entities and value objects treated as a single unit for data change
 
 1. **One aggregate root** - Single entry point for all modifications
 2. **Reference by ID only** - Aggregates reference others by identity, never by direct object reference
-3. **Transaction boundary** - One aggregate per transaction (eventual consistency between aggregates)
+3. **Transaction boundary** - Prefer one aggregate per transaction; assess explicit cross-aggregate atomicity requirements before choosing eventual consistency
 4. **Invariants within boundary** - Aggregate ensures its own consistency
 5. **Small aggregates** - Prefer smaller over larger
 
 ### Aggregate Sizing Heuristics
 
-| Metric | Healthy | Warning | Action |
-|--------|---------|---------|--------|
-| Entities per aggregate | 1-5 | 6-10 | >10: Split |
-| Lines of code (root) | <500 | 500-1000 | >1000: Split |
-| Transaction lock time | <100ms | 100-500ms | >500ms: Split |
-| Concurrent modification conflicts | Rare | Occasional | Frequent: Split |
+Choose boundaries from invariants and observed contention, not fixed entity,
+line-count, or timing thresholds. A large aggregate warrants inspection; it does
+not automatically warrant splitting. Splitting must preserve required atomicity.
 
 **Questions to ask:**
 - Can parts be eventually consistent? → Separate aggregates

@@ -1,6 +1,6 @@
 # Webhooks, Workflows, And Connector Migration
 
-Office 365 connectors — including the classic connector-based Incoming Webhooks — no longer work in Teams. Microsoft disabled them in the May 18–22, 2026 rollout. For webhook-style notifications, use a Workflows (Power Automate) webhook or a notification bot. Any remaining connector/MessageCard payload is a migration task, not a maintenance path.
+Office 365 connectors — including classic connector-based Incoming Webhooks — were disabled in Microsoft's May 18–22, 2026 rollout. For webhook-style notifications, use a Workflows (Power Automate) webhook or notification bot. A MessageCard payload alone does not imply a retired transport: Workflows can accept its noninteractive content. Inspect the endpoint and requested behavior before recommending migration.
 
 ## Connector Retirement Timeline
 

@@ -28,8 +28,9 @@ Drizzle has two query APIs:
 | **Relational** (`db.query...`) | Nested data, simple CRUD | Yes |
 
 Relations are **application-level** (not database constraints). They enable the
-relational queries API. Always define both the FK (`.references()` in the table)
-and the relation — one does not imply the other.
+relational queries API. Define the FK (`.references()` in the table) when database
+referential integrity is required and the relation when using relational queries;
+one does not imply the other.
 
 **Version note:** everything up to the final section uses the **stable 0.x**
 `relations()` API (npm `latest`). drizzle-orm v1.0 (beta/RC — and the syntax shown

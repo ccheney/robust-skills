@@ -567,7 +567,8 @@ CQRS adds significant complexity. Most applications don't need it.
 - You haven't tried a simple reporting database first
 - Adding it "just in case"
 
-**CQRS applies to specific bounded contexts, never entire systems.**
+Evaluate CQRS per bounded context. Do not propagate it across a system merely
+because one context benefits from separate read/write models.
 
 ### Simplified CQRS (Start Here)
 

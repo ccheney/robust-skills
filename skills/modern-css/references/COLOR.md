@@ -79,7 +79,7 @@ All modern color functions use space-separated syntax with `/` for alpha. The co
 }
 ```
 
-Consistent across `rgb()`, `hsl()`, `oklch()`, `oklab()`, `lab()`, `lch()`, and `color()`. Always use it.
+Consistent across `rgb()`, `hsl()`, `oklch()`, `oklab()`, `lab()`, `lch()`, and `color()`. Prefer this syntax for new styles when compatible with the project's targets and conventions.
 
 ---
 
@@ -220,7 +220,8 @@ Prefer OKLCH unless you need exact Display-P3 coordinates from a design tool.
 .vibrant { background: color-mix(in oklch, blue, yellow); }
 ```
 
-Always use `in oklch` unless you have a specific reason for another space.
+Consider `in oklch` for perceptual color adjustments; preserve another space
+when it matches the intended interpolation or the project's token system.
 
 ### Common Patterns
 

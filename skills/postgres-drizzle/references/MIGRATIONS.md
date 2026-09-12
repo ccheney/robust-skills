@@ -118,9 +118,10 @@ drizzle/
     _journal.json
 ```
 
-The `meta/` folder and `_journal.json` are part of the migration state — commit
-them, and never edit or hand-create files in `drizzle/` outside of `generate`
-(the journal won't know about them and `migrate` will skip or mismatch).
+The `meta/` folder and `_journal.json` are generated migration state; commit them
+with the migrations. Use `generate` or `generate --custom` to register new
+migrations. Review and edit the generated SQL before applying it when needed;
+do not rewrite applied migration history or hand-invent journal/snapshot entries.
 
 ### migrate
 
@@ -554,8 +555,9 @@ brief lock with a plain `CREATE INDEX` in the migration.
 SELECT * FROM drizzle.__drizzle_migrations;
 ```
 
-If a migration ran manually and only needs recording, insert its hash into that
-table — but prefer fixing the workflow (only ever apply via `migrate`).
+If SQL ran outside the migrator, inspect the actual schema and migration history
+before proposing reconciliation. Use the installed migrator's supported recovery
+procedure; do not guess hashes or edit its tracking table as a routine fix.
 
 ### "Schema out of sync"
 

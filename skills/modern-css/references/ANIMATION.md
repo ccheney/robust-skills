@@ -4,7 +4,8 @@
 
 CSS now handles entry/exit animations, intrinsic size interpolation, custom easing curves, cross-document transitions, and responsive shape morphing — all without JavaScript.
 
-**Every animation in this file must respect `prefers-reduced-motion`.** The universal reset appears first. Per-feature approaches appear inline.
+Respect `prefers-reduced-motion` for the animation being implemented. A global
+reset is one project-level option; component-level alternatives appear inline.
 
 ## Contents
 
@@ -26,7 +27,9 @@ CSS now handles entry/exit animations, intrinsic size interpolation, custom easi
 
 ## Universal Reduced-Motion Reset
 
-Apply at the top of every project. Override selectively for essential animations (e.g., progress spinners).
+Consider this reset when establishing a project's motion policy. For a local
+animation change, use the project's existing policy or scope reduced-motion
+styles to the affected component. Preserve essential feedback and lifecycle events.
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -371,7 +374,7 @@ Store as custom properties for reuse:
 }
 ```
 
-**Do not hand-write control points.** Use:
+For complex easing curves, these tools can generate control points:
 - [linear-easing-generator.netlify.app](https://linear-easing-generator.netlify.app/) — paste a JS easing function, get `linear()` output
 - [easingwizard.com](https://easingwizard.com) — visual editor
 

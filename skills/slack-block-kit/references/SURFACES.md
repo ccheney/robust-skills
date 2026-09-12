@@ -88,7 +88,7 @@ To suppress automatic link/media unfurls in a normal message, set both `unfurl_l
 | `chat.update` / `chat.delete` | Modify or remove a message |
 | incoming webhook | Publish through a preconfigured URL |
 | `response_url` | Respond to an interaction |
-| `chat.startStream` / `chat.appendStream` / `chat.stopStream` | Stream agent output; see `SKILL.md` |
+| `chat.startStream` / `chat.appendStream` / `chat.stopStream` | Stream agent output; see [STREAMING.md](STREAMING.md) |
 
 ## Modals
 
