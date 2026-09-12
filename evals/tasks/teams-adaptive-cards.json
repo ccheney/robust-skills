@@ -1,0 +1,782 @@
+[
+  {
+    "id": "teams-required-input",
+    "skill": "teams-adaptive-cards",
+    "category": "forms",
+    "group": "teams-adaptive-cards/teams-required-input",
+    "split": "development",
+    "prompt": "Repair this bot approval form. Keep the reason input required with a visible label and validation message, and preserve the request/action correlation. The bot already handles Submit. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-required-input/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-required-input/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-required-input/bad-1.txt",
+        "fails": [
+          "required"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-required-input/bad-2.txt",
+        "fails": [
+          "correlation"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "input-id",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "id"
+        ],
+        "value": "reason"
+      },
+      {
+        "id": "input-type",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "type"
+        ],
+        "value": "Input.Text"
+      },
+      {
+        "id": "label",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "label"
+        ],
+        "value": "Reason"
+      },
+      {
+        "id": "required",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "isRequired"
+        ],
+        "value": true
+      },
+      {
+        "id": "validation-message",
+        "op": "length",
+        "path": [
+          "body",
+          0,
+          "errorMessage"
+        ],
+        "min": 1
+      },
+      {
+        "id": "submit",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "type"
+        ],
+        "value": "Action.Submit"
+      },
+      {
+        "id": "correlation",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "data"
+        ],
+        "value": {
+          "action": "approve",
+          "requestId": "REQ-42"
+        }
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-mobile-facts",
+    "skill": "teams-adaptive-cards",
+    "category": "client-compatibility",
+    "group": "teams-adaptive-cards/teams-mobile-facts",
+    "split": "holdout",
+    "prompt": "Replace the unsupported Table for clients capped at schema 1.2 with a FactSet containing Service: API and Status: Degraded in that order. Preserve both facts and target version. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-mobile-facts/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-mobile-facts/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-mobile-facts/bad-1.txt",
+        "fails": [
+          "mobile-version"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-mobile-facts/bad-2.txt",
+        "fails": [
+          "facts"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "mobile-version",
+        "op": "equals",
+        "path": [
+          "version"
+        ],
+        "value": "1.2"
+      },
+      {
+        "id": "factset",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "type"
+        ],
+        "value": "FactSet"
+      },
+      {
+        "id": "facts",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "facts"
+        ],
+        "value": [
+          {
+            "title": "Service",
+            "value": "API"
+          },
+          {
+            "title": "Status",
+            "value": "Degraded"
+          }
+        ]
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-execute-fallback",
+    "skill": "teams-adaptive-cards",
+    "category": "actions",
+    "group": "teams-adaptive-cards/teams-execute-fallback",
+    "split": "development",
+    "prompt": "Repair this Universal Actions card for a bot that handles both adaptiveCard/action and legacy Submit. Use minimum version 1.4, keep approveRequest and REQ-42, and include the specified functional Submit fallback for older clients. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-execute-fallback/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-execute-fallback/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-execute-fallback/bad-1.txt",
+        "fails": [
+          "fallback-type",
+          "fallback-data"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-execute-fallback/bad-2.txt",
+        "fails": [
+          "request"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "version",
+        "op": "equals",
+        "path": [
+          "version"
+        ],
+        "value": "1.4"
+      },
+      {
+        "id": "execute",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "type"
+        ],
+        "value": "Action.Execute"
+      },
+      {
+        "id": "verb",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "verb"
+        ],
+        "value": "approveRequest"
+      },
+      {
+        "id": "request",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "data",
+          "requestId"
+        ],
+        "value": "REQ-42"
+      },
+      {
+        "id": "fallback-type",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "fallback",
+          "type"
+        ],
+        "value": "Action.Submit"
+      },
+      {
+        "id": "fallback-data",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "fallback",
+          "data"
+        ],
+        "value": {
+          "action": "approve",
+          "requestId": "REQ-42"
+        }
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-toggle-target",
+    "skill": "teams-adaptive-cards",
+    "category": "local-interaction",
+    "group": "teams-adaptive-cards/teams-toggle-target",
+    "split": "development",
+    "prompt": "Repair a local show-details card. Keep details initially hidden, preserve Build 42 logs, and wire Show details to that container using ToggleVisibility. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-toggle-target/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-toggle-target/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-toggle-target/bad-1.txt",
+        "fails": [
+          "targets"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-toggle-target/bad-2.txt",
+        "fails": [
+          "hidden"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "target-id",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "id"
+        ],
+        "value": "details"
+      },
+      {
+        "id": "hidden",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "isVisible"
+        ],
+        "value": false
+      },
+      {
+        "id": "logs",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "items",
+          0,
+          "text"
+        ],
+        "value": "Build 42 logs"
+      },
+      {
+        "id": "action",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "type"
+        ],
+        "value": "Action.ToggleVisibility"
+      },
+      {
+        "id": "targets",
+        "op": "set_equals",
+        "path": [
+          "actions",
+          0,
+          "targetElements"
+        ],
+        "value": [
+          "details"
+        ]
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-card-mention-root",
+    "skill": "teams-adaptive-cards",
+    "category": "mentions",
+    "group": "teams-adaptive-cards/teams-card-mention-root",
+    "split": "development",
+    "prompt": "Repair this raw card mention. Use the resolved Entra ID and keep the visible text. Place mention metadata on the raw card at its Teams extension root. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-card-mention-root/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-card-mention-root/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-card-mention-root/bad-1.txt",
+        "fails": [
+          "mention-metadata"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-card-mention-root/bad-2.txt",
+        "fails": [
+          "visible"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "visible",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "text"
+        ],
+        "value": "Assigned to <at>Ada</at>"
+      },
+      {
+        "id": "mention-metadata",
+        "op": "equals",
+        "path": [
+          "msteams",
+          "entities"
+        ],
+        "value": [
+          {
+            "type": "mention",
+            "text": "<at>Ada</at>",
+            "mentioned": {
+              "id": "11111111-1111-4111-8111-111111111111",
+              "name": "Ada"
+            }
+          }
+        ]
+      },
+      {
+        "id": "no-activity-entities",
+        "op": "absent",
+        "path": [
+          "entities"
+        ]
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-accessible-notification",
+    "skill": "teams-adaptive-cards",
+    "category": "accessibility",
+    "group": "teams-adaptive-cards/teams-accessible-notification",
+    "split": "development",
+    "prompt": "Build the raw notification card from this content. Use one wrapping TextBlock, one View logs URL action, and meaningful fallbackText carrying the same status and destination. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-accessible-notification/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-accessible-notification/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-accessible-notification/bad-1.txt",
+        "fails": [
+          "fallback-status",
+          "fallback-link"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-accessible-notification/bad-2.txt",
+        "fails": [
+          "wrapping"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "status",
+        "op": "contains",
+        "path": [
+          "body",
+          0,
+          "text"
+        ],
+        "value": "failed"
+      },
+      {
+        "id": "environment",
+        "op": "contains",
+        "path": [
+          "body",
+          0,
+          "text"
+        ],
+        "value": "production"
+      },
+      {
+        "id": "wrapping",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "wrap"
+        ],
+        "value": true
+      },
+      {
+        "id": "fallback-status",
+        "op": "contains",
+        "path": [
+          "fallbackText"
+        ],
+        "value": "failed"
+      },
+      {
+        "id": "fallback-link",
+        "op": "contains",
+        "path": [
+          "fallbackText"
+        ],
+        "value": "https://example.com/logs/42"
+      },
+      {
+        "id": "url-action",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "type"
+        ],
+        "value": "Action.OpenUrl"
+      },
+      {
+        "id": "destination",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "url"
+        ],
+        "value": "https://example.com/logs/42"
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-messagecard-migration",
+    "skill": "teams-adaptive-cards",
+    "category": "migration",
+    "group": "teams-adaptive-cards/teams-messagecard-migration",
+    "split": "holdout",
+    "prompt": "Convert this MessageCard into a raw Adaptive Card for a later notification webhook. Preserve the facts as a FactSet in their existing order and the View incident link. Remove connector-specific fields. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-messagecard-migration/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-messagecard-migration/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-messagecard-migration/bad-1.txt",
+        "fails": [
+          "facts"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-messagecard-migration/bad-2.txt",
+        "fails": [
+          "url"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "type",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "AdaptiveCard"
+      },
+      {
+        "id": "facts",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "facts"
+        ],
+        "value": [
+          {
+            "title": "Service",
+            "value": "API"
+          },
+          {
+            "title": "Status",
+            "value": "Down"
+          }
+        ]
+      },
+      {
+        "id": "url",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "url"
+        ],
+        "value": "https://example.com/incidents/7"
+      },
+      {
+        "id": "action",
+        "op": "equals",
+        "path": [
+          "actions",
+          0,
+          "type"
+        ],
+        "value": "Action.OpenUrl"
+      },
+      {
+        "id": "no-messagecard-type",
+        "op": "absent",
+        "path": [
+          "@type"
+        ]
+      },
+      {
+        "id": "no-connector-action",
+        "op": "absent",
+        "path": [
+          "potentialAction"
+        ]
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "teams-unique-input-ids",
+    "skill": "teams-adaptive-cards",
+    "category": "forms",
+    "group": "teams-adaptive-cards/teams-unique-input-ids",
+    "split": "holdout",
+    "prompt": "Repair the form so the bot receives independent comment and owner values. Its existing field contract is comment and owner. Preserve the labels, Save action and record correlation. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/teams-unique-input-ids/input.json"
+    ],
+    "grader": "teams-contract",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/teams-unique-input-ids/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-unique-input-ids/bad-1.txt",
+        "fails": [
+          "owner-id"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/teams-unique-input-ids/bad-2.txt",
+        "fails": [
+          "submit"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "comment-id",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "id"
+        ],
+        "value": "comment"
+      },
+      {
+        "id": "owner-id",
+        "op": "equals",
+        "path": [
+          "body",
+          1,
+          "id"
+        ],
+        "value": "owner"
+      },
+      {
+        "id": "comment-label",
+        "op": "equals",
+        "path": [
+          "body",
+          0,
+          "label"
+        ],
+        "value": "Comment"
+      },
+      {
+        "id": "owner-label",
+        "op": "equals",
+        "path": [
+          "body",
+          1,
+          "label"
+        ],
+        "value": "Owner"
+      },
+      {
+        "id": "submit",
+        "op": "equals",
+        "path": [
+          "actions",
+          0
+        ],
+        "value": {
+          "type": "Action.Submit",
+          "title": "Save",
+          "data": {
+            "action": "save",
+            "recordId": "42"
+          }
+        }
+      }
+    ],
+    "runtime": {
+      "target": "card"
+    }
+  },
+  {
+    "id": "graph",
+    "skill": "teams-adaptive-cards",
+    "category": "regression",
+    "group": "teams-adaptive-cards/graph",
+    "split": "development",
+    "prompt": "Repair this Microsoft Teams Graph chatMessage attachment wrapper. Preserve its attachment ID, card content, and body text. Return only the corrected JSON. Do not send it.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/graph/input.json"
+    ],
+    "grader": "teams",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/graph/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/graph/bad-1.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/graph/bad-2.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      }
+    ],
+    "input": "fixtures/teams-adaptive-cards/graph/input.json"
+  },
+  {
+    "id": "webhook",
+    "skill": "teams-adaptive-cards",
+    "category": "regression",
+    "group": "teams-adaptive-cards/webhook",
+    "split": "development",
+    "prompt": "Convert this raw Teams card into a Workflows webhook notification payload. Preserve the card text and make View release open https://example.com/releases/42. This is a notification-only webhook without a bot. Return only the corrected JSON. Do not send it.",
+    "inputs": [
+      "fixtures/teams-adaptive-cards/webhook/input.json"
+    ],
+    "grader": "teams",
+    "references": [
+      "reference_outputs/teams-adaptive-cards/webhook/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/teams-adaptive-cards/webhook/bad-1.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      },
+      {
+        "path": "reference_outputs/teams-adaptive-cards/webhook/bad-2.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      }
+    ],
+    "input": "fixtures/teams-adaptive-cards/webhook/input.json"
+  }
+]

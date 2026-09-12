@@ -1,0 +1,19 @@
+{
+  "blocks": [
+    {
+      "type": "actions",
+      "block_id": "release_actions",
+      "elements": [
+        {
+          "type": "button",
+          "action_id": "view_release",
+          "text": {
+            "type": "plain_text",
+            "text": "View release"
+          },
+          "url": "https://example.com/releases/42"
+        }
+      ]
+    }
+  ]
+}

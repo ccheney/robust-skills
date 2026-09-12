@@ -1,0 +1,1 @@
+CREATE TABLE users(id integer PRIMARY KEY,email text NOT NULL,deleted_at timestamptz); INSERT INTO users VALUES(1,'a@example.com',NULL);

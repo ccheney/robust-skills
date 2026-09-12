@@ -1,0 +1,7 @@
+{
+  "from": "src/entities/order/model/types.ts",
+  "to": "src/entities/product/@x/order",
+  "public_export": [
+    "ProductId"
+  ]
+}

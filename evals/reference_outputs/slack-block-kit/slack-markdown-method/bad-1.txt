@@ -1,0 +1,5 @@
+{
+  "channel": "C_RELEASES",
+  "markdown_text": "## Release\n\n**Ready** \u2014 [runbook](https://example.com/runbook)",
+  "text": "Ready"
+}

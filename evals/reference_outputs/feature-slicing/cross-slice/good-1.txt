@@ -1,0 +1,12 @@
+{
+  "imports": [
+    {
+      "from": "src/pages/checkout/ui/page.ts",
+      "to": "src/features/checkout"
+    },
+    {
+      "from": "src/pages/checkout/ui/page.ts",
+      "to": "src/features/cart"
+    }
+  ]
+}

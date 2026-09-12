@@ -1,0 +1,10 @@
+{
+  "needs_input": [
+    "refund_policy"
+  ],
+  "ready_steps": [
+    "load_order",
+    "load_customer"
+  ],
+  "execute_refund": true
+}

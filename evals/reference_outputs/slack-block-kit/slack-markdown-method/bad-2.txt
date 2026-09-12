@@ -1,0 +1,4 @@
+{
+  "channel": "C_RELEASES",
+  "markdown_text": "*Ready*"
+}

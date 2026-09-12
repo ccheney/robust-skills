@@ -1,0 +1,18 @@
+{
+  "placements": {
+    "minimum_balance": "application",
+    "transfer": "application",
+    "sql_account_repository": "infrastructure",
+    "account_repository_port": "domain"
+  },
+  "imports": [
+    {
+      "from": "application",
+      "to": "domain"
+    },
+    {
+      "from": "infrastructure",
+      "to": "domain"
+    }
+  ]
+}

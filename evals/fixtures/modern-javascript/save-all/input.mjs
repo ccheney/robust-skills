@@ -1,0 +1,1 @@
+export async function saveAll(items,save){const r=[];items.forEach(async x=>r.push(await save(x)));return r;}

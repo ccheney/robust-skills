@@ -1,0 +1,797 @@
+{
+  "date": "2026-09-12",
+  "kind": "Grader calibration against synthetic references and semantic counterexamples; no LLM calls",
+  "cases": 112,
+  "controls": 371,
+  "counts": {
+    "pass": 371
+  },
+  "runtime_source_sha256": "2f6fbdd6723c8de450abb78f60937b71bd31e401fd054a5cb88ee5dd06fed62d",
+  "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb",
+  "results": [
+    {
+      "id": "bazel-cache-diagnosis",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-configured-query",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-direct-dependency",
+      "skill": "bazel",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-explicit-membership",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-hermetic-tool",
+      "skill": "bazel",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-narrow-visibility",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-preserve-version",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-runtime-data",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-select-branches",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "bazel-use-repo",
+      "skill": "bazel",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "checkout-placement",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "cross-slice",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-cascade-overrides",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-container-adaptation",
+      "skill": "modern-css",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-keyboard-focus",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-logical-spacing",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-parent-validation",
+      "skill": "modern-css",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-reduced-motion",
+      "skill": "modern-css",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-responsive-cards",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-shared-tracks",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-shrinkable-content",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "css-theme-override",
+      "skill": "modern-css",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-aggregate-size",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-atomic-transfer",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-context-translation",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-dependency-direction",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-event-replay",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-missing-refund-rule",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-money-value-object",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-order-confirm",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-outbox-commit",
+      "skill": "clean-ddd-hexagonal",
+      "references": 1,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "ddd-read-model",
+      "skill": "clean-ddd-hexagonal",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "drizzle-stable-schema",
+      "skill": "postgres-drizzle",
+      "references": 1,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-cross-entity-api",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-internal-cycle",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-missing-framework",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-preserve-non-fsd",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-public-api",
+      "skill": "feature-slicing",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-reused-interaction",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-server-client-exports",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "fsd-shared-segments",
+      "skill": "feature-slicing",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "graph",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-bounded-map",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-group-identity",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-group-prototype",
+      "skill": "modern-javascript",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-lazy-take",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-nullish",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-own-property",
+      "skill": "modern-javascript",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-regexp-literal",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "javascript-retry-scope",
+      "skill": "modern-javascript",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-class-inheritance",
+      "skill": "mermaid-diagrams",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-decision-branches",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-er-cardinality",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-er-one-to-one",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-gantt-dependency",
+      "skill": "mermaid-diagrams",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-label-punctuation",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-reserved-id",
+      "skill": "mermaid-diagrams",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-sequence-aliases",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-sequence-order",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-state-lifecycle",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-state-retry",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "mermaid-subgraph-collision",
+      "skill": "mermaid-diagrams",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-atomic-reservation",
+      "skill": "postgres-drizzle",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-backfill-required",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-join-fanout",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-keyset-ties",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-latest-valid-order",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-null-antijoin",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-nullable-fk",
+      "skill": "postgres-drizzle",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-partial-unique",
+      "skill": "postgres-drizzle",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "postgres-tenant-rls",
+      "skill": "postgres-drizzle",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "rank",
+      "skill": "modern-javascript",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "save-all",
+      "skill": "modern-javascript",
+      "references": 2,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-accessible-fallback",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-button-contract",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-date-seconds",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-escape-untrusted",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-header-renderer",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-literal-label",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-markdown-method",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-message-alert",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-message-renderer",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-missing-identity",
+      "skill": "slack-mrkdwn",
+      "references": 2,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "slack-modal-input",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-notification-content",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-rich-text-list",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-sortable-table",
+      "skill": "slack-block-kit",
+      "references": 2,
+      "counterexamples": 3,
+      "calibrated": true
+    },
+    {
+      "id": "slack-stable-ids",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-standard-markdown-field",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-streaming-chunks",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-table-rows",
+      "skill": "slack-block-kit",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-trusted-mention-boundary",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "slack-verbatim-controls",
+      "skill": "slack-mrkdwn",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-accessible-notification",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-app-only-boundary",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-bot-mention",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-card-mention-root",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-card-text-markdown",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-channel-tag",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-escape-html",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-execute-fallback",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-graph-mention",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-graph-renderer",
+      "skill": "teams-message-formatting",
+      "references": 3,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-literal-mention-looking-text",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-messagecard-migration",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-missing-user-id",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-mobile-facts",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-required-input",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-toggle-target",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-two-mention-builder",
+      "skill": "teams-message-formatting",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "teams-unique-input-ids",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    },
+    {
+      "id": "webhook",
+      "skill": "teams-adaptive-cards",
+      "references": 1,
+      "counterexamples": 2,
+      "calibrated": true
+    }
+  ]
+}

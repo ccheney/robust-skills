@@ -1,0 +1,6 @@
+{
+  "file": "MODULE.bazel",
+  "bazel_version": "9.2.0",
+  "content": "bazel_dep(name=\"rules_python\",version=\"1.7.0\")\npip=use_extension(\"@rules_python//python/extensions:pip.bzl\",\"pip\")\npip.parse(hub_name=\"pypi\",python_version=\"3.12\",requirements_lock=\"//:requirements_lock.txt\")\n",
+  "error": "repository @pypi is not visible in the root module"
+}

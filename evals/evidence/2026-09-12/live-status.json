@@ -1,0 +1,148 @@
+{
+  "kind": "Incomplete Gemini 3.8 runs, excluded from pass rates",
+  "runs": [
+    {
+      "run": "expanded-gemini38-coverage",
+      "model": "gemini-3.8-flash",
+      "requests": 2,
+      "provider_events": [
+        {
+          "request": 1,
+          "attempt": 1,
+          "status": 200,
+          "elapsed_seconds": 2.795
+        },
+        {
+          "request": 2,
+          "attempt": 1,
+          "status": 429,
+          "elapsed_seconds": 0.24
+        }
+      ],
+      "summary": {
+        "candidate": {
+          "routing": {
+            "counts": {},
+            "scored": 0,
+            "pass_rate": null,
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null
+          },
+          "task": {
+            "counts": {
+              "blocked": 11
+            },
+            "scored": 0,
+            "pass_rate": null
+          }
+        }
+      },
+      "trials": [
+        {
+          "id": "slack-table-rows",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "mermaid-reserved-id",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "checkout-placement",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "slack-escape-untrusted",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "save-all",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "postgres-nullable-fk",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "graph",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "css-responsive-cards",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "bazel-direct-dependency",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "ddd-money-value-object",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "teams-graph-renderer",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        }
+      ]
+    },
+    {
+      "run": "updated-routing-gemini38",
+      "model": "gemini-3.8-flash",
+      "requests": 1,
+      "provider_events": [
+        {
+          "request": 1,
+          "attempt": 1,
+          "status": 429,
+          "elapsed_seconds": 0.235
+        }
+      ],
+      "summary": {
+        "candidate": {
+          "routing": {
+            "counts": {
+              "blocked": 2
+            },
+            "scored": 0,
+            "pass_rate": null,
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null
+          },
+          "task": {
+            "counts": {},
+            "scored": 0,
+            "pass_rate": null
+          }
+        }
+      },
+      "trials": [
+        {
+          "id": "teams-adaptive-cards-negative",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        },
+        {
+          "id": "modern-javascript-indirect",
+          "status": "blocked",
+          "detail": "Gemini HTTP 429; stopped without retry or paid fallback"
+        }
+      ]
+    }
+  ]
+}

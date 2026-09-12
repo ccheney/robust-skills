@@ -1,0 +1,1 @@
+CREATE TABLE stock(sku text PRIMARY KEY,quantity integer NOT NULL); INSERT INTO stock VALUES('widget',5);

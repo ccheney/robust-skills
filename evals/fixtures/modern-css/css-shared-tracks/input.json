@@ -1,0 +1,4 @@
+{
+  "html": "<style>body{margin:0}.invoice{width:700px;display:grid;grid-template-columns:80px 1fr 120px;gap:12px}.invoice.wide{grid-template-columns:100px 1fr 140px}.row,.header{grid-column:1/-1}.cell{height:20px}</style><div class=\"invoice\"><div class=\"header\"><div class=\"cell\">Qty</div><div class=\"cell\" id=\"h-name\">Name</div><div class=\"cell\" id=\"h-price\">Price</div></div><div class=\"row\"><div class=\"cell\">2</div><div class=\"cell\" id=\"r-name\">Widget</div><div class=\"cell\" id=\"r-price\">$20</div></div></div>",
+  "current_css": ".header{display:grid;grid-template-columns:subgrid}.row{display:grid;grid-template-columns:repeat(3,1fr)}"
+}

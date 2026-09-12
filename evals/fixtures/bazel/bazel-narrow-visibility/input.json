@@ -1,0 +1,5 @@
+{
+  "file": "lib/BUILD.bazel",
+  "content": "load(\"@rules_cc//cc:cc_library.bzl\",\"cc_library\")\ncc_library(name=\"auth\",srcs=[\"auth.cc\"])",
+  "consumer": "//app/server"
+}

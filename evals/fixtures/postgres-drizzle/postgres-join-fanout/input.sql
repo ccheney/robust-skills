@@ -1,0 +1,1 @@
+CREATE TABLE orders(id integer PRIMARY KEY); CREATE TABLE lines(order_id integer,amount integer); CREATE TABLE payments(order_id integer,amount integer); INSERT INTO orders VALUES(1),(2); INSERT INTO lines VALUES(1,10),(1,20); INSERT INTO payments VALUES(1,15),(1,15);

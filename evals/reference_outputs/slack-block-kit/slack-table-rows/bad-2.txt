@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "type": "table",
+      "rows": [
+        [
+          {
+            "type": "raw_text",
+            "text": "Service"
+          },
+          {
+            "type": "raw_text",
+            "text": "Status"
+          }
+        ],
+        [
+          {
+            "type": "raw_text",
+            "text": "API"
+          },
+          {
+            "type": "raw_text",
+            "text": "Failed"
+          }
+        ]
+      ]
+    }
+  ]
+}

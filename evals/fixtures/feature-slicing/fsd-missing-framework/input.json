@@ -1,0 +1,14 @@
+{
+  "known": [
+    "migration authorized",
+    "frontend has cross-page imports"
+  ],
+  "missing": [
+    "framework",
+    "router"
+  ],
+  "available_steps": [
+    "inventory_imports",
+    "identify_page_ownership"
+  ]
+}

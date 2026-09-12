@@ -1,0 +1,8 @@
+{
+  "interaction_path": "src/entities/add-to-cart",
+  "entity_path": "src/entities/product",
+  "page_imports": [
+    "catalog",
+    "recommendations"
+  ]
+}

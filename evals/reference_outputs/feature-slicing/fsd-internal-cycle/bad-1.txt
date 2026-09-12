@@ -1,0 +1,4 @@
+{
+  "component_import": "@/entities/user",
+  "external_import": "@/entities/user"
+}

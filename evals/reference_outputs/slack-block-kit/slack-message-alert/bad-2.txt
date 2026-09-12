@@ -1,0 +1,12 @@
+{
+  "text": "Ready",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": ":warning: *Dependency conflict detected* before deploy."
+      }
+    }
+  ]
+}

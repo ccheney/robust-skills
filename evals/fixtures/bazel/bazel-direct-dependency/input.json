@@ -1,0 +1,6 @@
+{
+  "version": "8.4.2",
+  "file": "app/BUILD.bazel",
+  "content": "load(\"@rules_cc//cc:cc_binary.bzl\", \"cc_binary\")\ncc_binary(name=\"server\",srcs=[\"main.cc\"])",
+  "header_owner": "//lib:protocol"
+}

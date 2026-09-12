@@ -2,3 +2,4 @@
 __pycache__/
 evals/results/
 evals/local.json
+evals/runtime/node_modules/

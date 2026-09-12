@@ -1,0 +1,5 @@
+{
+  "type": "plain_text",
+  "text": "R&amp;D &lt;ops&gt; \"ready\"",
+  "emoji": true
+}

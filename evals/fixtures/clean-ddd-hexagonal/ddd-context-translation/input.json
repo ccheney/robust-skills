@@ -1,0 +1,13 @@
+{
+  "domain_states": [
+    "ready_to_dispatch",
+    "in_transit",
+    "delivered"
+  ],
+  "carrier_states": {
+    "READY": "Carrier has label; package still with merchant",
+    "MOVING": "Carrier has possession",
+    "DONE": "Delivery confirmed"
+  },
+  "unwanted_import": "domain imports CarrierV7ShipmentDto"
+}

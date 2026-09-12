@@ -1,0 +1,9 @@
+{
+  "trigger_id": "trigger-from-interaction",
+  "callback_id": "release_form",
+  "block_id": "note",
+  "action_id": "summary",
+  "title": "Release note",
+  "submit": "Save",
+  "field_label": "Summary"
+}

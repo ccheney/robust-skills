@@ -1,0 +1,13 @@
+{
+  "client_exports": [
+    "UserCard",
+    "UserId",
+    "getUser"
+  ],
+  "server_exports": [
+    "getUser",
+    "UserId"
+  ],
+  "client_imports_server": false,
+  "route_directory": "app"
+}

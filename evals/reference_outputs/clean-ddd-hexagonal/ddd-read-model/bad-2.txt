@@ -1,0 +1,8 @@
+{
+  "read_strategy": "reporting_view",
+  "write_source": "postgresql",
+  "event_sourcing": false,
+  "new_microservices": [
+    "dashboard-service"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "edges": {
+    "a": "shared/api -> shared/config",
+    "b": "shared/ui -> shared/lib",
+    "c": "shared/lib -> entities/user"
+  }
+}

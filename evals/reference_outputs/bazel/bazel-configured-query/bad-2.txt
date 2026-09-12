@@ -1,0 +1,7 @@
+{
+  "tool": "cquery",
+  "expression": "deps(//app:server)",
+  "flags": [
+    "--config=ci"
+  ]
+}

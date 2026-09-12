@@ -1,0 +1,5 @@
+{
+  "symptom": "Changing code generator version leaves stale generated output on a remote cache hit.",
+  "available": "same target/config on both machines; execution log and action graph",
+  "question": "Which declared action inputs differ?"
+}

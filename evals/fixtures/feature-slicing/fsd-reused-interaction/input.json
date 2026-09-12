@@ -1,0 +1,9 @@
+{
+  "pages": [
+    "catalog",
+    "recommendations"
+  ],
+  "interaction": "add-to-cart",
+  "entity": "product",
+  "existing_entity": "src/entities/product"
+}

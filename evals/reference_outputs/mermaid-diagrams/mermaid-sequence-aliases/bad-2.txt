@@ -1,0 +1,5 @@
+sequenceDiagram
+ participant C as API Client
+ participant G as API Gateway
+ C->>G: POST /orders
+ 

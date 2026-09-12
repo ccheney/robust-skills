@@ -1,0 +1,4 @@
+{
+  "html": "<style>body{margin:0}.host{margin-bottom:20px}.part{height:20px}</style><div class=\"host\" style=\"width:280px\"><div class=\"card\"><div id=\"sa\" class=\"part\">S1</div><div id=\"sb\" class=\"part\">S2</div></div></div><div class=\"host\" style=\"width:600px\"><div class=\"card\"><div id=\"la\" class=\"part\">L1</div><div id=\"lb\" class=\"part\">L2</div></div></div>",
+  "current_css": ".host{container-type:inline-size}.card{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:400px){.card{grid-template-columns:1fr 1fr}}"
+}

@@ -1,0 +1,7 @@
+{
+  "text": "@Ada please review [release 42](https://example.com/42) in #releases.",
+  "resolved": {
+    "Ada": "U123ABC",
+    "releases": "C123ABC"
+  }
+}

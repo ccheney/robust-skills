@@ -1,0 +1,12 @@
+{
+  "example_order": {
+    "id": "o-42",
+    "items": [
+      {
+        "quantity": 2,
+        "priceCents": 350
+      }
+    ]
+  },
+  "entrypoint": "HTTP and persistence are adapters, not part of this domain class."
+}

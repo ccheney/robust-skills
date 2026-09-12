@@ -1,0 +1,3 @@
+flowchart LR
+ V["Validate: schema"] --> F["Fetch (retry x3)"]
+ V --> S["Store result"]

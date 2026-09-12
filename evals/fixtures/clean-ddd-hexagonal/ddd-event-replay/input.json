@@ -1,0 +1,11 @@
+{
+  "requirements": [
+    "reconstruct account state at an arbitrary recorded event",
+    "rebuild projections",
+    "evolve event schemas without rewriting history"
+  ],
+  "stores": [
+    "append_only_event_log",
+    "dashboard_projection"
+  ]
+}

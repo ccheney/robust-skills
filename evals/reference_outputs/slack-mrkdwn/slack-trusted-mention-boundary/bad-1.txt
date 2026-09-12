@@ -1,0 +1,1 @@
+export const assignment=(id,note)=>`Assigned to <@${id}>: ${note}`;

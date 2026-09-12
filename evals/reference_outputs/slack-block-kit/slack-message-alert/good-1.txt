@@ -1,0 +1,12 @@
+{
+  "text": "Dependency conflict detected before deploy.",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": ":warning: *Dependency conflict detected* before deploy."
+      }
+    }
+  ]
+}

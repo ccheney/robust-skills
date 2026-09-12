@@ -1,0 +1,806 @@
+[
+  {
+    "id": "slack-message-alert",
+    "skill": "slack-block-kit",
+    "category": "surface-compatibility",
+    "group": "slack-block-kit/slack-message-alert",
+    "split": "development",
+    "prompt": "Repair this message-surface alert. Preserve the warning and its complete fallback text; use a message-compatible block. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-message-alert/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-message-alert/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-message-alert/bad-1.txt",
+        "fails": [
+          "slack-surface"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-message-alert/bad-2.txt",
+        "fails": [
+          "warning-preserved"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "warning-preserved",
+        "op": "contains",
+        "path": [
+          "text"
+        ],
+        "value": "Dependency conflict detected"
+      },
+      {
+        "id": "body-preserved",
+        "op": "contains",
+        "path": [
+          "blocks",
+          0,
+          "text",
+          "text"
+        ],
+        "value": "Dependency conflict detected"
+      }
+    ],
+    "runtime": {
+      "surface": "message"
+    }
+  },
+  {
+    "id": "slack-header-renderer",
+    "skill": "slack-block-kit",
+    "category": "text-object-types",
+    "group": "slack-block-kit/slack-header-renderer",
+    "split": "development",
+    "prompt": "Use a header for Release status and formatted body text API is ready. Header text must use its supported text-object renderer. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-header-renderer/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-header-renderer/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-header-renderer/bad-1.txt",
+        "fails": [
+          "slack-text-objects"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-header-renderer/bad-2.txt",
+        "fails": [
+          "body"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "title",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "text",
+          "text"
+        ],
+        "value": "Release status"
+      },
+      {
+        "id": "body",
+        "op": "equals",
+        "path": [
+          "blocks",
+          1,
+          "text",
+          "text"
+        ],
+        "value": "*API* is ready."
+      }
+    ],
+    "runtime": {
+      "surface": "message"
+    }
+  },
+  {
+    "id": "slack-modal-input",
+    "skill": "slack-block-kit",
+    "category": "interactivity",
+    "group": "slack-block-kit/slack-modal-input",
+    "split": "development",
+    "prompt": "Build the supplied modal request for views.open. Preserve trigger_id, callback_id, block_id, and action_id so the handler can read the submitted summary. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-modal-input/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-modal-input/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-modal-input/bad-1.txt",
+        "fails": [
+          "action"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-modal-input/bad-2.txt",
+        "fails": [
+          "trigger"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "trigger",
+        "op": "equals",
+        "path": [
+          "trigger_id"
+        ],
+        "value": "trigger-from-interaction"
+      },
+      {
+        "id": "callback",
+        "op": "equals",
+        "path": [
+          "view",
+          "callback_id"
+        ],
+        "value": "release_form"
+      },
+      {
+        "id": "block",
+        "op": "equals",
+        "path": [
+          "view",
+          "blocks",
+          0,
+          "block_id"
+        ],
+        "value": "note"
+      },
+      {
+        "id": "action",
+        "op": "equals",
+        "path": [
+          "view",
+          "blocks",
+          0,
+          "element",
+          "action_id"
+        ],
+        "value": "summary"
+      },
+      {
+        "id": "input-type",
+        "op": "equals",
+        "path": [
+          "view",
+          "blocks",
+          0,
+          "element",
+          "type"
+        ],
+        "value": "plain_text_input"
+      }
+    ],
+    "runtime": {
+      "surface": "modal",
+      "payload_path": [
+        "view"
+      ]
+    }
+  },
+  {
+    "id": "slack-table-rows",
+    "skill": "slack-block-kit",
+    "category": "tabular-data",
+    "group": "slack-block-kit/slack-table-rows",
+    "split": "development",
+    "prompt": "Create a static Slack table with the two supplied rows. Use raw_text cells and preserve row/column order. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-table-rows/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-table-rows/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-table-rows/bad-1.txt",
+        "fails": [
+          "slack-table-shape"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-table-rows/bad-2.txt",
+        "fails": [
+          "data"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "headers",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          0
+        ],
+        "value": [
+          {
+            "type": "raw_text",
+            "text": "Service"
+          },
+          {
+            "type": "raw_text",
+            "text": "Status"
+          }
+        ]
+      },
+      {
+        "id": "data",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          1
+        ],
+        "value": [
+          {
+            "type": "raw_text",
+            "text": "API"
+          },
+          {
+            "type": "raw_text",
+            "text": "Healthy"
+          }
+        ]
+      }
+    ],
+    "runtime": {
+      "surface": "message",
+      "allow_raw_block": true
+    }
+  },
+  {
+    "id": "slack-sortable-table",
+    "skill": "slack-block-kit",
+    "category": "data-types",
+    "group": "slack-block-kit/slack-sortable-table",
+    "split": "development",
+    "prompt": "Build a sortable data_table captioned Service latency. Keep header and row order. Latencies must be numeric cells so sorting is numeric. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-sortable-table/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-sortable-table/good-1.txt",
+      "reference_outputs/slack-block-kit/slack-sortable-table/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-sortable-table/bad-1.txt",
+        "fails": [
+          "slack-table-shape"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-sortable-table/bad-2.txt",
+        "fails": [
+          "numeric-cell",
+          "numeric-value"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-sortable-table/bad-3.txt",
+        "fails": [
+          "all-rows",
+          "second-service",
+          "second-number"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "caption",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "caption"
+        ],
+        "value": "Service latency"
+      },
+      {
+        "id": "numeric-cell",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          1,
+          1,
+          "type"
+        ],
+        "value": "raw_number"
+      },
+      {
+        "id": "numeric-value",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          1,
+          1,
+          "value"
+        ],
+        "value": 12
+      },
+      {
+        "id": "all-rows",
+        "op": "length",
+        "path": [
+          "blocks",
+          0,
+          "rows"
+        ],
+        "min": 3,
+        "max": 3
+      },
+      {
+        "id": "first-service",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          1,
+          0,
+          "text"
+        ],
+        "value": "API"
+      },
+      {
+        "id": "second-service",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          2,
+          0,
+          "text"
+        ],
+        "value": "Worker"
+      },
+      {
+        "id": "second-number",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          2,
+          1,
+          "value"
+        ],
+        "value": 8
+      },
+      {
+        "id": "second-number-type",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "rows",
+          2,
+          1,
+          "type"
+        ],
+        "value": "raw_number"
+      }
+    ],
+    "runtime": {
+      "surface": "message",
+      "allow_raw_block": true
+    }
+  },
+  {
+    "id": "slack-markdown-method",
+    "skill": "slack-block-kit",
+    "category": "method-compatibility",
+    "group": "slack-block-kit/slack-markdown-method",
+    "split": "holdout",
+    "prompt": "Prepare chat.postMessage using its standard-Markdown markdown_text argument. Preserve the channel and content. Do not combine incompatible top-level text/blocks fields. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-markdown-method/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-markdown-method/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-markdown-method/bad-1.txt",
+        "fails": [
+          "slack-method-fields",
+          "no-text"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-markdown-method/bad-2.txt",
+        "fails": [
+          "content"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "channel",
+        "op": "equals",
+        "path": [
+          "channel"
+        ],
+        "value": "C_RELEASES"
+      },
+      {
+        "id": "content",
+        "op": "equals",
+        "path": [
+          "markdown_text"
+        ],
+        "value": "## Release\n\n**Ready** \u2014 [runbook](https://example.com/runbook)"
+      },
+      {
+        "id": "no-text",
+        "op": "absent",
+        "path": [
+          "text"
+        ]
+      },
+      {
+        "id": "no-blocks",
+        "op": "absent",
+        "path": [
+          "blocks"
+        ]
+      }
+    ],
+    "runtime": {
+      "surface": "message",
+      "method": "chat.postMessage"
+    }
+  },
+  {
+    "id": "slack-streaming-chunks",
+    "skill": "slack-block-kit",
+    "category": "streaming",
+    "group": "slack-block-kit/slack-streaming-chunks",
+    "split": "development",
+    "prompt": "Prepare a chunks-only chat.appendStream SDK call using the supplied IDs. Use a flat task_update chunk with id, title, and status; do not nest a task object or send top-level blocks. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-streaming-chunks/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-streaming-chunks/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-streaming-chunks/bad-1.txt",
+        "fails": [
+          "flat-task-id",
+          "status"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-streaming-chunks/bad-2.txt",
+        "fails": [
+          "no-top-level-blocks"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "channel",
+        "op": "equals",
+        "path": [
+          "channel"
+        ],
+        "value": "C_RELEASES"
+      },
+      {
+        "id": "stream-id",
+        "op": "equals",
+        "path": [
+          "ts"
+        ],
+        "value": "123.456"
+      },
+      {
+        "id": "chunk-type",
+        "op": "equals",
+        "path": [
+          "chunks",
+          0,
+          "type"
+        ],
+        "value": "task_update"
+      },
+      {
+        "id": "flat-task-id",
+        "op": "equals",
+        "path": [
+          "chunks",
+          0,
+          "id"
+        ],
+        "value": "build"
+      },
+      {
+        "id": "status",
+        "op": "equals",
+        "path": [
+          "chunks",
+          0,
+          "status"
+        ],
+        "value": "complete"
+      },
+      {
+        "id": "no-top-level-blocks",
+        "op": "absent",
+        "path": [
+          "blocks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slack-rich-text-list",
+    "skill": "slack-block-kit",
+    "category": "structured-rich-text",
+    "group": "slack-block-kit/slack-rich-text-list",
+    "split": "development",
+    "prompt": "Create a structured rich_text bullet list with API ready and Worker ready as two list items. Each list item must be a rich_text_section containing text elements. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-rich-text-list/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-rich-text-list/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-rich-text-list/bad-1.txt",
+        "fails": [
+          "first-item-type",
+          "first-text"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-rich-text-list/bad-2.txt",
+        "fails": [
+          "bullet"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "list",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "type"
+        ],
+        "value": "rich_text_list"
+      },
+      {
+        "id": "bullet",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "style"
+        ],
+        "value": "bullet"
+      },
+      {
+        "id": "first-item-type",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "elements",
+          0,
+          "type"
+        ],
+        "value": "rich_text_section"
+      },
+      {
+        "id": "first-text",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "elements",
+          0,
+          "elements",
+          0,
+          "text"
+        ],
+        "value": "API ready"
+      },
+      {
+        "id": "second-text",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "elements",
+          1,
+          "elements",
+          0,
+          "text"
+        ],
+        "value": "Worker ready"
+      }
+    ],
+    "runtime": {
+      "surface": "message"
+    }
+  },
+  {
+    "id": "slack-accessible-fallback",
+    "skill": "slack-block-kit",
+    "category": "accessibility",
+    "group": "slack-block-kit/slack-accessible-fallback",
+    "split": "holdout",
+    "prompt": "Build a block message and a complete top-level text fallback for mobile notifications and screen readers. Both must include the service, result, version, and duration. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-accessible-fallback/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-accessible-fallback/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-accessible-fallback/bad-1.txt",
+        "fails": [
+          "fallback-complete"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-accessible-fallback/bad-2.txt",
+        "fails": [
+          "body-complete"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "fallback-complete",
+        "op": "contains_all",
+        "path": [
+          "text"
+        ],
+        "value": [
+          "API",
+          "passed",
+          "4.0.0",
+          "8 minutes"
+        ]
+      },
+      {
+        "id": "body-complete",
+        "op": "contains_all",
+        "path": [
+          "blocks",
+          0,
+          "text",
+          "text"
+        ],
+        "value": [
+          "API",
+          "passed",
+          "4.0.0",
+          "8 minutes"
+        ]
+      }
+    ],
+    "runtime": {
+      "surface": "message"
+    }
+  },
+  {
+    "id": "slack-button-contract",
+    "skill": "slack-block-kit",
+    "category": "actions",
+    "group": "slack-block-kit/slack-button-contract",
+    "split": "development",
+    "prompt": "Create one View release button in actions block release_actions. Preserve action_id view_release and the supplied URL; use a button-compatible label object. Return only JSON using the requested fields; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/slack-block-kit/slack-button-contract/input.json"
+    ],
+    "grader": "slack-contract",
+    "references": [
+      "reference_outputs/slack-block-kit/slack-button-contract/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/slack-block-kit/slack-button-contract/bad-1.txt",
+        "fails": [
+          "slack-text-objects"
+        ]
+      },
+      {
+        "path": "reference_outputs/slack-block-kit/slack-button-contract/bad-2.txt",
+        "fails": [
+          "destination"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "block-id",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "block_id"
+        ],
+        "value": "release_actions"
+      },
+      {
+        "id": "action-id",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "action_id"
+        ],
+        "value": "view_release"
+      },
+      {
+        "id": "destination",
+        "op": "equals",
+        "path": [
+          "blocks",
+          0,
+          "elements",
+          0,
+          "url"
+        ],
+        "value": "https://example.com/releases/42"
+      }
+    ],
+    "runtime": {
+      "surface": "message"
+    }
+  }
+]

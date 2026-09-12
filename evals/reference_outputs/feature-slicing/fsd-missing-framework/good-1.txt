@@ -1,0 +1,11 @@
+{
+  "needs_input": [
+    "framework",
+    "router"
+  ],
+  "ready_steps": [
+    "inventory_imports",
+    "identify_page_ownership"
+  ],
+  "rename_routes_now": false
+}

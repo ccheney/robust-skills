@@ -1,48 +1,173 @@
 # Skill evaluations
 
-This directory contains evaluation cases, fixtures, outcome graders, and the
-runner. They are maintenance tools, not instructions loaded into installed skills.
+Run these evaluations locally to find missing skill guidance, routing mistakes,
+and regressions. The suite has **112 artifact tasks across all 11 skills**, **226
+routing requests**, and **371 grader controls** (alternative correct answers and
+deliberate semantic mistakes). See [COVERAGE.md](COVERAGE.md) for every scenario.
+There is no CI workflow and no automatic report upload.
 
-## What runs
+## Run locally
 
-- `routing.json`: 55 direct, indirect, negative, incomplete, and boundary cases
-  across all 11 skills. A trial records actual `read_skill` tool calls in this
-  harness; saying a skill was used is not evidence of loading it.
-- `pilot.json`: six automated artifact cases for JavaScript, Teams Adaptive
-  Cards, and FSD. JavaScript executes behavior assertions in a restricted Node
-  container. Teams checks wrapper/content invariants and the bundled linter.
-  FSD checks requested placement and dependency edges, not prose wording.
-- `workflows.json`: the original 11 manual forward-test prompts, retained for
-  broader review. These are not counted as automated task scores.
-- `fixtures/`: task inputs visible to the model. `reference_outputs/` and
-  `graders/`: held outside model context to test grader correctness.
+Requirements: Python 3.10+, Node.js for the bundled Teams linter, and Docker.
+The preparation command downloads the pinned public runtime dependencies; it
+does not call a model. The graders run JavaScript, Chromium, Mermaid, Drizzle,
+Buildifier and PostgreSQL in disposable containers.
 
-`smoke` runs four routing cases and three task cases. By default task cases run
-with candidate skills and without skills (10 total trials). `full` runs all 55
-routing cases and all six automated tasks. An optional baseline arm uses skills
-from a specified Git commit, branch, or tag, resolved once at startup.
+```bash
+python3 -m pip install -r evals/requirements.txt
+python3 -m evals.prepare
+python3 scripts/validate_skills.py
+python3 -m evals.validation
+RUN_DOCKER_EVAL_TESTS=1 python3 -m unittest evals.test_evals evals.test_contracts
+python3 -m evals.calibrate --jobs 3
+python3 -m evals.runner --dry-run
+```
 
-Every trial starts with fresh messages and a fresh catalog. The model can read
-skill entrypoints and bounded reference ranges; it has no shell, network,
-credential, home-directory, evaluator, or Git-history tools. Graders evaluate
-artifacts after the model finishes. This is an API evaluation harness, not a
-replica of Codex, Claude Code, or Copilot's instruction hierarchy or skill loader.
-Its selection numbers must not be presented as those hosts' activation rates.
+`calibrate` must accept every reference answer and reject every counterexample
+for its declared reason. An unavailable runtime or an assertion that never ran
+does not establish that a negative control works. Calibration is grader
+verification, not evidence of model performance.
 
-## Model and cost
+Configure a free-tier Google account as described below, then run:
 
-The default is `gemini-3.8-flash`; select `--model gemini-3.5-flash` only for an
-explicit older-model comparison run. The model stays fixed throughout each run. Google's current
-[pricing page](https://ai.google.dev/gemini-api/docs/pricing) lists free input and
-output tokens on the free tier. Use a Google AI Studio project **without Cloud
-Billing enabled**. Create its API key in [AI Studio](https://aistudio.google.com/apikey).
+```bash
+# Four routing requests and three paired artifact tasks: 10 trials.
+python3 -m evals.runner --profile smoke --output evals/results/smoke
 
-A free API still requires authentication. The local runner can retrieve a
-Gemini-restricted key through an authenticated `gcloud` account. It checks
-`billingEnabled: false` before fetching the key, and keeps the key in memory.
-The active Google CLI account/project configuration is not changed.
+# One development task per skill, paired with no-skill answers: 22 trials.
+python3 -m evals.runner --profile coverage --max-requests 100 \
+  --output evals/results/coverage
 
-Create an ignored `evals/local.json` using `local.example.json` as the template:
+# Focus on a skill; use repeated paired trials before drawing conclusions.
+python3 -m evals.runner --profile full --skill modern-javascript --suite task \
+  --repeats 3 --max-requests 100 --output evals/results/javascript
+
+# Inspect descriptions independently of task execution.
+python3 -m evals.runner --profile full --suite routing --skill slack-mrkdwn \
+  --variants candidate --output evals/results/slack-routing
+
+# Keep current fixtures/graders while comparing two skill snapshots.
+python3 -m evals.runner --profile coverage --variants candidate,none,baseline \
+  --baseline-ref v4.0.0 --output evals/results/comparison
+```
+
+Development is the default split. Select `--split holdout` for reserved
+measurement cases or `--split all` for the complete inventory. `--case ID` is
+repeatable and must name a case in the selected profile. `--skill`, `--suite`
+and `--split` combine as filters. The full suite with both splits and the default
+candidate/no-skill arms contains 450 trials before repetitions; it is unlikely
+to fit a small free quota in one run.
+
+To continue after a quota reset, repeat the same command with `--resume` and the
+same output directory. Scored trials are reused, while blocked, inconclusive and
+errored trials are attempted again. Model, selected trials, skill snapshot,
+fixture/harness fingerprint and turn limit must match. The per-invocation request
+budget and spacing can change. To rerun a scored failure after editing a skill,
+start a new output directory; never overwrite the before-change evidence.
+
+## What is measured
+
+- **Routing:** the model sees only the skill names/descriptions initially.
+  Actual successful `read_skill` calls determine selection, compared against
+  expected sets. Cases include direct requests, implicit needs, incomplete
+  context, scope boundaries, keyword decoys, similar skills and mixed requests.
+- **Artifact quality:** the relevant skill is explicitly supplied in candidate
+  and previous-snapshot arms, with optional reference reads. This separates
+  quality conditional on skill availability from automatic selection. The
+  no-skill arm receives the identical request and raw inputs, without the catalog
+  or skill text. `preloaded_skills` and observed `selected_skills` are distinct.
+- **Repeat consistency and comparisons:** reports retain all per-assertion
+  scores, per-skill/split cells, paired candidate/no-skill/baseline outcomes, and
+  whether all or any observed repeated trials pass. Unscored trials remain
+  visible. These are empirical counts, not statistical significance claims.
+
+Each trial starts with fresh messages, skill state and grader resources. The
+model can read only repository skill Markdown and bounded reference ranges.
+It cannot access expected answers, grader code, local credentials, personal
+skills, Git history, shell, database or posting tools. Graders execute artifacts
+after generation; this is not an interactive coding-agent benchmark. These
+numbers describe this API harness, **not Codex, Copilot or Claude Code activation
+or end-to-end success rates**.
+
+## Fixtures and graders
+
+`tasks/<skill>.json` owns the task definitions. `fixtures/` contains realistic
+raw inputs; `assertions/` contains private executable checks;
+`reference_outputs/` holds known-good implementations and semantic mutants.
+The model receives only each case's declared `inputs`. There are no reference
+answers in prompts. `workflows.json` contains separate manual host-level reviews
+and contributes no automated task scores.
+
+| Skill area | Observable checks | Limits |
+|---|---|---|
+| JavaScript | Completion, ordering, errors, iterator cleanup, identity, nullish defaults, grouping, concurrency and retries | Small Node modules, not application integration |
+| CSS | Computed styles and geometry across viewports, containers, RTL, themes, focus and reduced motion | Pinned Chromium; not all browsers or visual aesthetics |
+| PostgreSQL / Drizzle | Disposable database migrations, constraints, tenant policies, query mutations, concurrent reservations; schema typecheck and ORM metadata | PostgreSQL 18.6 and pinned Drizzle; not production query plans or migration downtime |
+| Mermaid | Actual SVG rendering, normalized nodes/edges, messages, cardinalities, inheritance and task dependencies | Pinned Mermaid; no subjective diagram-quality score |
+| Bazel | Buildifier syntax plus declared dependencies, visibility, tools, Bzlmod and configuration decisions | Declarative Starlark subset; does not run a full Bazel build or download toolchains |
+| DDD / FSD | Domain behavior modules, dependency graphs, ownership, transactions and explicit structured decisions | Structured architecture exercises, not proof of a complete application design |
+| Slack / Teams | Payload invariants, content/identity preservation, escaping, surface/method contracts and Teams linter | Targeted constraints, not complete vendor schemas or live delivery/rendering |
+
+Checks focus on observable results and accept legitimate alternatives: import
+aliases, reordered symbol sets, different HTML wrappers, table block versus
+message wrapper where unspecified, alternate CSS implementations and equivalent
+ER relationships. Exact comparisons are reserved for user-supplied identifiers,
+content that must be preserved, required values and genuinely ordered results.
+Some architecture exercises intentionally use constrained JSON decision fields;
+these are specified in the request, not a universal output format for the skill.
+
+Every case has a category, a development/holdout split and a scenario group.
+Keep equivalent examples and paraphrases in one split. Validation detects exact
+prompt duplicates, group/split conflicts, invalid paths, absent controls,
+unknown assertions and missing skill coverage. Human review must still catch
+semantic duplicates and ambiguous tasks. Positive-control calibration of
+holdout graders is allowed; reserve holdout model outcomes from instruction
+and description tuning. If a holdout failure drives an edit, reclassify that
+scenario as development and add a new unseen holdout scenario.
+
+The runtime has no network, host mounts or credentials and uses read-only
+filesystems, unprivileged users, resource limits and deadlines. Runtime source
+hashes reject stale Docker builds. The Node base and PostgreSQL images are
+pinned by digest; package locks pin JavaScript libraries and Buildifier downloads
+are checksum-verified. Node container image IDs are recorded for executable outcomes; PostgreSQL uses
+the fixed image digest above.
+OS packages downloaded during image construction can still change; preserve the
+built image when exact reproduction matters. This isolation does not make
+in-process JavaScript assertions an adversarially secure grading protocol.
+
+## Use failures to improve skills
+
+1. Inspect the request, raw input, artifact, tool trace and individual failures.
+   Reproduce locally with the current grader before changing instructions.
+2. Classify the problem: missing/misleading skill guidance, routing ambiguity,
+   model error despite adequate guidance, underspecified fixture, overly narrow
+   grader, or infrastructure failure. Do not teach a skill an arbitrary checker
+   preference.
+3. For a skill defect, make a focused correction in its description, entrypoint
+   or relevant reference. Add a realistic regression and a nearby negative case
+   when the change affects scope. Preserve user intent and valid alternatives.
+4. Calibrate changed graders against good and deliberately wrong artifacts.
+   Rerun affected development cases, sibling boundaries and repeated paired
+   comparisons. Keep before/after reports under separate names.
+5. Measure on reserved requests after freezing the change. Record unresolved
+   failures and provider limits; do not weaken valid assertions to manufacture a
+   pass or promote a blocked trial to success.
+
+[VALIDATION.md](VALIDATION.md) records the actual evidence and skill corrections
+for this expansion. There is no automatic skill rewrite or model-based judge.
+Human review remains necessary for qualitative outputs and ambiguous routing.
+
+## Model, credentials and free quotas
+
+The default is **`gemini-3.8-flash`**. `--model gemini-3.5-flash` exists only for an
+explicit older-model comparison. There is no automatic model switch or paid
+fallback. Google's [pricing](https://ai.google.dev/gemini-api/docs/pricing) lists
+free input/output for the free tier, but a free API still needs authentication
+and is subject to [project quotas](https://ai.google.dev/gemini-api/docs/rate-limits).
+Use a Google AI Studio project without Cloud Billing enabled.
+
+The local runner can retrieve a Gemini-restricted key through your authenticated
+Google CLI account. Copy `local.example.json` to ignored `evals/local.json`:
 
 ```json
 {
@@ -52,102 +177,37 @@ Create an ignored `evals/local.json` using `local.example.json` as the template:
 }
 ```
 
-Sign in with `gcloud auth login you@example.com --no-activate`. If you manage
-Google CLI through asdf, an optional `gcloud_version` field selects an installed
-version for these commands. This config contains identifiers, not the key value.
-It is never sent to the model or included in the skill catalog.
+Sign in with `gcloud auth login you@example.com --no-activate`. An optional
+`gcloud_version` selects an installed asdf version. The runner checks
+`billingEnabled: false` before retrieving the key, keeps the key in memory and
+does not change the active CLI account/project. These identifiers are not
+included in model context. The key value never enters reports.
 
-Without a local config, environment credentials remain supported:
-`GEMINI_API_KEY` plus `GEMINI_FREE_TIER=true`. That environment flag is an
-assertion, not a billing lookup; only use it for an unbilled project. Pass
-`--no-local-config` to select this mode explicitly.
+Alternatively set `GEMINI_API_KEY` and `GEMINI_FREE_TIER=true`, then pass
+`--no-local-config`. This flag asserts that the key belongs to an unbilled
+project; only the Google CLI path verifies billing state automatically.
 
-The runner uses the selected free-tier model and a fixed endpoint; it never
-switches models during a run or falls back to a paid model.
-Transient HTTP 408/500/502/503/504 and network failures get at most two retries,
-with exponential backoff and jitter. Every attempt counts toward the run's
-request cap. A transient failure that exhausts retries leaves that trial
-unscored; independent later trials can continue. Authentication, quota (429),
-and other nontransient HTTP errors halt provider requests for the run.
-Google controls [per-project quotas](https://ai.google.dev/gemini-api/docs/rate-limits),
-so a complete suite is not guaranteed to fit a day's free allowance.
+The default budget is 36 requests, eight turns per trial, and 15 seconds between
+requests. Tool reads consume additional turns. The shuffle seed controls order,
+not model generation randomness. Transient network and HTTP 408/500/502/503/504
+failures receive at most two bounded retries, each charged to the request cap.
+Quota/authentication errors stop further requests for that invocation. There is
+no background scheduling or automatic quota-reset polling.
 
-## Run locally
+`results.json` retains artifacts, tool traces, assertions, skill/fixture hashes,
+model IDs, token counts where available, elapsed time, retry events, credential
+provenance without keys, and unscored reasons. `summary.md` presents outcome
+counts and per-skill cells. Exit codes: 0 all pass; 1 scored failures; 2 unscored
+trials, possibly alongside failures. Results remain in ignored `evals/results/`.
 
-Requirements: Python 3.10+, PyYAML 6.x, Node.js, and Docker for the JavaScript
-grader. Node runs generated code in a read-only, network-disabled container with
-no credentials, limited memory/CPU/processes, and an execution deadline.
+## Sources
 
-```bash
-python3 -m pip install 'PyYAML==6.0.2'
-docker pull node:24.11.1-bookworm-slim
-python3 scripts/validate_skills.py
-python3 -m evals.validation
-RUN_DOCKER_EVAL_TESTS=1 python3 -m unittest evals.test_evals -v
-python3 -m evals.runner --dry-run
-```
-
-The commands above need no model key and make no LLM requests. The Node image
-pull and dependency install download public packages. After configuring your
-local Google account, run:
-
-```bash
-python3 -m evals.runner --profile smoke --max-requests 36
-python3 -m evals.runner --profile full --repeats 3 \
-  --variants candidate,none,baseline --baseline-ref v4.0.0 \
-  --max-requests 100 --output evals/results/comparison
-```
-
-Rerun a specific case without repeating unrelated tasks:
-
-```bash
-python3 -m evals.runner --case checkout-placement --variants candidate \
-  --output evals/results/checkout-rerun
-```
-
-The request cap applies to the entire run, including reference-reading turns.
-The default is eight model turns per trial and 15 seconds between requests.
-Trials are shuffled with a recorded seed to reduce ordering bias; this seed
-controls scheduling, not the provider's generation randomness. Large suites
-need larger quotas or multiple days. There is no background scheduling.
-
-## Local execution only
-
-There is no GitHub Actions evaluation workflow. Run validation and live model
-comparisons locally. Results stay in the ignored `evals/results/` directory;
-no reports are uploaded automatically. The former CI workflow and its GitHub
-secret/variable were removed when evaluations moved to local execution.
-
-## Reports and interpretation
-
-`results.json` stores per-trial artifacts, tool traces, selected skills, grader
-results, elapsed time, available token counts, returned model identifiers, Git
-refs, snapshot/case hashes, dirty-tree status, credential provenance (without
-the key), provider attempts/retries, and run limits. `summary.md` gives
-per-variant counts. Routing precision/recall and task pass rates use only scored
-trials, alongside explicit unscored counts; a fully blocked run has a null rate.
-Exit codes: 0 = all trials pass; 1 = scored failures; 2 = blocked, inconclusive,
-or errored trials (possibly alongside failures).
-
-Candidate and no-skill cases receive identical task prompts and raw inputs.
-Expected routing labels and reference solutions never reach the model. A
-previous-release comparison keeps current cases and graders fixed and changes
-only the available skill snapshot. Do not claim a statistically significant
-improvement from one successful smoke run. Inspect failed traces and repeat
-paired trials before changing instructions. Add unseen real requests and
-regressions as the pilot grows; do not tune descriptions against every future
-measurement case.
-
-Known limits: FSD grading covers placement, not a compiled frontend; the Teams
-linter is not live Teams rendering; the JavaScript fixtures are small modules.
-There is no model-based judge, description optimizer, or automatic skill rewrite.
-
-## Basis
-
-The approach follows Anthropic's [skill evaluation announcement](https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills)
+The suite follows Anthropic's [skill evaluation announcement](https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills)
 and [agent evaluation guidance](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents):
-compare skill/no-skill outcomes, isolate trials, prefer executable graders, and
-record failures and resource use. The transport uses Google's documented
-[Chat Completions compatibility endpoint](https://ai.google.dev/gemini-api/docs/openai).
-Retry behavior follows Google's [troubleshooting guidance](https://ai.google.dev/gemini-api/docs/troubleshooting).
-Provider and billing details were checked September 11, 2026.
+realistic tasks, executable outcomes, calibrated graders, isolated trials,
+skill/no-skill comparisons, repeated measurements and explicit failure analysis.
+Skill descriptions and instruction scope follow OpenAI's
+[skills and prompting guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra).
+The provider uses Google's [OpenAI compatibility endpoint](https://ai.google.dev/gemini-api/docs/openai)
+and [documented retry guidance](https://ai.google.dev/gemini-api/docs/troubleshooting).
+Model and provider information was checked September 12, 2026.

@@ -1,0 +1,645 @@
+[
+  {
+    "id": "bazel-direct-dependency",
+    "skill": "bazel",
+    "category": "build-graph",
+    "group": "bazel/bazel-direct-dependency",
+    "split": "development",
+    "prompt": "main.cc directly includes the protocol header owned by //lib:protocol. Add the direct edge for server. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-direct-dependency/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-direct-dependency/good-1.txt",
+      "reference_outputs/bazel/bazel-direct-dependency/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-direct-dependency/bad-1.txt",
+        "fails": [
+          "direct-edge"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-direct-dependency/bad-2.txt",
+        "fails": [
+          "direct-edge"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "source",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "server",
+          "srcs"
+        ],
+        "value": [
+          "main.cc"
+        ]
+      },
+      {
+        "id": "rule",
+        "op": "equals",
+        "path": [
+          "targets",
+          "server",
+          "rule"
+        ],
+        "value": "cc_binary"
+      },
+      {
+        "id": "direct-edge",
+        "op": "contains",
+        "path": [
+          "targets",
+          "server",
+          "deps"
+        ],
+        "value": "//lib:protocol"
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-runtime-data",
+    "skill": "bazel",
+    "category": "runfiles",
+    "group": "bazel/bazel-runtime-data",
+    "split": "development",
+    "prompt": "config_test reads assets/settings.json through runfiles. Declare its runtime dependency without adding it to Python deps. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-runtime-data/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-runtime-data/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-runtime-data/bad-1.txt",
+        "fails": [
+          "runfiles-edge"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-runtime-data/bad-2.txt",
+        "fails": [
+          "runfiles-edge"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "runfiles-edge",
+        "op": "contains",
+        "path": [
+          "targets",
+          "config_test",
+          "data"
+        ],
+        "value": "//assets:settings.json"
+      },
+      {
+        "id": "test-source",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "config_test",
+          "srcs"
+        ],
+        "value": [
+          "config_test.py"
+        ]
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-narrow-visibility",
+    "skill": "bazel",
+    "category": "visibility",
+    "group": "bazel/bazel-narrow-visibility",
+    "split": "development",
+    "prompt": "Expose auth only to the exact //app/server package. Do not make it public or expose the whole app subtree. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-narrow-visibility/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-narrow-visibility/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-narrow-visibility/bad-1.txt",
+        "fails": [
+          "narrow-api"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-narrow-visibility/bad-2.txt",
+        "fails": [
+          "narrow-api"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "narrow-api",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "auth",
+          "visibility"
+        ],
+        "value": [
+          "//app/server:__pkg__"
+        ]
+      },
+      {
+        "id": "source",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "auth",
+          "srcs"
+        ],
+        "value": [
+          "auth.cc"
+        ]
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-hermetic-tool",
+    "skill": "bazel",
+    "category": "hermeticity",
+    "group": "bazel/bazel-hermetic-tool",
+    "split": "holdout",
+    "prompt": "Replace the host-discovered compiler with the executable target :compiler. The compiler reads schema.json and writes stdout, which must become the declared generated.txt output. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-hermetic-tool/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-hermetic-tool/good-1.txt",
+      "reference_outputs/bazel/bazel-hermetic-tool/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-hermetic-tool/bad-1.txt",
+        "fails": [
+          "declared-tool"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-hermetic-tool/bad-2.txt",
+        "fails": [
+          "resolved-tool"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "declared-tool",
+        "op": "contains",
+        "path": [
+          "targets",
+          "generated",
+          "tools"
+        ],
+        "value": ":compiler"
+      },
+      {
+        "id": "input",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "generated",
+          "srcs"
+        ],
+        "value": [
+          "schema.json"
+        ]
+      },
+      {
+        "id": "output",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "generated",
+          "outs"
+        ],
+        "value": [
+          "generated.txt"
+        ]
+      },
+      {
+        "id": "resolved-tool",
+        "op": "matches",
+        "path": [
+          "targets",
+          "generated",
+          "cmd"
+        ],
+        "value": ".*\\$\\((location|execpath) :compiler\\).*"
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-use-repo",
+    "skill": "bazel",
+    "category": "bzlmod",
+    "group": "bazel/bazel-use-repo",
+    "split": "development",
+    "prompt": "BUILD files already load from @pypi. Import the repository produced by the pip extension. Do not change module or Python version pins. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-use-repo/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-use-repo/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-use-repo/bad-1.txt",
+        "fails": [
+          "extension-import"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-use-repo/bad-2.txt",
+        "fails": [
+          "extension-import"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "extension-import",
+        "op": "contains",
+        "path": [
+          "repositories"
+        ],
+        "value": "pypi"
+      },
+      {
+        "id": "module-pin",
+        "op": "equals",
+        "path": [
+          "targets",
+          "rules_python",
+          "version"
+        ],
+        "value": "1.7.0"
+      },
+      {
+        "id": "python-pin",
+        "op": "equals",
+        "path": [
+          "calls",
+          1,
+          "kwargs",
+          "python_version"
+        ],
+        "value": "3.12"
+      }
+    ],
+    "runtime": {
+      "file_type": "module"
+    }
+  },
+  {
+    "id": "bazel-select-branches",
+    "skill": "bazel",
+    "category": "configuration",
+    "group": "bazel/bazel-select-branches",
+    "split": "development",
+    "prompt": "Select -DPROD when --define env=prod matches production; use -DDEV otherwise. Preserve main.cc and express the condition in Bazel configuration. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-select-branches/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-select-branches/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-select-branches/bad-1.txt",
+        "fails": [
+          "production-branch",
+          "default-branch"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-select-branches/bad-2.txt",
+        "fails": [
+          "condition"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "condition",
+        "op": "equals",
+        "path": [
+          "targets",
+          "production",
+          "define_values",
+          "env"
+        ],
+        "value": "prod"
+      },
+      {
+        "id": "production-branch",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "app",
+          "copts",
+          "args",
+          0,
+          ":production"
+        ],
+        "value": [
+          "-DPROD"
+        ]
+      },
+      {
+        "id": "default-branch",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "app",
+          "copts",
+          "args",
+          0,
+          "//conditions:default"
+        ],
+        "value": [
+          "-DDEV"
+        ]
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-explicit-membership",
+    "skill": "bazel",
+    "category": "package-boundaries",
+    "group": "bazel/bazel-explicit-membership",
+    "split": "development",
+    "prompt": "Use explicit srcs for only main.py and api.py. The repository requires explicit lists for this public target; tools/helper.py belongs to a separate package. Return only the complete Starlark file. Preserve the supplied version and unrelated declarations.",
+    "inputs": [
+      "fixtures/bazel/bazel-explicit-membership/input.json"
+    ],
+    "grader": "starlark-runtime",
+    "references": [
+      "reference_outputs/bazel/bazel-explicit-membership/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-explicit-membership/bad-1.txt",
+        "fails": [
+          "package-membership"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-explicit-membership/bad-2.txt",
+        "fails": [
+          "package-membership"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "package-membership",
+        "op": "set_equals",
+        "path": [
+          "targets",
+          "api",
+          "srcs"
+        ],
+        "value": [
+          "main.py",
+          "api.py"
+        ]
+      }
+    ],
+    "runtime": {
+      "file_type": "build"
+    }
+  },
+  {
+    "id": "bazel-configured-query",
+    "skill": "bazel",
+    "category": "diagnostics",
+    "group": "bazel/bazel-configured-query",
+    "split": "development",
+    "prompt": "Choose the query that reveals configured dependencies of //app:server for the failing invocation. Output tool, expression, and flags. Preserve both supplied configuration flags. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/bazel/bazel-configured-query/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/bazel/bazel-configured-query/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-configured-query/bad-1.txt",
+        "fails": [
+          "configured-graph"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-configured-query/bad-2.txt",
+        "fails": [
+          "same-configuration"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "configured-graph",
+        "op": "equals",
+        "path": [
+          "tool"
+        ],
+        "value": "cquery"
+      },
+      {
+        "id": "target-expression",
+        "op": "equals",
+        "path": [
+          "expression"
+        ],
+        "value": "deps(//app:server)"
+      },
+      {
+        "id": "same-configuration",
+        "op": "set_equals",
+        "path": [
+          "flags"
+        ],
+        "value": [
+          "--config=ci",
+          "--platforms=//platforms:linux_arm64"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bazel-cache-diagnosis",
+    "skill": "bazel",
+    "category": "cache-correctness",
+    "group": "bazel/bazel-cache-diagnosis",
+    "split": "holdout",
+    "prompt": "Plan diagnosis of a wrong remote cache hit. Output graph_tool, compare, clean_first, and disable_sandbox. Investigate the action contract before deleting caches or weakening isolation. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/bazel/bazel-cache-diagnosis/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/bazel/bazel-cache-diagnosis/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-cache-diagnosis/bad-1.txt",
+        "fails": [
+          "preserve-evidence"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-cache-diagnosis/bad-2.txt",
+        "fails": [
+          "preserve-isolation"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-cache-diagnosis/bad-3.txt",
+        "fails": [
+          "action-graph"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "action-graph",
+        "op": "equals",
+        "path": [
+          "graph_tool"
+        ],
+        "value": "aquery"
+      },
+      {
+        "id": "compare-action-key",
+        "op": "contains_all",
+        "path": [
+          "compare"
+        ],
+        "value": [
+          "argv",
+          "inputs",
+          "environment",
+          "execution_platform"
+        ]
+      },
+      {
+        "id": "preserve-evidence",
+        "op": "equals",
+        "path": [
+          "clean_first"
+        ],
+        "value": false
+      },
+      {
+        "id": "preserve-isolation",
+        "op": "equals",
+        "path": [
+          "disable_sandbox"
+        ],
+        "value": false
+      }
+    ]
+  },
+  {
+    "id": "bazel-preserve-version",
+    "skill": "bazel",
+    "category": "scope-preservation",
+    "group": "bazel/bazel-preserve-version",
+    "split": "development",
+    "prompt": "Plan only the authorized visibility correction in this Bazel 8 repository. Output bazel_version, dependency_system, changed_files, and migration_required. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/bazel/bazel-preserve-version/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/bazel/bazel-preserve-version/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/bazel/bazel-preserve-version/bad-1.txt",
+        "fails": [
+          "pin"
+        ]
+      },
+      {
+        "path": "reference_outputs/bazel/bazel-preserve-version/bad-2.txt",
+        "fails": [
+          "change-scope"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "pin",
+        "op": "equals",
+        "path": [
+          "bazel_version"
+        ],
+        "value": "8.4.2"
+      },
+      {
+        "id": "dependency-system",
+        "op": "equals",
+        "path": [
+          "dependency_system"
+        ],
+        "value": "WORKSPACE"
+      },
+      {
+        "id": "change-scope",
+        "op": "set_equals",
+        "path": [
+          "changed_files"
+        ],
+        "value": [
+          "lib/auth/BUILD.bazel"
+        ]
+      },
+      {
+        "id": "no-upgrade",
+        "op": "equals",
+        "path": [
+          "migration_required"
+        ],
+        "value": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,1 @@
+export function timeoutOf(config){return config?.timeout ?? 5000;}

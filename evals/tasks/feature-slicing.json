@@ -1,0 +1,524 @@
+[
+  {
+    "id": "fsd-cross-entity-api",
+    "skill": "feature-slicing",
+    "category": "cross-entity",
+    "group": "feature-slicing/fsd-cross-entity-api",
+    "split": "development",
+    "prompt": "Repair the order entity dependency without exposing product internals. Output from, to, and public_export. Preserve the order source file and use the product @x API intended for order; export ProductId only. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-cross-entity-api/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-cross-entity-api/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-cross-entity-api/bad-1.txt",
+        "fails": [
+          "explicit-cross-api"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-cross-entity-api/bad-2.txt",
+        "fails": [
+          "narrow-export"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "source-preserved",
+        "op": "equals",
+        "path": [
+          "from"
+        ],
+        "value": "src/entities/order/model/types.ts"
+      },
+      {
+        "id": "explicit-cross-api",
+        "op": "one_of",
+        "path": [
+          "to"
+        ],
+        "value": [
+          "src/entities/product/@x/order",
+          "src/entities/product/@x/order.ts"
+        ]
+      },
+      {
+        "id": "narrow-export",
+        "op": "set_equals",
+        "path": [
+          "public_export"
+        ],
+        "value": [
+          "ProductId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fsd-server-client-exports",
+    "skill": "feature-slicing",
+    "category": "framework-compatibility",
+    "group": "feature-slicing/fsd-server-client-exports",
+    "split": "holdout",
+    "prompt": "Separate the public APIs so the client never imports a server-only database module. Output client_exports, server_exports, client_imports_server, and route_directory. Preserve the framework app route directory. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-server-client-exports/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-server-client-exports/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-server-client-exports/bad-1.txt",
+        "fails": [
+          "client-surface"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-server-client-exports/bad-2.txt",
+        "fails": [
+          "framework-path"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "client-surface",
+        "op": "set_equals",
+        "path": [
+          "client_exports"
+        ],
+        "value": [
+          "UserCard",
+          "UserId"
+        ]
+      },
+      {
+        "id": "server-surface",
+        "op": "set_equals",
+        "path": [
+          "server_exports"
+        ],
+        "value": [
+          "getUser",
+          "UserId"
+        ]
+      },
+      {
+        "id": "server-isolation",
+        "op": "equals",
+        "path": [
+          "client_imports_server"
+        ],
+        "value": false
+      },
+      {
+        "id": "framework-path",
+        "op": "equals",
+        "path": [
+          "route_directory"
+        ],
+        "value": "app"
+      }
+    ]
+  },
+  {
+    "id": "fsd-public-api",
+    "skill": "feature-slicing",
+    "category": "encapsulation",
+    "group": "feature-slicing/fsd-public-api",
+    "split": "development",
+    "prompt": "Define the user slice public contract. Output public_exports and wildcard_exports. Export only UserCard and UserId, using a set of symbol names in the contract listing. Internal database records and debug helpers remain private. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-public-api/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-public-api/good-1.txt",
+      "reference_outputs/feature-slicing/fsd-public-api/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-public-api/bad-1.txt",
+        "fails": [
+          "intentional-exports"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-public-api/bad-2.txt",
+        "fails": [
+          "no-wildcards"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "intentional-exports",
+        "op": "set_equals",
+        "path": [
+          "public_exports"
+        ],
+        "value": [
+          "UserCard",
+          "UserId"
+        ]
+      },
+      {
+        "id": "no-wildcards",
+        "op": "one_of",
+        "path": [
+          "wildcard_exports"
+        ],
+        "value": [
+          false,
+          []
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fsd-internal-cycle",
+    "skill": "feature-slicing",
+    "category": "cycles",
+    "group": "feature-slicing/fsd-internal-cycle",
+    "split": "development",
+    "prompt": "Break the slice self-barrel cycle. Output component_import and external_import. The component should use its sibling model file directly; outside consumers retain the slice public API. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-internal-cycle/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-internal-cycle/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-internal-cycle/bad-1.txt",
+        "fails": [
+          "relative-inside"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-internal-cycle/bad-2.txt",
+        "fails": [
+          "public-outside"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "relative-inside",
+        "op": "equals",
+        "path": [
+          "component_import"
+        ],
+        "value": "../model/state"
+      },
+      {
+        "id": "public-outside",
+        "op": "equals",
+        "path": [
+          "external_import"
+        ],
+        "value": "@/entities/user"
+      }
+    ]
+  },
+  {
+    "id": "fsd-shared-segments",
+    "skill": "feature-slicing",
+    "category": "layer-exceptions",
+    "group": "feature-slicing/fsd-shared-segments",
+    "split": "development",
+    "prompt": "Assess these imports under FSD. Output allowed_edges and rejected_edges using the supplied edge IDs. Shared segments may import each other; Shared may not import domain slices. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-shared-segments/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-shared-segments/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-shared-segments/bad-1.txt",
+        "fails": [
+          "shared-segment-exception"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-shared-segments/bad-2.txt",
+        "fails": [
+          "domain-isolation"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "shared-segment-exception",
+        "op": "set_equals",
+        "path": [
+          "allowed_edges"
+        ],
+        "value": [
+          "a",
+          "b"
+        ]
+      },
+      {
+        "id": "domain-isolation",
+        "op": "set_equals",
+        "path": [
+          "rejected_edges"
+        ],
+        "value": [
+          "c"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fsd-reused-interaction",
+    "skill": "feature-slicing",
+    "category": "extraction",
+    "group": "feature-slicing/fsd-reused-interaction",
+    "split": "development",
+    "prompt": "Two pages now need the same business interaction. Output interaction_path, entity_path, and page_imports (both supplied page IDs). Extract the reusable add-to-cart action into features; keep product identity/data in entities. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-reused-interaction/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-reused-interaction/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-reused-interaction/bad-1.txt",
+        "fails": [
+          "action-owner"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-reused-interaction/bad-2.txt",
+        "fails": [
+          "noun-owner"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "action-owner",
+        "op": "equals",
+        "path": [
+          "interaction_path"
+        ],
+        "value": "src/features/add-to-cart"
+      },
+      {
+        "id": "noun-owner",
+        "op": "equals",
+        "path": [
+          "entity_path"
+        ],
+        "value": "src/entities/product"
+      },
+      {
+        "id": "both-consumers",
+        "op": "set_equals",
+        "path": [
+          "page_imports"
+        ],
+        "value": [
+          "catalog",
+          "recommendations"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fsd-preserve-non-fsd",
+    "skill": "feature-slicing",
+    "category": "scope-preservation",
+    "group": "feature-slicing/fsd-preserve-non-fsd",
+    "split": "holdout",
+    "prompt": "This is an existing non-FSD project and the user requests a local button fix only. Output target_path, migrate_to_fsd, install_steiger, and rename_folders. Preserve the current project conventions. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-preserve-non-fsd/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-preserve-non-fsd/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-preserve-non-fsd/bad-1.txt",
+        "fails": [
+          "no-migration"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-preserve-non-fsd/bad-2.txt",
+        "fails": [
+          "no-renaming"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "target",
+        "op": "equals",
+        "path": [
+          "target_path"
+        ],
+        "value": "src/components/Button.tsx"
+      },
+      {
+        "id": "no-migration",
+        "op": "equals",
+        "path": [
+          "migrate_to_fsd"
+        ],
+        "value": false
+      },
+      {
+        "id": "no-tool-install",
+        "op": "equals",
+        "path": [
+          "install_steiger"
+        ],
+        "value": false
+      },
+      {
+        "id": "no-renaming",
+        "op": "set_equals",
+        "path": [
+          "rename_folders"
+        ],
+        "value": []
+      }
+    ]
+  },
+  {
+    "id": "fsd-missing-framework",
+    "skill": "feature-slicing",
+    "category": "missing-context",
+    "group": "feature-slicing/fsd-missing-framework",
+    "split": "development",
+    "prompt": "Plan an authorized FSD migration when the framework and router are unknown. Output needs_input using missing identifiers, ready_steps, and rename_routes_now. Inspect imports and ownership first; do not guess reserved route directories. Return only JSON using the fields requested; preserve supplied identifiers.",
+    "inputs": [
+      "fixtures/feature-slicing/fsd-missing-framework/input.json"
+    ],
+    "grader": "contract",
+    "references": [
+      "reference_outputs/feature-slicing/fsd-missing-framework/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/fsd-missing-framework/bad-1.txt",
+        "fails": [
+          "framework-question"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/fsd-missing-framework/bad-2.txt",
+        "fails": [
+          "no-route-guess"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "framework-question",
+        "op": "set_equals",
+        "path": [
+          "needs_input"
+        ],
+        "value": [
+          "framework",
+          "router"
+        ]
+      },
+      {
+        "id": "useful-work",
+        "op": "contains_all",
+        "path": [
+          "ready_steps"
+        ],
+        "value": [
+          "inventory_imports",
+          "identify_page_ownership"
+        ]
+      },
+      {
+        "id": "no-route-guess",
+        "op": "equals",
+        "path": [
+          "rename_routes_now"
+        ],
+        "value": false
+      }
+    ]
+  },
+  {
+    "id": "checkout-placement",
+    "skill": "feature-slicing",
+    "category": "regression",
+    "group": "feature-slicing/checkout-placement",
+    "split": "development",
+    "prompt": "Place a checkout-only form and its validation in the existing FSD project. They should use the existing shared button. Return only JSON with form_path, validation_path, and imports (an array of objects with from and to file/module paths). Include form-to-validation and form-to-button imports. Paths are relative to the repository root. Preserve existing architecture and tooling.",
+    "inputs": [
+      "fixtures/feature-slicing/checkout-placement/input.txt"
+    ],
+    "grader": "fsd",
+    "references": [
+      "reference_outputs/feature-slicing/checkout-placement/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/checkout-placement/bad-1.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/checkout-placement/bad-2.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cross-slice",
+    "skill": "feature-slicing",
+    "category": "regression",
+    "group": "feature-slicing/cross-slice",
+    "split": "development",
+    "prompt": "Repair this FSD same-layer import by composing the two existing feature APIs from the available page. Do not merge, relocate, or delete the features. Return only JSON with imports (objects with from and to repository-relative paths) describing the replacement graph. Use the feature public APIs, not their internals.",
+    "inputs": [
+      "fixtures/feature-slicing/cross-slice/input.json"
+    ],
+    "grader": "fsd",
+    "references": [
+      "reference_outputs/feature-slicing/cross-slice/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/feature-slicing/cross-slice/bad-1.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      },
+      {
+        "path": "reference_outputs/feature-slicing/cross-slice/bad-2.txt",
+        "fails": [
+          "legacy-outcome"
+        ]
+      }
+    ]
+  }
+]

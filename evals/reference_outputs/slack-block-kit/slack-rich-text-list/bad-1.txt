@@ -1,0 +1,23 @@
+{
+  "blocks": [
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "text",
+              "text": "API ready"
+            },
+            {
+              "type": "text",
+              "text": "Worker ready"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

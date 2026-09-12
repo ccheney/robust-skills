@@ -1,0 +1,8 @@
+{
+  "business_rules": [
+    "integer minor units",
+    "immutable value",
+    "currency identity matters"
+  ],
+  "usage": "new Money(125, \"USD\").add(new Money(75, \"USD\"))"
+}

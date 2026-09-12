@@ -1,0 +1,2 @@
+load("@rules_cc//cc:cc_binary.bzl", binary="cc_binary")
+binary(name="server",srcs=["main.cc"],deps=["//lib:protocol"])

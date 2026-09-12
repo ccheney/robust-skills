@@ -16,6 +16,7 @@ from evals.graders import grade
 from evals.providers import Gemini, EvalUnavailable
 from evals.runner import build_plan, run_trial, summarize, main
 from evals.validation import validate
+from evals.cases import load_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
 TEXTS = {
@@ -92,7 +93,7 @@ class CatalogTests(unittest.TestCase):
     def test_traversal_and_unknown_tools_are_rejected(self):
         catalog = Catalog(TEXTS)
         for path in (
-            "../../evals/pilot.json",
+            "../../evals/tasks/bazel.json",
             "/tmp/secret",
             "references/../../answers.txt",
         ):
@@ -340,7 +341,15 @@ class CredentialTests(unittest.TestCase):
 
 class InventoryTests(unittest.TestCase):
     def test_inventory_and_balanced_variants(self):
-        self.assertEqual(validate(ROOT), 6)
+        self.assertEqual(validate(ROOT), len(load_tasks(ROOT)))
+        self.assertGreaterEqual(
+            min(
+                __import__("collections")
+                .Counter(c["skill"] for c in load_tasks(ROOT))
+                .values()
+            ),
+            10,
+        )
         plan = build_plan(ROOT, "smoke", ["candidate", "none"], 1, 42)
         self.assertEqual(len(plan), 10)
         for case in ("save-all", "graph", "checkout-placement"):
@@ -407,13 +416,11 @@ class InventoryTests(unittest.TestCase):
 
 class GraderTests(unittest.TestCase):
     def setUp(self):
-        self.cases = {
-            c["id"]: c for c in json.loads((ROOT / "evals/pilot.json").read_text())
-        }
+        self.cases = {c["id"]: c for c in load_tasks(ROOT)}
 
     def test_reference_json_outputs_pass(self):
         for identity in ("graph", "webhook", "checkout-placement", "cross-slice"):
-            text = (ROOT / "evals/reference_outputs" / f"{identity}.txt").read_text()
+            text = (ROOT / "evals" / self.cases[identity]["references"][0]).read_text()
             with self.subTest(identity=identity):
                 self.assertEqual(
                     grade(ROOT, self.cases[identity], text)["status"], "pass"
@@ -421,7 +428,7 @@ class GraderTests(unittest.TestCase):
 
     def test_wrong_wrappers_fail(self):
         for identity in ("graph", "webhook"):
-            original = (ROOT / "evals" / self.cases[identity]["input"]).read_text()
+            original = (ROOT / "evals" / self.cases[identity]["inputs"][0]).read_text()
             self.assertEqual(
                 grade(ROOT, self.cases[identity], original)["status"], "fail"
             )
@@ -440,7 +447,7 @@ class GraderTests(unittest.TestCase):
             grade(
                 ROOT,
                 self.cases["cross-slice"],
-                (ROOT / "evals/fixtures/imports.json").read_text(),
+                (ROOT / "evals" / self.cases["cross-slice"]["inputs"][0]).read_text(),
             )["status"],
             "fail",
         )
@@ -457,12 +464,14 @@ class GraderTests(unittest.TestCase):
     )
     def test_javascript_controls(self):
         for identity in ("save-all", "rank"):
-            valid = (ROOT / "evals/reference_outputs" / f"{identity}.txt").read_text()
+            valid = (ROOT / "evals" / self.cases[identity]["references"][0]).read_text()
             with self.subTest(identity=identity):
                 self.assertEqual(
                     grade(ROOT, self.cases[identity], valid)["status"], "pass"
                 )
-            original = (ROOT / "evals" / self.cases[identity]["input"]).read_text()
+            original = (
+                ROOT / "evals" / self.cases[identity]["counterexamples"][0]["path"]
+            ).read_text()
             self.assertEqual(
                 grade(ROOT, self.cases[identity], original)["status"], "fail"
             )

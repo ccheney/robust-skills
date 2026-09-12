@@ -1,0 +1,1 @@
+.badge{margin-inline-start:24px;margin-inline-end:0}

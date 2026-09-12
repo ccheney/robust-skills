@@ -1,0 +1,13 @@
+{
+  "available_symbols": [
+    "UserCard",
+    "UserId",
+    "UserDatabaseRow",
+    "debugUserStore"
+  ],
+  "slice": "src/entities/user",
+  "consumers": [
+    "pages/profile",
+    "features/invite"
+  ]
+}

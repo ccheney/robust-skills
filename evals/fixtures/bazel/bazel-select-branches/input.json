@@ -1,0 +1,5 @@
+{
+  "file": "BUILD.bazel",
+  "configuration": "--define env=prod",
+  "current": "load(\"@rules_cc//cc:cc_binary.bzl\", \"cc_binary\")\ncc_binary(name=\"app\",srcs=[\"main.cc\"],copts=[\"-DPROD\"])"
+}

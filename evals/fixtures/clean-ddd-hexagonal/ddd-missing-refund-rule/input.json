@@ -1,0 +1,15 @@
+{
+  "available": [
+    "order_id",
+    "customer_id",
+    "payment_reference"
+  ],
+  "missing": [
+    "refund_policy"
+  ],
+  "known_safe_steps": [
+    "load_order",
+    "load_customer"
+  ],
+  "request": "Prepare the use case, not an external refund."
+}

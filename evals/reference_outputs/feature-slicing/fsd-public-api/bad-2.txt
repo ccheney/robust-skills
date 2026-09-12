@@ -1,0 +1,7 @@
+{
+  "public_exports": [
+    "UserCard",
+    "UserId"
+  ],
+  "wildcard_exports": true
+}

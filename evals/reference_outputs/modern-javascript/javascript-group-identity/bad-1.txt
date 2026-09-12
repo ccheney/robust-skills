@@ -1,0 +1,1 @@
+export function groupByOwner(rows){return new Map(Object.entries(Object.groupBy(rows,r=>JSON.stringify(r.owner))));}

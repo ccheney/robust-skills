@@ -1,0 +1,1 @@
+CREATE TABLE orders(id integer PRIMARY KEY,customer_id integer,created_at timestamptz,status text); INSERT INTO orders VALUES(1,10,'2026-01-01','paid'),(2,10,'2026-01-02','cancelled'),(3,20,'2026-01-01','paid'),(4,20,'2026-01-01','paid');

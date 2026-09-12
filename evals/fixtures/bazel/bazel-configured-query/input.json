@@ -1,0 +1,10 @@
+{
+  "invocation": [
+    "bazel",
+    "build",
+    "//app:server",
+    "--config=ci",
+    "--platforms=//platforms:linux_arm64"
+  ],
+  "question": "Which select branches and toolchains actually apply?"
+}

@@ -1,0 +1,31 @@
+{
+  "@type": "MessageCard",
+  "@context": "https://schema.org/extensions",
+  "summary": "Incident",
+  "sections": [
+    {
+      "facts": [
+        {
+          "name": "Service",
+          "value": "API"
+        },
+        {
+          "name": "Status",
+          "value": "Down"
+        }
+      ]
+    }
+  ],
+  "potentialAction": [
+    {
+      "@type": "OpenUri",
+      "name": "View incident",
+      "targets": [
+        {
+          "os": "default",
+          "uri": "https://example.com/incidents/7"
+        }
+      ]
+    }
+  ]
+}

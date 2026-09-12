@@ -1,0 +1,1 @@
+.grid{width:min(600px,100%);display:flex;flex-wrap:wrap;gap:16px}.item{flex:0 0 calc((100% - 32px)/3)}@media(max-width:500px){.item{flex-basis:100%}}

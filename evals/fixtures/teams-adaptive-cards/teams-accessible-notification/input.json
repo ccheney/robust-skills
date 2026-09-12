@@ -1,0 +1,6 @@
+{
+  "release": 42,
+  "status": "failed",
+  "environment": "production",
+  "logs": "https://example.com/logs/42"
+}

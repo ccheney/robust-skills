@@ -16,11 +16,13 @@ from evals.credentials import from_gcloud
 from evals.graders import grade
 from evals.providers import DEFAULT_MODEL, FREE_MODELS, Gemini, EvalUnavailable
 from evals.validation import validate
+from evals.cases import load_tasks, input_prompt
+from evals.reporting import breakdown, fingerprint
 
-HARNESS_VERSION = 3
+HARNESS_VERSION = 4
 
 
-def run_trial(client, texts, prompt, max_turns=8):
+def run_trial(client, texts, prompt, max_turns=8, preload=None):
     catalog = Catalog(texts)
     instruction = (
         "Complete the user request. The user's explicit instructions take precedence over skill guidelines. "
@@ -29,11 +31,24 @@ def run_trial(client, texts, prompt, max_turns=8):
     )
     if catalog.entries:
         instruction += "\nAvailable skills:\n" + catalog.discovery()
+    preloaded = []
+    if preload:
+        resource = catalog.invoke("read_skill", {"skill": preload})
+        if "error" in resource:
+            return {
+                "status": "error",
+                "detail": "Task skill missing from this snapshot",
+                "selected_skills": [],
+                "trace": [],
+                "tokens": {},
+            }
+        preloaded.append(preload)
+        instruction += "\nExplicitly supplied task skill:\n" + resource["content"]
     messages = [
         {"role": "system", "content": instruction},
         {"role": "user", "content": prompt},
     ]
-    trace, tokens = [], Counter()
+    trace, tokens = ([{"preloaded_skill": preload}] if preload else []), Counter()
     started = time.monotonic()
     outcome, detail, answer = "inconclusive", "Turn limit reached", ""
     for _ in range(max_turns):
@@ -106,7 +121,14 @@ def run_trial(client, texts, prompt, max_turns=8):
         "status": outcome,
         "detail": detail,
         "answer": answer,
-        "selected_skills": sorted(catalog.loaded),
+        "selected_skills": sorted(
+            {
+                t["arguments"]["skill"]
+                for t in trace
+                if t.get("tool") == "read_skill" and "error" not in t["result"]
+            }
+        ),
+        "preloaded_skills": preloaded,
         "references_read": catalog.reads,
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "tokens": dict(tokens),
@@ -117,7 +139,7 @@ def run_trial(client, texts, prompt, max_turns=8):
 def build_plan(root, profile, variants, repeats, seed, baseline_ref=None):
     config = json.loads((root / "evals/profiles.json").read_text())[profile]
     routing = json.loads((root / "evals/routing.json").read_text())
-    tasks = json.loads((root / "evals/pilot.json").read_text())
+    tasks = load_tasks(root)
     for key, cases in [("routing", routing), ("tasks", tasks)]:
         if config[key] != "all" and set(config[key]) - {c["id"] for c in cases}:
             raise ValueError(f"Unknown case IDs in profile {profile}: {key}")
@@ -211,12 +233,41 @@ def save_report(path, report):
         "",
         f"Provider requests: {report.get('requests', 0)}. Missing credentials, quota limits, truncation, and unavailable graders are never counted as passes.",
     ]
+    if report.get("breakdown"):
+        lines += [
+            "",
+            "| Variant | Suite | Skill | Split | Passed / scored | Unscored | Mean assertion score |",
+            "|---|---|---|---|---:|---:|---:|",
+        ]
+        for cell in report["breakdown"]["cells"]:
+            score = cell["mean_assertion_score"]
+            lines.append(
+                f"| {cell['variant']} | {cell['kind']} | {cell['skill']} | {cell['split']} | {cell['passed']} / {cell['scored']} | {cell['unscored']} | {f'{score:.3f}' if score is not None else '—'} |"
+            )
+        lines += [
+            "",
+            "Paired task comparisons and repeated-trial consistency are recorded in results.json. Rates exclude unscored trials; consult their counts.",
+        ]
     (path / "summary.md").write_text("\n".join(lines) + "\n")
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=["smoke", "full"], default="smoke")
+    parser.add_argument(
+        "--profile", choices=["smoke", "coverage", "full"], default="smoke"
+    )
+    parser.add_argument(
+        "--skill", action="append", help="Filter by owning skill (repeatable)"
+    )
+    parser.add_argument(
+        "--split", choices=["all", "development", "holdout"], default="development"
+    )
+    parser.add_argument("--suite", choices=["all", "routing", "task"], default="all")
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Reuse scored trials in --output after verifying identical inputs",
+    )
     parser.add_argument("--model", choices=FREE_MODELS, default=DEFAULT_MODEL)
     parser.add_argument("--variants", default="candidate,none")
     parser.add_argument("--baseline-ref")
@@ -273,6 +324,25 @@ def main(argv=None):
                     f"Cases not in the selected profile: {sorted(missing)}"
                 )
             trials = [t for t in trials if t["case"]["id"] in args.case_ids]
+        if args.skill:
+            missing = set(args.skill) - {
+                t["case"].get("skill", t["case"].get("owner")) for t in trials
+            }
+            if missing:
+                raise ValueError(f"Unknown or filtered-out skills: {sorted(missing)}")
+            trials = [
+                t
+                for t in trials
+                if t["case"].get("skill", t["case"].get("owner")) in args.skill
+            ]
+        if args.split != "all":
+            trials = [t for t in trials if t["case"]["split"] == args.split]
+        if args.suite != "all":
+            trials = [t for t in trials if t["kind"] == args.suite]
+        if not trials:
+            raise ValueError(
+                "No matching trials; check profile, split and suite filters"
+            )
         sha, texts = snapshot(root)
         snapshots = {"candidate": texts, "none": {}}
         refs = {"candidate": sha, "none": None}
@@ -332,6 +402,61 @@ def main(argv=None):
         "summary": {},
         "requests": 0,
     }
+    report["task_loading"] = "explicit preload; routing remains automatic"
+    report["split"] = args.split
+    report["suite_fingerprint"] = fingerprint(root)
+    report["run_identity"] = hashlib.sha256(
+        json.dumps(
+            {
+                "model": args.model,
+                "plan": plan,
+                "snapshots": report["snapshots"],
+                "suite": report["suite_fingerprint"],
+                "max_turns": args.max_turns,
+            },
+            sort_keys=True,
+        ).encode()
+    ).hexdigest()
+
+    def trial_key(row):
+        return (
+            row.get("id", row.get("case", {}).get("id")),
+            row["kind"],
+            row["variant"],
+            row["repeat"],
+        )
+
+    prior_requests = 0
+    prior_events = []
+    if args.resume:
+        existing = args.output / "results.json"
+        if not existing.is_file():
+            parser.error("--resume needs an existing results.json in --output")
+        previous = json.loads(existing.read_text())
+        if previous.get("run_identity") != report["run_identity"]:
+            parser.error(
+                "Cannot resume: model, snapshots, plan, fixtures or harness changed"
+            )
+        report = previous
+        report["trials"] = [
+            r for r in report["trials"] if r["status"] in ("pass", "fail")
+        ]
+        completed = {trial_key(r) for r in report["trials"]}
+        trials = [t for t in trials if trial_key(t) not in completed]
+        prior_requests = report.get("requests", 0)
+        prior_events = report.get("provider_events", [])
+        report.setdefault("resumed_at", []).append(
+            datetime.now(timezone.utc).isoformat()
+        )
+        report["limits"] = {
+            "max_requests": args.max_requests,
+            "max_turns": args.max_turns,
+            "interval": args.interval,
+            "timeout": args.timeout,
+        }
+        if not trials:
+            print("All selected trials were already scored.")
+            return 1 if any(r["status"] == "fail" for r in report["trials"]) else 0
     unavailable = None
     try:
         credentials = None if args.no_local_config else from_gcloud(args.local_config)
@@ -351,14 +476,9 @@ def main(argv=None):
     for trial in trials:
         case = trial["case"]
         print(f"Running {trial['variant']} {case['id']} #{trial['repeat']}", flush=True)
-        prompt = case["prompt"]
-        if trial["kind"] == "task":
-            prompt += (
-                "\n\nInput file "
-                + case["input"]
-                + ":\n"
-                + (root / "evals" / case["input"]).read_text()
-            )
+        prompt = input_prompt(root, case) if trial["kind"] == "task" else case["prompt"]
+        if fingerprint(root) != report["suite_fingerprint"]:
+            unavailable = "Evaluation inputs or harness changed during this run; start a new report"
         if unavailable:
             outcome = {
                 "status": "blocked",
@@ -369,10 +489,16 @@ def main(argv=None):
             }
         else:
             outcome = run_trial(
-                client, snapshots[trial["variant"]], prompt, args.max_turns
+                client,
+                snapshots[trial["variant"]],
+                prompt,
+                args.max_turns,
+                preload=case["skill"]
+                if trial["kind"] == "task" and trial["variant"] != "none"
+                else None,
             )
-            report["requests"] = client.requests
-            report["provider_events"] = client.events
+            report["requests"] = prior_requests + client.requests
+            report["provider_events"] = prior_events + client.events
         if outcome["status"] == "completed":
             if trial["kind"] == "routing":
                 outcome.update(
@@ -385,6 +511,9 @@ def main(argv=None):
                 outcome.update(grade(root, case, outcome["answer"]))
         row = {
             "id": case["id"],
+            "skill": case.get("skill", case.get("owner")),
+            "split": case["split"],
+            "category": case.get("category", case.get("kind")),
             "kind": trial["kind"],
             "variant": trial["variant"],
             "repeat": trial["repeat"],
@@ -394,6 +523,7 @@ def main(argv=None):
             row["expected_skills"] = case["expected_skills"]
         report["trials"].append(row)
         report["summary"] = summarize(report["trials"])
+        report["breakdown"] = breakdown(report["trials"])
         save_report(args.output, report)
         print(
             f"{row['variant']} {row['id']} #{row['repeat']}: {row['status']}",

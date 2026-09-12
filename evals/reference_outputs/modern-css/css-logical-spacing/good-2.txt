@@ -1,0 +1,1 @@
+.badge{margin-left:24px;margin-right:0}:dir(rtl) .badge{margin-left:0;margin-right:24px}

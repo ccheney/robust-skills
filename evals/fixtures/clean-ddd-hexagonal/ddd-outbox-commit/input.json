@@ -1,0 +1,15 @@
+{
+  "current": [
+    "save_order_in_database",
+    "publish_to_broker"
+  ],
+  "failure": "Process crashes after the database commit but before publish.",
+  "available": [
+    "same-database outbox table",
+    "background publisher"
+  ],
+  "operation_ids": [
+    "save_order",
+    "insert_outbox"
+  ]
+}

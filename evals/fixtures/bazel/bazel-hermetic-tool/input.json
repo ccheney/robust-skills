@@ -1,0 +1,5 @@
+{
+  "file": "BUILD.bazel",
+  "content": "genrule(name=\"generated\",srcs=[\"schema.json\"],outs=[\"generated.txt\"],cmd=\"compiler schema.json > $@\")",
+  "tool_target": ":compiler"
+}

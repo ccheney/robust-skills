@@ -1,0 +1,1 @@
+:root{color-scheme:light dark}.panel{background:light-dark(rgb(255 255 255),rgb(20 20 20))}:root[data-theme=light]{color-scheme:light}

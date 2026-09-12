@@ -1,0 +1,1 @@
+export class Order{constructor(id,items){this.id=id;this.items=items.map(i=>({...i}));this.status="DRAFT";this.events=[];}confirm(){if(!this.items.length||this.status!=="DRAFT")throw Error();this.status="CONFIRMED";}}

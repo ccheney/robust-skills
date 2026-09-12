@@ -1,0 +1,23 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.3",
+  "body": [
+    {
+      "type": "Input.Text",
+      "id": "reason",
+      "label": "Reason",
+      "isRequired": false,
+      "errorMessage": "Enter a reason."
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Approve",
+      "data": {
+        "action": "approve",
+        "requestId": "REQ-42"
+      }
+    }
+  ]
+}

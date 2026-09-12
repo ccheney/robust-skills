@@ -122,7 +122,7 @@ def validate(root):
             if not isinstance(expected, list) or any(not isinstance(n, str) or n not in names for n in expected):
                 raise ValueError(f"invalid expected skills in {case['id']}")
             kind = case.get("kind")
-            if kind not in {"direct", "indirect", "negative", "incomplete", "boundary"}:
+            if kind not in {"direct", "indirect", "negative", "incomplete", "boundary", "near-miss", "mixed"}:
                 raise ValueError(f"invalid kind in {case['id']}")
             coverage[case["owner"]].add(kind)
         for name, kinds in coverage.items():

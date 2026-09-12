@@ -1,0 +1,1 @@
+export async function mapLimit(items,limit,fn){const out=[];for(const v of items)out.push(await fn(v));return out;}

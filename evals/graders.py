@@ -4,14 +4,15 @@ import json
 import re
 import subprocess
 import tempfile
-import uuid
 from pathlib import Path, PurePosixPath
-
-NODE_IMAGE = "node:24.11.1-bookworm-slim"
+from evals.checks import check_contract, finish
+from evals.runtime import execute
+from evals.postgres import grade_sql
+from evals import messaging
 
 
 def result(ok, detail):
-    return {"status": "pass" if ok else "fail", "detail": detail}
+    return finish([{"id": "legacy-outcome", "passed": bool(ok), "detail": detail}])
 
 
 def extract(text):
@@ -128,85 +129,71 @@ def grade_teams(root, case, output):
         return result(checked.returncode == 0, checked.stdout[-500:])
 
 
-def grade_javascript(root, case, text):
-    image = subprocess.run(
-        ["docker", "image", "inspect", NODE_IMAGE], capture_output=True, timeout=10
-    )
-    if image.returncode:
-        return {
-            "status": "blocked",
-            "detail": f"Pre-pull {NODE_IMAGE} to run isolated JavaScript grading",
-        }
-    with tempfile.TemporaryDirectory(prefix="skill-js-grade-") as directory:
-        folder = Path(directory)
-        folder.chmod(0o755)
-        (folder / "answer.mjs").write_text(extract(text))
-        (folder / "exports.mjs").write_text(
-            "import * as answer from './answer.mjs';\nexport const saveAll = answer.saveAll;\nexport const rank = answer.rank;\n"
-        )
-        sentinel = "verified-" + uuid.uuid4().hex
-        checker = (
-            (root / "evals/graders/javascript.mjs")
-            .read_text()
-            .replace("Behavior checks passed", sentinel)
-        )
-        container = folder.name
-        try:
-            checked = subprocess.run(
-                [
-                    "docker",
-                    "run",
-                    "--name",
-                    container,
-                    "--rm",
-                    "-i",
-                    "--pull=never",
-                    "--network=none",
-                    "--read-only",
-                    "--cap-drop=ALL",
-                    "--security-opt=no-new-privileges",
-                    "--pids-limit=64",
-                    "--memory=128m",
-                    "--cpus=1",
-                    "--user=65534:65534",
-                    "--mount",
-                    f"type=bind,src={folder},dst=/eval,readonly",
-                    "--workdir=/eval",
-                    NODE_IMAGE,
-                    "node",
-                    "--input-type=module",
-                    "-",
-                    case["id"],
-                ],
-                input=checker,
-                capture_output=True,
-                text=True,
-                timeout=20,
-            )
-        except subprocess.TimeoutExpired:
-            return result(False, "Generated JavaScript exceeded its execution deadline")
-        finally:
-            subprocess.run(
-                ["docker", "rm", "-f", container], capture_output=True, timeout=10
-            )
-        if checked.returncode in (125, 126, 127):
-            return {
-                "status": "blocked",
-                "detail": "Container could not start the grader",
-            }
-        ok = checked.returncode == 0 and sentinel in checked.stdout.splitlines()
-        return result(
-            ok,
-            "Behavior checks passed"
-            if ok
-            else (checked.stderr[-1000:] or "Grader did not complete its assertions"),
-        )
-
-
-def grade(root, case, text):
+def _grade(root, case, text):
     try:
-        if case["grader"] == "javascript":
-            return grade_javascript(root, case, text)
+        if case["grader"] in ("slack-contract", "teams-contract", "markup-contract"):
+            output = json.loads(extract(text))
+            if (
+                case["grader"] == "slack-contract"
+                and case.get("runtime", {}).get("allow_raw_block")
+                and isinstance(output, dict)
+                and "blocks" not in output
+                and output.get("type")
+            ):
+                output = {"blocks": [output]}
+            checks = check_contract(output, case["assertions"])
+            if case["grader"] == "slack-contract":
+                checks += messaging.slack(output, case.get("runtime", {}))
+            elif case["grader"] == "teams-contract":
+                extra = messaging.teams(root, output, case.get("runtime", {}))
+                if isinstance(extra, dict):
+                    return extra
+                checks += extra
+            else:
+                checks += check_contract(
+                    messaging.markup_data(output, case["runtime"]),
+                    case["runtime"]["assertions"],
+                )
+            return finish(checks)
+        if case["grader"] == "postgres-runtime":
+            return grade_sql(root, case, extract(text))
+        if case["grader"] in (
+            "javascript-runtime",
+            "css-runtime",
+            "mermaid-runtime",
+            "starlark-runtime",
+            "drizzle-runtime",
+        ):
+            mode = case["grader"].removesuffix("-runtime")
+            payload = {
+                "mode": mode,
+                "candidate": extract(text),
+                **case.get("runtime", {}),
+            }
+            if mode == "javascript":
+                payload.update(
+                    test=(root / "evals" / case["test"]).read_text(),
+                    exports=case.get("exports", []),
+                )
+            if mode == "css":
+                payload["html"] = (root / "evals" / case["runtime"]["html"]).read_text()
+            measured = execute(payload)
+            if "status" in measured:
+                return measured
+            assertions = measured.get("assertions", [])
+            if measured.get("error"):
+                assertions.append(
+                    {
+                        "id": "artifact-executes",
+                        "passed": False,
+                        "detail": measured["error"],
+                    }
+                )
+            if case.get("assertions") and measured.get("data") is not None:
+                assertions += check_contract(measured["data"], case["assertions"])
+            return finish(assertions, runtime_image_id=measured.get("runtime_image_id"))
+        if case["grader"] == "contract":
+            return finish(check_contract(json.loads(extract(text)), case["assertions"]))
         output = json.loads(extract(text))
         if not isinstance(output, dict):
             return result(False, "Output must be a JSON object")
@@ -222,3 +209,30 @@ def grade(root, case, text):
             "status": "blocked",
             "detail": "Grader dependency missing or execution timeout",
         }
+
+
+def grade(root, case, text):
+    outcome = _grade(root, case, text)
+    if outcome.get("status") not in ("pass", "fail") or "assertions" not in outcome:
+        return outcome
+    from evals.validation import expected_assertions
+
+    checks = outcome["assertions"]
+    seen = {a["id"] for a in checks}
+    for identity in expected_assertions(case):
+        if identity not in seen:
+            checks.append(
+                {
+                    "id": identity,
+                    "passed": False,
+                    "detail": "Not reached or no measurement returned",
+                }
+            )
+    return finish(
+        checks,
+        **{
+            k: v
+            for k, v in outcome.items()
+            if k not in {"status", "score", "detail", "assertions"}
+        },
+    )

@@ -3,6 +3,7 @@
 import json
 import os
 import random
+import re
 import sys
 import time
 from urllib.error import HTTPError, URLError
@@ -103,6 +104,34 @@ class Gemini:
                     result = json.load(response)
             except HTTPError as exc:
                 event["status"] = exc.code
+                if exc.code == 429:
+                    # Retain only quota identifiers and retry timing, never raw bodies.
+                    try:
+                        details = (
+                            json.loads(exc.read(65536))
+                            .get("error", {})
+                            .get("details", [])
+                        )
+                        quotas = []
+                        for detail in details:
+                            for violation in detail.get("violations", []):
+                                entry = {
+                                    k: str(violation[k])
+                                    for k in ("quotaMetric", "quotaId", "quotaValue")
+                                    if k in violation
+                                    and re.fullmatch(
+                                        r"[A-Za-z0-9_./-]{1,250}", str(violation[k])
+                                    )
+                                }
+                                if entry:
+                                    quotas.append(entry)
+                            delay = detail.get("retryDelay", "")
+                            if re.fullmatch(r"[0-9.]+s", delay):
+                                event["retry_after"] = delay
+                        if quotas:
+                            event["quota_constraints"] = quotas
+                    except (ValueError, TypeError, AttributeError, OSError):
+                        pass
                 if exc.code not in TRANSIENT_HTTP:
                     self.halted = f"Gemini HTTP {exc.code}; stopped without retry or paid fallback"
                     raise EvalUnavailable(self.halted) from None

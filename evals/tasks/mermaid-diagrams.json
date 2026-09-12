@@ -1,0 +1,1319 @@
+[
+  {
+    "id": "mermaid-reserved-id",
+    "skill": "mermaid-diagrams",
+    "category": "syntax",
+    "group": "mermaid-diagrams/mermaid-reserved-id",
+    "split": "development",
+    "prompt": "Repair the reserved lowercase end identifier while keeping Start pointing to a node displayed as End. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-reserved-id/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-reserved-id/good-1.txt",
+      "reference_outputs/mermaid-diagrams/mermaid-reserved-id/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-reserved-id/bad-1.txt",
+        "fails": [
+          "direction"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-reserved-id/bad-2.txt",
+        "fails": [
+          "direction"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "flowchart",
+        "op": "one_of",
+        "path": [
+          "type"
+        ],
+        "value": [
+          "flowchart",
+          "flowchart-v2"
+        ]
+      },
+      {
+        "id": "direction",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Start"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "End"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Start",
+          "End"
+        ]
+      },
+      {
+        "id": "arrowheads",
+        "op": "all",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "directed",
+            "op": "equals",
+            "path": [
+              "directed"
+            ],
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-subgraph-collision",
+    "skill": "mermaid-diagrams",
+    "category": "syntax",
+    "group": "mermaid-diagrams/mermaid-subgraph-collision",
+    "split": "development",
+    "prompt": "Repair the collision between subgraph Build and its Compile node. Keep the Compile-to-Done edge and the Build grouping. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-subgraph-collision/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-subgraph-collision/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-subgraph-collision/bad-1.txt",
+        "fails": [
+          "compile-before-done"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-subgraph-collision/bad-2.txt",
+        "fails": [
+          "compile-before-done"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "compile-before-done",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Compile"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Done"
+          }
+        ]
+      },
+      {
+        "id": "compile-label",
+        "op": "contains",
+        "path": [
+          "labels"
+        ],
+        "value": "Compile"
+      },
+      {
+        "id": "done-label",
+        "op": "contains",
+        "path": [
+          "labels"
+        ],
+        "value": "Done"
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Compile",
+          "Done"
+        ]
+      },
+      {
+        "id": "arrowheads",
+        "op": "all",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "directed",
+            "op": "equals",
+            "path": [
+              "directed"
+            ],
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-decision-branches",
+    "skill": "mermaid-diagrams",
+    "category": "branch-semantics",
+    "group": "mermaid-diagrams/mermaid-decision-branches",
+    "split": "development",
+    "prompt": "Draw the decision Eligible? with Yes leading to Approve and No leading to Reject. Preserve these exact branch labels. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-decision-branches/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-decision-branches/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-decision-branches/bad-1.txt",
+        "fails": [
+          "yes-branch",
+          "no-branch"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-decision-branches/bad-2.txt",
+        "fails": [
+          "yes-branch"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "yes-branch",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Eligible?"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Approve"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "Yes"
+          }
+        ]
+      },
+      {
+        "id": "no-branch",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Eligible?"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Reject"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "No"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Eligible?",
+          "Approve",
+          "Reject"
+        ]
+      },
+      {
+        "id": "arrowheads",
+        "op": "all",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "directed",
+            "op": "equals",
+            "path": [
+              "directed"
+            ],
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-label-punctuation",
+    "skill": "mermaid-diagrams",
+    "category": "label-escaping",
+    "group": "mermaid-diagrams/mermaid-label-punctuation",
+    "split": "holdout",
+    "prompt": "Render this three-step pipeline with its punctuation intact: Fetch (retry x3), Validate: schema, Store result. Edges follow that order. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-label-punctuation/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-label-punctuation/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-label-punctuation/bad-1.txt",
+        "fails": [
+          "fetch-before-validation"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-label-punctuation/bad-2.txt",
+        "fails": [
+          "validation-before-store"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "fetch-before-validation",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Fetch (retry x3)"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Validate: schema"
+          }
+        ]
+      },
+      {
+        "id": "validation-before-store",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Validate: schema"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Store result"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Fetch (retry x3)",
+          "Validate: schema",
+          "Store result"
+        ]
+      },
+      {
+        "id": "arrowheads",
+        "op": "all",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "directed",
+            "op": "equals",
+            "path": [
+              "directed"
+            ],
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-sequence-aliases",
+    "skill": "mermaid-diagrams",
+    "category": "interaction-order",
+    "group": "mermaid-diagrams/mermaid-sequence-aliases",
+    "split": "development",
+    "prompt": "Show API Client sending POST /orders to API Gateway, followed by API Gateway returning 201 Created to API Client. Use aliases for names with spaces. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-sequence-aliases/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-sequence-aliases/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-sequence-aliases/bad-1.txt",
+        "fails": [
+          "response-direction"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-sequence-aliases/bad-2.txt",
+        "fails": [
+          "response-direction"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "sequence-type",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "sequence"
+      },
+      {
+        "id": "request-direction",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "API Client"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "API Gateway"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "POST /orders"
+          }
+        ]
+      },
+      {
+        "id": "response-direction",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "API Gateway"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "API Client"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "201 Created"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "API Client",
+          "API Gateway"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-sequence-order",
+    "skill": "mermaid-diagrams",
+    "category": "causality",
+    "group": "mermaid-diagrams/mermaid-sequence-order",
+    "split": "holdout",
+    "prompt": "Show exactly these four messages in order: Client requests API; API inserts into DB; DB confirms saved; API returns success. Use the supplied message labels. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-sequence-order/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-sequence-order/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-sequence-order/bad-1.txt",
+        "fails": [
+          "message-order"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-sequence-order/bad-2.txt",
+        "fails": [
+          "message-order"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "message-order",
+        "op": "equals",
+        "path": [
+          "messages"
+        ],
+        "value": [
+          {
+            "from": "Client",
+            "to": "API",
+            "label": "request"
+          },
+          {
+            "from": "API",
+            "to": "DB",
+            "label": "insert"
+          },
+          {
+            "from": "DB",
+            "to": "API",
+            "label": "saved"
+          },
+          {
+            "from": "API",
+            "to": "Client",
+            "label": "success"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Client",
+          "API",
+          "DB"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-er-cardinality",
+    "skill": "mermaid-diagrams",
+    "category": "data-modeling",
+    "group": "mermaid-diagrams/mermaid-er-cardinality",
+    "split": "development",
+    "prompt": "Draw USER to ORDER: each order has exactly one user; a user may have zero or more orders. Include uuid USER.id PK and ORDER.id PK plus ORDER.user_id FK. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-er-cardinality/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-er-cardinality/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-er-cardinality/bad-1.txt",
+        "fails": [
+          "order-cardinality"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-er-cardinality/bad-2.txt",
+        "fails": [
+          "foreign-key"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "order-cardinality",
+        "op": "any",
+        "path": [
+          "relationships"
+        ],
+        "checks": [
+          {
+            "id": "user-cardinality",
+            "op": "equals",
+            "path": [
+              "members",
+              "USER"
+            ],
+            "value": "ONLY_ONE"
+          },
+          {
+            "id": "other-cardinality",
+            "op": "equals",
+            "path": [
+              "members",
+              "ORDER"
+            ],
+            "value": "ZERO_OR_MORE"
+          }
+        ]
+      },
+      {
+        "id": "foreign-key",
+        "op": "set_equals",
+        "path": [
+          "columns",
+          "ORDER",
+          "user_id",
+          "keys"
+        ],
+        "value": [
+          "FK"
+        ]
+      },
+      {
+        "id": "primary-key",
+        "op": "set_equals",
+        "path": [
+          "columns",
+          "USER",
+          "id",
+          "keys"
+        ],
+        "value": [
+          "PK"
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "USER",
+          "ORDER"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-er-one-to-one",
+    "skill": "mermaid-diagrams",
+    "category": "data-constraints",
+    "group": "mermaid-diagrams/mermaid-er-one-to-one",
+    "split": "holdout",
+    "prompt": "Draw an optional profile for each user: a profile belongs to exactly one user, and a user has at most one profile. PROFILE.user_id must be both FK and UK, on one attribute line. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-er-one-to-one/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-er-one-to-one/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-er-one-to-one/bad-1.txt",
+        "fails": [
+          "optional-one"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-er-one-to-one/bad-2.txt",
+        "fails": [
+          "unique-foreign-key"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "optional-one",
+        "op": "any",
+        "path": [
+          "relationships"
+        ],
+        "checks": [
+          {
+            "id": "user-cardinality",
+            "op": "equals",
+            "path": [
+              "members",
+              "USER"
+            ],
+            "value": "ONLY_ONE"
+          },
+          {
+            "id": "other-cardinality",
+            "op": "equals",
+            "path": [
+              "members",
+              "PROFILE"
+            ],
+            "value": "ZERO_OR_ONE"
+          }
+        ]
+      },
+      {
+        "id": "unique-foreign-key",
+        "op": "set_equals",
+        "path": [
+          "columns",
+          "PROFILE",
+          "user_id",
+          "keys"
+        ],
+        "value": [
+          "FK",
+          "UK"
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "USER",
+          "PROFILE"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-state-lifecycle",
+    "skill": "mermaid-diagrams",
+    "category": "state-machine",
+    "group": "mermaid-diagrams/mermaid-state-lifecycle",
+    "split": "development",
+    "prompt": "Draw the supplied lifecycle with submit, approve, and reject transitions. Approved and Rejected are terminal; Draft is the initial state. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-state-lifecycle/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-state-lifecycle/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-state-lifecycle/bad-1.txt",
+        "fails": [
+          "reject-transition"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-state-lifecycle/bad-2.txt",
+        "fails": [
+          "rejected-terminal"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "initial",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "[*]"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Draft"
+          }
+        ]
+      },
+      {
+        "id": "submit-transition",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Draft"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Submitted"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "submit"
+          }
+        ]
+      },
+      {
+        "id": "approve-transition",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Submitted"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Approved"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "approve"
+          }
+        ]
+      },
+      {
+        "id": "reject-transition",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Submitted"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Rejected"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "reject"
+          }
+        ]
+      },
+      {
+        "id": "approved-terminal",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Approved"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "[*]"
+          }
+        ]
+      },
+      {
+        "id": "rejected-terminal",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Rejected"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "[*]"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "[*]",
+          "Draft",
+          "Submitted",
+          "Approved",
+          "Rejected"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-state-retry",
+    "skill": "mermaid-diagrams",
+    "category": "state-machine",
+    "group": "mermaid-diagrams/mermaid-state-retry",
+    "split": "development",
+    "prompt": "Show a retry loop: start moves Queued to Running, retry returns Running to Queued, finish moves Running to terminal Done. Do not make retry terminate. Return only Mermaid source. Preserve the specified labels and relationships; do not invent nodes. Target Mermaid 11.16.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-state-retry/input.mmd"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-state-retry/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-state-retry/bad-1.txt",
+        "fails": [
+          "retry-loop"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-state-retry/bad-2.txt",
+        "fails": [
+          "terminal"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "retry-loop",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Running"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Queued"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "retry"
+          }
+        ]
+      },
+      {
+        "id": "finish",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Running"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "Done"
+          },
+          {
+            "id": "label",
+            "op": "equals",
+            "path": [
+              "label"
+            ],
+            "value": "finish"
+          }
+        ]
+      },
+      {
+        "id": "terminal",
+        "op": "any",
+        "path": [
+          "edges"
+        ],
+        "checks": [
+          {
+            "id": "from",
+            "op": "equals",
+            "path": [
+              "from"
+            ],
+            "value": "Done"
+          },
+          {
+            "id": "to",
+            "op": "equals",
+            "path": [
+              "to"
+            ],
+            "value": "[*]"
+          }
+        ]
+      },
+      {
+        "id": "no-invented-nodes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "[*]",
+          "Queued",
+          "Running",
+          "Done"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mermaid-class-inheritance",
+    "skill": "mermaid-diagrams",
+    "category": "class-modeling",
+    "group": "mermaid-diagrams/mermaid-class-inheritance",
+    "split": "development",
+    "prompt": "Draw Customer with public String name and public tier() returning String. VIP extends Customer. Preserve the two class names and the inheritance direction. Return Mermaid source only.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-class-inheritance/input.json"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-class-inheritance/good-1.txt",
+      "reference_outputs/mermaid-diagrams/mermaid-class-inheritance/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-class-inheritance/bad-1.txt",
+        "fails": [
+          "extends"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-class-inheritance/bad-2.txt",
+        "fails": [
+          "return-type"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "type",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "class"
+      },
+      {
+        "id": "classes",
+        "op": "set_equals",
+        "path": [
+          "nodes"
+        ],
+        "value": [
+          "Customer",
+          "VIP"
+        ]
+      },
+      {
+        "id": "extends",
+        "op": "edges",
+        "path": [
+          "inheritance"
+        ],
+        "required": [
+          [
+            "VIP",
+            "Customer"
+          ]
+        ],
+        "allowed": [
+          [
+            "VIP",
+            "Customer"
+          ]
+        ]
+      },
+      {
+        "id": "return-type",
+        "op": "equals",
+        "path": [
+          "db",
+          "getClasses",
+          "Customer",
+          "methods",
+          0,
+          "returnType"
+        ],
+        "value": "String"
+      }
+    ]
+  },
+  {
+    "id": "mermaid-gantt-dependency",
+    "skill": "mermaid-diagrams",
+    "category": "scheduling",
+    "group": "mermaid-diagrams/mermaid-gantt-dependency",
+    "split": "holdout",
+    "prompt": "Create a Gantt chart. Design (id d1) starts 2026-09-14 and lasts two calendar days. Implement (id d2) depends on d1 and lasts three calendar days. Do not exclude weekends. Return Mermaid only, preserving task IDs and dependency.",
+    "inputs": [
+      "fixtures/mermaid-diagrams/mermaid-gantt-dependency/input.json"
+    ],
+    "grader": "mermaid-runtime",
+    "references": [
+      "reference_outputs/mermaid-diagrams/mermaid-gantt-dependency/good-1.txt",
+      "reference_outputs/mermaid-diagrams/mermaid-gantt-dependency/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-gantt-dependency/bad-1.txt",
+        "fails": [
+          "implementation-start",
+          "dependency"
+        ]
+      },
+      {
+        "path": "reference_outputs/mermaid-diagrams/mermaid-gantt-dependency/bad-2.txt",
+        "fails": [
+          "implementation-end"
+        ]
+      }
+    ],
+    "assertions": [
+      {
+        "id": "gantt",
+        "op": "equals",
+        "path": [
+          "type"
+        ],
+        "value": "gantt"
+      },
+      {
+        "id": "design-start",
+        "op": "equals",
+        "path": [
+          "tasks",
+          "d1",
+          "start"
+        ],
+        "value": "2026-09-14T00:00:00.000Z"
+      },
+      {
+        "id": "implementation-start",
+        "op": "equals",
+        "path": [
+          "tasks",
+          "d2",
+          "start"
+        ],
+        "value": "2026-09-16T00:00:00.000Z"
+      },
+      {
+        "id": "implementation-end",
+        "op": "equals",
+        "path": [
+          "tasks",
+          "d2",
+          "end"
+        ],
+        "value": "2026-09-19T00:00:00.000Z"
+      },
+      {
+        "id": "dependency",
+        "op": "equals",
+        "path": [
+          "tasks",
+          "d2",
+          "depends_on"
+        ],
+        "value": "after d1"
+      }
+    ]
+  }
+]

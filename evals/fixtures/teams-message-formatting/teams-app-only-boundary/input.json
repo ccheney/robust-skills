@@ -1,0 +1,10 @@
+{
+  "candidates": [
+    "graph_app_only_ordinary_send",
+    "bot"
+  ],
+  "permissions": [
+    "Teamwork.Migrate.All"
+  ],
+  "purpose": "ordinary-notification"
+}

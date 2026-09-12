@@ -1,0 +1,26 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Service",
+          "value": "API"
+        },
+        {
+          "title": "Status",
+          "value": "Down"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "View incident",
+      "url": "https://example.com/incidents/7"
+    }
+  ]
+}

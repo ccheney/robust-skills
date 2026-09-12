@@ -1,0 +1,1 @@
+export async function mapLimit(items,limit,fn){if(!Number.isInteger(limit)||limit<1)throw new RangeError('limit');const out=new Array(items.length);let cursor=0;await Promise.all(Array.from({length:Math.min(limit,items.length)},async()=>{while(cursor<items.length){const i=cursor++;out[i]=await fn(items[i],i);}}));return out;}

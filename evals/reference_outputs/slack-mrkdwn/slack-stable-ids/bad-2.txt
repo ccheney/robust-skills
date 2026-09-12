@@ -1,0 +1,5 @@
+{
+  "text": "<@U123ABC> please review <https://example.com/42|release 42> in <#C123ABC>.",
+  "unfurl_links": false,
+  "unfurl_media": true
+}

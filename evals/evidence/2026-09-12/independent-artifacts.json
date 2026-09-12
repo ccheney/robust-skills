@@ -1,0 +1,562 @@
+{
+  "kind": "Independent Codex forward-test artifacts, regraded after documented grader corrections; not Gemini performance results",
+  "results": [
+    {
+      "id": "ddd-order-confirm",
+      "skill": "clean-ddd-hexagonal",
+      "split": "holdout",
+      "artifact": "export class Order {\n  #id;\n  #items;\n  #status = 'DRAFT';\n  #events = [];\n\n  constructor(id, items) {\n    if (!Array.isArray(items)) {\n      throw new TypeError('items must be an array');\n    }\n\n    this.#id = id;\n    this.#items = Array.from(items, item => {\n      if (item === null || typeof item !== 'object') {\n        throw new TypeError('Each item must be an object');\n      }\n\n      const { quantity, priceCents } = item;\n      if (!Number.isSafeInteger(quantity) || quantity <= 0) {\n        throw new RangeError('quantity must be a positive safe integer');\n      }\n      if (!Number.isSafeInteger(priceCents) || priceCents < 0) {\n        throw new RangeError('priceCents must be a nonnegative safe integer');\n      }\n      return { quantity, priceCents };\n    });\n  }\n\n  get id() {\n    return this.#id;\n  }\n\n  get status() {\n    return this.#status;\n  }\n\n  get events() {\n    return this.#events.map(event => ({ ...event }));\n  }\n\n  get totalCents() {\n    return this.#items.reduce(\n      (total, item) => total + item.quantity * item.priceCents,\n      0,\n    );\n  }\n\n  confirm() {\n    if (this.#status === 'CONFIRMED') {\n      throw new Error('Order is already confirmed');\n    }\n    if (this.#items.length === 0) {\n      throw new Error('Cannot confirm an empty order');\n    }\n\n    this.#status = 'CONFIRMED';\n    this.#events.push({ type: 'OrderConfirmed', orderId: this.#id });\n  }\n}\n",
+      "artifact_sha256": "2ae99bec320129d9b2792ababfd2b563887f31ad91eecc71853f8e365c4cb809",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "8/8 assertions passed",
+        "assertions": [
+          {
+            "id": "module-loads",
+            "passed": true
+          },
+          {
+            "id": "required-exports",
+            "passed": true
+          },
+          {
+            "id": "empty-rejected",
+            "passed": true
+          },
+          {
+            "id": "single-transition",
+            "passed": true
+          },
+          {
+            "id": "records-fact",
+            "passed": true
+          },
+          {
+            "id": "valid-items",
+            "passed": true
+          },
+          {
+            "id": "total",
+            "passed": true
+          },
+          {
+            "id": "input-isolation",
+            "passed": true
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "drizzle-stable-schema",
+      "skill": "postgres-drizzle",
+      "split": "holdout",
+      "artifact": "import { relations } from 'drizzle-orm';\nimport { index, pgTable, text, uuid } from 'drizzle-orm/pg-core';\n\nexport const users = pgTable('users', {\n  id: uuid('id').primaryKey(),\n  email: text('email').notNull(),\n});\n\nexport const posts = pgTable(\n  'posts',\n  {\n    id: uuid('id').primaryKey(),\n    userId: uuid('user_id')\n      .notNull()\n      .references(() => users.id, { onDelete: 'cascade' }),\n  },\n  table => [index('posts_user_id_idx').on(table.userId)],\n);\n\nexport const postsRelations = relations(posts, ({ one }) => ({\n  author: one(users, {\n    fields: [posts.userId],\n    references: [users.id],\n  }),\n}));\n",
+      "artifact_sha256": "8ecda66ca7643e21ff5973983a37956bb53962e219d59205eca49186f300cb84",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "7/7 assertions passed",
+        "assertions": [
+          {
+            "id": "drizzle-types",
+            "passed": true
+          },
+          {
+            "id": "users-primary",
+            "passed": true,
+            "detail": "users-primary"
+          },
+          {
+            "id": "uuid",
+            "passed": true,
+            "detail": "uuid"
+          },
+          {
+            "id": "required",
+            "passed": true,
+            "detail": "required"
+          },
+          {
+            "id": "index",
+            "passed": true,
+            "detail": "index"
+          },
+          {
+            "id": "foreign-key",
+            "passed": true,
+            "detail": "foreign-key"
+          },
+          {
+            "id": "relation",
+            "passed": true,
+            "detail": "relation"
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "mermaid-er-cardinality",
+      "skill": "mermaid-diagrams",
+      "split": "development",
+      "artifact": "erDiagram\n    USER ||--o{ ORDER : has\n    USER {\n        uuid id PK\n    }\n    ORDER {\n        uuid id PK\n        uuid user_id FK\n    }\n",
+      "artifact_sha256": "58c60a4290321d92f79c41fa5a221b1425e896e7733533bf24093d22bbf01e1d",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "5/5 assertions passed",
+        "assertions": [
+          {
+            "id": "diagram-renders",
+            "passed": true
+          },
+          {
+            "id": "order-cardinality",
+            "passed": true,
+            "detail": "order-cardinality"
+          },
+          {
+            "id": "foreign-key",
+            "passed": true,
+            "detail": "foreign-key"
+          },
+          {
+            "id": "primary-key",
+            "passed": true,
+            "detail": "primary-key"
+          },
+          {
+            "id": "no-invented-nodes",
+            "passed": true,
+            "detail": "no-invented-nodes"
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "teams-graph-renderer",
+      "skill": "teams-message-formatting",
+      "split": "development",
+      "artifact": "{\n  \"body\": {\n    \"contentType\": \"html\",\n    \"content\": \"<strong>Release 42</strong>: <a href=\\\"https://example.com/42\\\">View release</a>\"\n  }\n}\n",
+      "artifact_sha256": "8e435b3d557991a965815c9b9f9dfc96d5d3f2c88d4f3350214e33e50bae081c",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "4/4 assertions passed",
+        "assertions": [
+          {
+            "id": "html-body",
+            "passed": true,
+            "detail": "html-body"
+          },
+          {
+            "id": "visible-content",
+            "passed": true,
+            "detail": "visible-content"
+          },
+          {
+            "id": "bold",
+            "passed": true,
+            "detail": "bold"
+          },
+          {
+            "id": "link",
+            "passed": true,
+            "detail": "link"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bazel-runtime-data",
+      "skill": "bazel",
+      "split": "development",
+      "artifact": "load(\"@rules_python//python:defs.bzl\", \"py_test\")\n\npy_test(\n    name = \"config_test\",\n    srcs = [\"config_test.py\"],\n    data = [\"//assets:settings.json\"],\n)\n",
+      "artifact_sha256": "be44598038250ac15fe085ae78b40f4186f937ac179efca247e68fdd5a002f77",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "3/3 assertions passed",
+        "assertions": [
+          {
+            "id": "starlark-syntax",
+            "passed": true
+          },
+          {
+            "id": "runfiles-edge",
+            "passed": true,
+            "detail": "runfiles-edge"
+          },
+          {
+            "id": "test-source",
+            "passed": true,
+            "detail": "test-source"
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "css-container-adaptation",
+      "skill": "modern-css",
+      "split": "development",
+      "artifact": ".host {\n  container-type: inline-size;\n}\n\n.card {\n  display: grid;\n  grid-template-columns: 1fr;\n  gap: 12px;\n}\n\n@container (inline-size >= 400px) {\n  .card {\n    grid-template-columns: 1fr 1fr;\n  }\n}\n",
+      "artifact_sha256": "f3ae36f75dde48e1e5c983d7545d545fc88b96b53a362e133fcbaf44590530b2",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "4/4 assertions passed",
+        "assertions": [
+          {
+            "id": "wide-viewport/small-stacked",
+            "passed": true
+          },
+          {
+            "id": "wide-viewport/small-gap",
+            "passed": true
+          },
+          {
+            "id": "wide-viewport/large-row",
+            "passed": true
+          },
+          {
+            "id": "wide-viewport/large-gap",
+            "passed": true
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "fsd-public-api",
+      "skill": "feature-slicing",
+      "split": "development",
+      "artifact": "{\n  \"public_exports\": [\n    \"UserCard\",\n    \"UserId\"\n  ],\n  \"wildcard_exports\": []\n}\n",
+      "artifact_sha256": "2e57476c2c21005168529eb4525f52c8ad0281ebab45367564d82320fcc8983d",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "2/2 assertions passed",
+        "assertions": [
+          {
+            "id": "intentional-exports",
+            "passed": true,
+            "detail": "intentional-exports"
+          },
+          {
+            "id": "no-wildcards",
+            "passed": true,
+            "detail": "no-wildcards"
+          }
+        ]
+      }
+    },
+    {
+      "id": "javascript-group-prototype",
+      "skill": "modern-javascript",
+      "split": "holdout",
+      "artifact": "export function groupByName(rows) {\n  return Object.groupBy(rows, row => String(row.name));\n}\n",
+      "artifact_sha256": "1e5f2b63533983034c63477ccda0b046440d619e0694c33ad059bb966a121884",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "5/5 assertions passed",
+        "assertions": [
+          {
+            "id": "module-loads",
+            "passed": true
+          },
+          {
+            "id": "required-exports",
+            "passed": true
+          },
+          {
+            "id": "special-keys",
+            "passed": true
+          },
+          {
+            "id": "null-prototype",
+            "passed": true
+          },
+          {
+            "id": "empty",
+            "passed": true
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "javascript-retry-scope",
+      "skill": "modern-javascript",
+      "split": "development",
+      "artifact": "export async function retry(operation, attempts, shouldRetry) {\n  for (let attempt = 0; attempt < attempts; attempt++) {\n    try {\n      return await operation();\n    } catch (error) {\n      if (attempt + 1 === attempts || !shouldRetry(error)) {\n        throw error;\n      }\n    }\n  }\n}\n",
+      "artifact_sha256": "b001b210e36bf703dbe8856a6c0ba7bdff0da931b7695bbbb53621f6c95aedd7",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "6/6 assertions passed",
+        "assertions": [
+          {
+            "id": "module-loads",
+            "passed": true
+          },
+          {
+            "id": "required-exports",
+            "passed": true
+          },
+          {
+            "id": "eventual-success",
+            "passed": true
+          },
+          {
+            "id": "attempt-count",
+            "passed": true
+          },
+          {
+            "id": "non-retryable",
+            "passed": true
+          },
+          {
+            "id": "identity",
+            "passed": true
+          }
+        ],
+        "runtime_image_id": "sha256:773c07405feb560ecfc4bf29a4732f4d46ed79d6d58b84ca0ced22e558eb9afb"
+      }
+    },
+    {
+      "id": "postgres-join-fanout",
+      "skill": "postgres-drizzle",
+      "split": "development",
+      "artifact": "WITH line_totals AS (\n    SELECT order_id, SUM(amount) AS line_total\n    FROM lines\n    GROUP BY order_id\n), payment_totals AS (\n    SELECT order_id, SUM(amount) AS paid_total\n    FROM payments\n    GROUP BY order_id\n)\nSELECT\n    orders.id,\n    COALESCE(line_totals.line_total, 0) AS line_total,\n    COALESCE(payment_totals.paid_total, 0) AS paid_total\nFROM orders\nLEFT JOIN line_totals ON line_totals.order_id = orders.id\nLEFT JOIN payment_totals ON payment_totals.order_id = orders.id\nORDER BY orders.id;\n",
+      "artifact_sha256": "05005078cf88dc6330e7eebe35cf0e6dba719d6eec41ce7d3195f4af6f915e51",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "4/4 assertions passed",
+        "assertions": [
+          {
+            "id": "sql-applies",
+            "passed": true,
+            "detail": ""
+          },
+          {
+            "id": "no-fanout",
+            "passed": true,
+            "detail": "['30|30']"
+          },
+          {
+            "id": "empty-order",
+            "passed": true,
+            "detail": "['0|0']"
+          },
+          {
+            "id": "changing-data",
+            "passed": true,
+            "detail": "['35|30']"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slack-sortable-table",
+      "skill": "slack-block-kit",
+      "split": "development",
+      "artifact": "{\n  \"type\": \"data_table\",\n  \"caption\": \"Service latency\",\n  \"rows\": [\n    [\n      {\n        \"type\": \"raw_text\",\n        \"text\": \"Service\"\n      },\n      {\n        \"type\": \"raw_text\",\n        \"text\": \"Latency\"\n      }\n    ],\n    [\n      {\n        \"type\": \"raw_text\",\n        \"text\": \"API\"\n      },\n      {\n        \"type\": \"raw_number\",\n        \"value\": 12,\n        \"text\": \"12\"\n      }\n    ],\n    [\n      {\n        \"type\": \"raw_text\",\n        \"text\": \"Worker\"\n      },\n      {\n        \"type\": \"raw_number\",\n        \"value\": 8,\n        \"text\": \"8\"\n      }\n    ]\n  ]\n}\n",
+      "artifact_sha256": "216335a915fc55af92a16170b7d70cecfc5c1106a8804da44711392bd46168d4",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "15/15 assertions passed",
+        "assertions": [
+          {
+            "id": "caption",
+            "passed": true,
+            "detail": "caption"
+          },
+          {
+            "id": "numeric-cell",
+            "passed": true,
+            "detail": "numeric-cell"
+          },
+          {
+            "id": "numeric-value",
+            "passed": true,
+            "detail": "numeric-value"
+          },
+          {
+            "id": "all-rows",
+            "passed": true,
+            "detail": "all-rows"
+          },
+          {
+            "id": "first-service",
+            "passed": true,
+            "detail": "first-service"
+          },
+          {
+            "id": "second-service",
+            "passed": true,
+            "detail": "second-service"
+          },
+          {
+            "id": "second-number",
+            "passed": true,
+            "detail": "second-number"
+          },
+          {
+            "id": "second-number-type",
+            "passed": true,
+            "detail": "second-number-type"
+          },
+          {
+            "id": "slack-block-count",
+            "passed": true,
+            "detail": "slack-block-count"
+          },
+          {
+            "id": "slack-surface",
+            "passed": true,
+            "detail": "slack-surface"
+          },
+          {
+            "id": "slack-text-objects",
+            "passed": true,
+            "detail": "slack-text-objects"
+          },
+          {
+            "id": "slack-ids",
+            "passed": true,
+            "detail": "slack-ids"
+          },
+          {
+            "id": "slack-table-shape",
+            "passed": true,
+            "detail": "slack-table-shape"
+          },
+          {
+            "id": "slack-markdown-budget",
+            "passed": true,
+            "detail": "slack-markdown-budget"
+          },
+          {
+            "id": "slack-method-fields",
+            "passed": true,
+            "detail": "slack-method-fields"
+          }
+        ]
+      }
+    },
+    {
+      "id": "teams-execute-fallback",
+      "skill": "teams-adaptive-cards",
+      "split": "development",
+      "artifact": "{\n  \"type\": \"AdaptiveCard\",\n  \"version\": \"1.4\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"Approve REQ-42\",\n      \"wrap\": true\n    }\n  ],\n  \"actions\": [\n    {\n      \"type\": \"Action.Execute\",\n      \"title\": \"Approve\",\n      \"verb\": \"approveRequest\",\n      \"data\": {\n        \"requestId\": \"REQ-42\"\n      },\n      \"fallback\": {\n        \"type\": \"Action.Submit\",\n        \"title\": \"Approve\",\n        \"data\": {\n          \"action\": \"approve\",\n          \"requestId\": \"REQ-42\"\n        }\n      }\n    }\n  ]\n}\n",
+      "artifact_sha256": "349fcfd6d508c5acad33448b6bd11b119b0c240ac5b516428d04851d9d568b65",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "7/7 assertions passed",
+        "assertions": [
+          {
+            "id": "version",
+            "passed": true,
+            "detail": "version"
+          },
+          {
+            "id": "execute",
+            "passed": true,
+            "detail": "execute"
+          },
+          {
+            "id": "verb",
+            "passed": true,
+            "detail": "verb"
+          },
+          {
+            "id": "request",
+            "passed": true,
+            "detail": "request"
+          },
+          {
+            "id": "fallback-type",
+            "passed": true,
+            "detail": "fallback-type"
+          },
+          {
+            "id": "fallback-data",
+            "passed": true,
+            "detail": "fallback-data"
+          },
+          {
+            "id": "teams-wire-contract",
+            "passed": true,
+            "detail": "Teams Adaptive Card check: card.json (target: card)\nWARN: $.actions[0]: Action.Execute requires Universal Actions bot invoke handling; verify this transport has a bot backend.\nWARN: $.fallbackText: Add fallbackText with a concise summary for unsupported clients and accessibility.\nWARN: $.version: Versions later than 1.2 can have limited or inconsistent Teams mobile behavior; verify target clients.\nINFO: $.$schema: Add the Adaptive Card schema URL to help tooling validate the card.\nSummary: 0 error(s), 3 warning(s), 1 info item(s).\n"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slack-missing-identity",
+      "skill": "slack-mrkdwn",
+      "split": "holdout",
+      "artifact": "{\n  \"status\": \"needs_identity\",\n  \"missing\": [\n    \"user_id\"\n  ],\n  \"text\": \"Ada, please review release 42.\"\n}\n",
+      "artifact_sha256": "8577767588735b8d631233aee277ec6fb7f1fd3b4b123422dfb65b607a8c51f6",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "3/3 assertions passed",
+        "assertions": [
+          {
+            "id": "request-identity",
+            "passed": true,
+            "detail": "request-identity"
+          },
+          {
+            "id": "missing-user-id",
+            "passed": true,
+            "detail": "missing-user-id"
+          },
+          {
+            "id": "fallback",
+            "passed": true,
+            "detail": "fallback"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slack-verbatim-controls",
+      "skill": "slack-mrkdwn",
+      "split": "development",
+      "artifact": "{\n  \"type\": \"mrkdwn\",\n  \"text\": \"R&amp;D &lt;!channel&gt; &lt;https://bad.example|click&gt;\",\n  \"verbatim\": true\n}\n",
+      "artifact_sha256": "09d139331d43b01bb1e420cc715863eb48ad971f75b93368bfef7cbb8072a04e",
+      "outcome": {
+        "status": "pass",
+        "score": 1.0,
+        "detail": "3/3 assertions passed",
+        "assertions": [
+          {
+            "id": "safe-explicit-controls",
+            "passed": true,
+            "detail": "safe-explicit-controls"
+          },
+          {
+            "id": "renderer",
+            "passed": true,
+            "detail": "renderer"
+          },
+          {
+            "id": "auto-parse",
+            "passed": true,
+            "detail": "auto-parse"
+          }
+        ]
+      }
+    }
+  ]
+}

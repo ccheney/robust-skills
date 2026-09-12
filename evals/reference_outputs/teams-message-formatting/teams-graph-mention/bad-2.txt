@@ -1,0 +1,19 @@
+{
+  "body": {
+    "contentType": "html",
+    "content": "<p><at id=\"0\">Ada</at> please review.</p>"
+  },
+  "mentions": [
+    {
+      "id": 0,
+      "mentionText": "Ada",
+      "mentioned": {
+        "user": {
+          "id": "Ada",
+          "displayName": "Ada",
+          "userIdentityType": "aadUser"
+        }
+      }
+    }
+  ]
+}

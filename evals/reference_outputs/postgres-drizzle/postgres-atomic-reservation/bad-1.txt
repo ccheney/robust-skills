@@ -1,0 +1,1 @@
+CREATE FUNCTION reserve(item text,requested integer) RETURNS boolean LANGUAGE plpgsql AS $$ BEGIN IF requested<=0 THEN RETURN false; END IF; UPDATE stock SET quantity=quantity-requested WHERE sku=item; RETURN FOUND; END $$;

@@ -1,0 +1,400 @@
+[
+  {
+    "id": "save-all",
+    "skill": "modern-javascript",
+    "category": "correctness",
+    "group": "modern-javascript/save-all",
+    "split": "development",
+    "prompt": "Fix saveAll(items, save): start independent saves concurrently, wait for all, preserve input order, propagate rejection, and handle empty input. Preserve its signature. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/save-all/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/save-all/good-1.txt",
+      "reference_outputs/modern-javascript/save-all/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/save-all/bad-1.txt",
+        "fails": [
+          "concurrent-start"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/save-all/bad-2.txt",
+        "fails": [
+          "resolved-values"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/save-all.mjs",
+    "exports": [
+      "saveAll"
+    ],
+    "assertion_ids": [
+      "concurrent-start",
+      "resolved-values",
+      "input-order",
+      "rejection",
+      "empty"
+    ]
+  },
+  {
+    "id": "rank",
+    "skill": "modern-javascript",
+    "category": "correctness",
+    "group": "modern-javascript/rank",
+    "split": "development",
+    "prompt": "Fix rank(scores) to return descending points without mutating input. Preserve object identity and input order of tied scores. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/rank/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/rank/good-1.txt",
+      "reference_outputs/modern-javascript/rank/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/rank/bad-1.txt",
+        "fails": [
+          "nonmutating"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/rank/bad-2.txt",
+        "fails": [
+          "identity"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/rank.mjs",
+    "exports": [
+      "rank"
+    ],
+    "assertion_ids": [
+      "descending",
+      "nonmutating",
+      "identity",
+      "stable-ties",
+      "empty"
+    ]
+  },
+  {
+    "id": "javascript-nullish",
+    "skill": "modern-javascript",
+    "category": "semantics",
+    "group": "modern-javascript/javascript-nullish",
+    "split": "development",
+    "prompt": "Implement timeoutOf(config), defaulting missing or null timeout to 5000. Preserve explicit 0, false, and empty-string values; a missing config also uses 5000. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-nullish/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-nullish/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-nullish/bad-1.txt",
+        "fails": [
+          "falsy-preserved"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-nullish/bad-2.txt",
+        "fails": [
+          "missing-config"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-nullish.mjs",
+    "exports": [
+      "timeoutOf"
+    ],
+    "assertion_ids": [
+      "falsy-preserved",
+      "nullish-default",
+      "missing-config"
+    ]
+  },
+  {
+    "id": "javascript-own-property",
+    "skill": "modern-javascript",
+    "category": "edge-cases",
+    "group": "modern-javascript/javascript-own-property",
+    "split": "development",
+    "prompt": "Implement owns(record,key) for arbitrary objects, including null-prototype records and objects with a shadowed hasOwnProperty. Inherited properties must return false. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-own-property/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-own-property/good-1.txt",
+      "reference_outputs/modern-javascript/javascript-own-property/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-own-property/bad-1.txt",
+        "fails": [
+          "inherited-excluded"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-own-property/bad-2.txt",
+        "fails": [
+          "null-prototype",
+          "shadowed"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-own-property.mjs",
+    "exports": [
+      "owns"
+    ],
+    "assertion_ids": [
+      "own",
+      "inherited-excluded",
+      "null-prototype",
+      "shadowed"
+    ]
+  },
+  {
+    "id": "javascript-group-identity",
+    "skill": "modern-javascript",
+    "category": "data-integrity",
+    "group": "modern-javascript/javascript-group-identity",
+    "split": "development",
+    "prompt": "Implement groupByOwner(rows), returning a Map grouped by row.owner object identity. Preserve row order and row objects; distinct owners with identical properties stay distinct. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-group-identity/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-group-identity/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-group-identity/bad-1.txt",
+        "fails": [
+          "identity-keys"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-group-identity/bad-2.txt",
+        "fails": [
+          "row-identity"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-group-identity.mjs",
+    "exports": [
+      "groupByOwner"
+    ],
+    "assertion_ids": [
+      "identity-keys",
+      "row-identity",
+      "empty-map"
+    ]
+  },
+  {
+    "id": "javascript-group-prototype",
+    "skill": "modern-javascript",
+    "category": "security",
+    "group": "modern-javascript/javascript-group-prototype",
+    "split": "holdout",
+    "prompt": "Implement groupByName(rows), returning a null-prototype object whose string keys are row.name. Treat __proto__, constructor, and toString as ordinary group names. Preserve row objects and order. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-group-prototype/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-group-prototype/good-1.txt",
+      "reference_outputs/modern-javascript/javascript-group-prototype/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-group-prototype/bad-1.txt",
+        "fails": [
+          "special-keys"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-group-prototype/bad-2.txt",
+        "fails": [
+          "null-prototype"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-group-prototype.mjs",
+    "exports": [
+      "groupByName"
+    ],
+    "assertion_ids": [
+      "special-keys",
+      "null-prototype",
+      "empty"
+    ]
+  },
+  {
+    "id": "javascript-lazy-take",
+    "skill": "modern-javascript",
+    "category": "resource-lifecycle",
+    "group": "modern-javascript/javascript-lazy-take",
+    "split": "development",
+    "prompt": "Implement take(source,count) as an iterator over at most count elements of a synchronous iterable. Do not consume source before iteration or read one extra element. Close the source iterator when stopping early. count is a nonnegative integer. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-lazy-take/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-lazy-take/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-lazy-take/bad-1.txt",
+        "fails": [
+          "bounded-consumption"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-lazy-take/bad-2.txt",
+        "fails": [
+          "bounded-consumption",
+          "zero"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-lazy-take.mjs",
+    "exports": [
+      "take"
+    ],
+    "assertion_ids": [
+      "lazy",
+      "bounded-consumption",
+      "closes-source",
+      "zero"
+    ]
+  },
+  {
+    "id": "javascript-regexp-literal",
+    "skill": "modern-javascript",
+    "category": "security",
+    "group": "modern-javascript/javascript-regexp-literal",
+    "split": "development",
+    "prompt": "Implement literalPattern(text), returning a RegExp that matches the complete input string literally, including metacharacters. Never treat user text as regex syntax. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-regexp-literal/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-regexp-literal/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-regexp-literal/bad-1.txt",
+        "fails": [
+          "metacharacters"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-regexp-literal/bad-2.txt",
+        "fails": [
+          "anchored"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-regexp-literal.mjs",
+    "exports": [
+      "literalPattern"
+    ],
+    "assertion_ids": [
+      "metacharacters",
+      "anchored",
+      "empty"
+    ]
+  },
+  {
+    "id": "javascript-bounded-map",
+    "skill": "modern-javascript",
+    "category": "concurrency",
+    "group": "modern-javascript/javascript-bounded-map",
+    "split": "holdout",
+    "prompt": "Implement mapLimit(items,limit,fn), returning a promise for results in input order. Run no more than limit operations at once, actually use concurrency when work permits, propagate errors, and return [] for empty input. Reject limits that are not positive integers. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-bounded-map/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-bounded-map/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-bounded-map/bad-1.txt",
+        "fails": [
+          "bounded",
+          "invalid-limit"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-bounded-map/bad-2.txt",
+        "fails": [
+          "uses-concurrency"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-bounded-map.mjs",
+    "exports": [
+      "mapLimit"
+    ],
+    "assertion_ids": [
+      "bounded",
+      "uses-concurrency",
+      "invalid-limit",
+      "empty",
+      "errors"
+    ]
+  },
+  {
+    "id": "javascript-retry-scope",
+    "skill": "modern-javascript",
+    "category": "error-handling",
+    "group": "modern-javascript/javascript-retry-scope",
+    "split": "development",
+    "prompt": "Implement retry(operation,attempts,shouldRetry). attempts includes the first call. Return the first success; retry only errors accepted by shouldRetry; on exhaustion throw the last error unchanged. attempts is a positive integer. Do not introduce timers or change operation arguments. Return one JavaScript ES module, with the stated exports. Target Node 24. No test code in the answer.",
+    "inputs": [
+      "fixtures/modern-javascript/javascript-retry-scope/input.mjs"
+    ],
+    "grader": "javascript-runtime",
+    "references": [
+      "reference_outputs/modern-javascript/javascript-retry-scope/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-javascript/javascript-retry-scope/bad-1.txt",
+        "fails": [
+          "attempt-count",
+          "non-retryable"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-javascript/javascript-retry-scope/bad-2.txt",
+        "fails": [
+          "eventual-success",
+          "identity"
+        ]
+      }
+    ],
+    "test": "assertions/modern-javascript/javascript-retry-scope.mjs",
+    "exports": [
+      "retry"
+    ],
+    "assertion_ids": [
+      "eventual-success",
+      "attempt-count",
+      "non-retryable",
+      "identity"
+    ]
+  }
+]

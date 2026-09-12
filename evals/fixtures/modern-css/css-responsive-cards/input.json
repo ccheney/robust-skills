@@ -1,0 +1,4 @@
+{
+  "html": "<style>body{margin:0}.item{height:20px}</style><div class=\"grid\"><div id=\"a\" class=\"item\">A</div><div id=\"b\" class=\"item\">B</div><div id=\"c\" class=\"item\">C</div></div>",
+  "current_css": ".grid{width:min(600px,100%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}"
+}

@@ -1,0 +1,10 @@
+{
+  "text": "Deployment update",
+  "displayed": {
+    "deployment": 42,
+    "status": "failed",
+    "environment": "production",
+    "owner": "Ada",
+    "rollback": "https://example.com/rollback/42"
+  }
+}

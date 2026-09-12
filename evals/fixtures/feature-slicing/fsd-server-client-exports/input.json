@@ -1,0 +1,9 @@
+{
+  "project": "Next.js App Router with existing FSD layers src/_app and src/_pages",
+  "exports": {
+    "UserCard": "client component",
+    "getUser": "server-only database query",
+    "UserId": "shared type"
+  },
+  "routes": "app"
+}

@@ -1,0 +1,12 @@
+{
+  "rows": [
+    [
+      "Service",
+      "Status"
+    ],
+    [
+      "API",
+      "Healthy"
+    ]
+  ]
+}

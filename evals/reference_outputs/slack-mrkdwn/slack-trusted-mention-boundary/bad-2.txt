@@ -1,0 +1,1 @@
+export const assignment=(id,note)=>`Assigned to &lt;@${id}&gt;: ${note.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}`;

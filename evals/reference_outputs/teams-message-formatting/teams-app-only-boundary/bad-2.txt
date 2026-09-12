@@ -1,0 +1,8 @@
+{
+  "delivery": "bot",
+  "blocked": [
+    "graph_app_only_ordinary_send"
+  ],
+  "required_capability": "installed_bot",
+  "permission_to_request": "Teamwork.Migrate.All"
+}

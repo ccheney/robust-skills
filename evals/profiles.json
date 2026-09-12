@@ -15,5 +15,21 @@
   "full": {
     "routing": "all",
     "tasks": "all"
+  },
+  "coverage": {
+    "routing": [],
+    "tasks": [
+      "bazel-direct-dependency",
+      "ddd-money-value-object",
+      "checkout-placement",
+      "mermaid-reserved-id",
+      "css-responsive-cards",
+      "save-all",
+      "postgres-nullable-fk",
+      "slack-table-rows",
+      "slack-escape-untrusted",
+      "graph",
+      "teams-graph-renderer"
+    ]
   }
 }

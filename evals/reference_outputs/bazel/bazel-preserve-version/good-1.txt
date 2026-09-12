@@ -1,0 +1,8 @@
+{
+  "bazel_version": "8.4.2",
+  "dependency_system": "WORKSPACE",
+  "changed_files": [
+    "lib/auth/BUILD.bazel"
+  ],
+  "migration_required": false
+}

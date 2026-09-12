@@ -1,0 +1,1 @@
+export async function mapLimit(items,limit,fn){return Promise.all(items.map(fn));}

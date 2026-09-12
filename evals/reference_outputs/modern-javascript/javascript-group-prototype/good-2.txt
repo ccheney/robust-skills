@@ -1,0 +1,1 @@
+export function groupByName(rows){const out=Object.create(null);for(const row of rows)(out[row.name]??=[]).push(row);return out;}

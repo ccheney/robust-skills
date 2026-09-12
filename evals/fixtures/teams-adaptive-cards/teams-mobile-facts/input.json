@@ -1,0 +1,20 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Table",
+      "rows": [
+        [
+          "Service",
+          "API"
+        ],
+        [
+          "Status",
+          "Degraded"
+        ]
+      ]
+    }
+  ],
+  "client_max": "1.2"
+}

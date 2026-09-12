@@ -1,0 +1,11 @@
+{
+  "graph_tool": "aquery",
+  "compare": [
+    "argv",
+    "inputs",
+    "environment",
+    "execution_platform"
+  ],
+  "clean_first": true,
+  "disable_sandbox": false
+}

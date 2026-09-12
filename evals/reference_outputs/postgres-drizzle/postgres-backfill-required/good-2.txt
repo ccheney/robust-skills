@@ -1,0 +1,1 @@
+ALTER TABLE invoices ADD COLUMN status text NOT NULL DEFAULT 'open'; UPDATE invoices SET status='settled' WHERE total=0;

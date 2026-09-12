@@ -1,0 +1,7 @@
+{
+  "status": "ready",
+  "missing": [
+    "slack_user_id"
+  ],
+  "text": "Ada, please review release 42."
+}

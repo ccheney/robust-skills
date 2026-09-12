@@ -1,0 +1,739 @@
+[
+  {
+    "id": "css-responsive-cards",
+    "skill": "modern-css",
+    "category": "layout",
+    "group": "modern-css/css-responsive-cards",
+    "split": "development",
+    "prompt": "Render three equal cards in a row above 500px viewport width, in a container no wider than 600px. At 400px viewport width stack cards at full available width. Use 16px gaps and avoid horizontal overflow. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-responsive-cards/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-responsive-cards/good-1.txt",
+      "reference_outputs/modern-css/css-responsive-cards/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-responsive-cards/bad-1.txt",
+        "fails": [
+          "mobile/stacked"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-responsive-cards/bad-2.txt",
+        "fails": [
+          "desktop/gap"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-responsive-cards/page.html",
+      "states": [
+        {
+          "id": "desktop",
+          "viewport": {
+            "width": 1000,
+            "height": 600
+          },
+          "checks": [
+            {
+              "id": "row",
+              "kind": "same-row",
+              "selector": "#a",
+              "other": "#c",
+              "value": true
+            },
+            {
+              "id": "gap",
+              "kind": "gap-x",
+              "selector": "#a",
+              "other": "#b",
+              "value": 16
+            },
+            {
+              "id": "equal-width",
+              "kind": "rect",
+              "selector": "#a",
+              "property": "width",
+              "value": 189.33333333333334
+            }
+          ]
+        },
+        {
+          "id": "mobile",
+          "viewport": {
+            "width": 400,
+            "height": 600
+          },
+          "checks": [
+            {
+              "id": "stacked",
+              "kind": "same-column",
+              "selector": "#a",
+              "other": "#b",
+              "value": true
+            },
+            {
+              "id": "gap",
+              "kind": "gap-y",
+              "selector": "#a",
+              "other": "#b",
+              "value": 16
+            },
+            {
+              "id": "full-width",
+              "kind": "rect",
+              "selector": "#a",
+              "property": "width",
+              "value": 400
+            },
+            {
+              "id": "overflow",
+              "kind": "overflow",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-container-adaptation",
+    "skill": "modern-css",
+    "category": "container-queries",
+    "group": "modern-css/css-container-adaptation",
+    "split": "development",
+    "prompt": "At the same 1000px viewport, cards inside the 280px host stack their two parts; cards inside the 600px host use two columns. Use a 12px gap. Respond to the host width, not the viewport. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-container-adaptation/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-container-adaptation/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-container-adaptation/bad-1.txt",
+        "fails": [
+          "wide-viewport/small-stacked"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-container-adaptation/bad-2.txt",
+        "fails": [
+          "wide-viewport/large-row"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-container-adaptation/page.html",
+      "states": [
+        {
+          "id": "wide-viewport",
+          "viewport": {
+            "width": 1000,
+            "height": 600
+          },
+          "checks": [
+            {
+              "id": "small-stacked",
+              "kind": "same-column",
+              "selector": "#sa",
+              "other": "#sb",
+              "value": true
+            },
+            {
+              "id": "small-gap",
+              "kind": "gap-y",
+              "selector": "#sa",
+              "other": "#sb",
+              "value": 12
+            },
+            {
+              "id": "large-row",
+              "kind": "same-row",
+              "selector": "#la",
+              "other": "#lb",
+              "value": true
+            },
+            {
+              "id": "large-gap",
+              "kind": "gap-x",
+              "selector": "#la",
+              "other": "#lb",
+              "value": 12
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-cascade-overrides",
+    "skill": "modern-css",
+    "category": "cascade",
+    "group": "modern-css/css-cascade-overrides",
+    "split": "development",
+    "prompt": "Correct the button to blue while preserving the notice green. The existing unlayered rule currently beats the component layer. Add an override without any important declarations. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-cascade-overrides/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-cascade-overrides/good-1.txt",
+      "reference_outputs/modern-css/css-cascade-overrides/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-cascade-overrides/bad-1.txt",
+        "fails": [
+          "normal/button-color"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-cascade-overrides/bad-2.txt",
+        "fails": [
+          "normal/no-important"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-cascade-overrides/page.html",
+      "states": [
+        {
+          "id": "normal",
+          "checks": [
+            {
+              "id": "button-color",
+              "kind": "style",
+              "selector": ".button",
+              "property": "color",
+              "value": "rgb(0, 0, 255)"
+            },
+            {
+              "id": "notice-preserved",
+              "kind": "style",
+              "selector": ".notice",
+              "property": "color",
+              "value": "rgb(0, 128, 0)"
+            },
+            {
+              "id": "no-important",
+              "kind": "important",
+              "value": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-parent-validation",
+    "skill": "modern-css",
+    "category": "relational-selectors",
+    "group": "modern-css/css-parent-validation",
+    "split": "development",
+    "prompt": "Give each field wrapper a 1px gray border. Only the wrapper containing an invalid email input should have a red border (rgb 220 0 0). Do not style the valid wrapper red. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-parent-validation/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-parent-validation/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-parent-validation/bad-1.txt",
+        "fails": [
+          "normal/valid-parent"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-parent-validation/bad-2.txt",
+        "fails": [
+          "normal/invalid-parent"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-parent-validation/page.html",
+      "states": [
+        {
+          "id": "normal",
+          "checks": [
+            {
+              "id": "invalid-parent",
+              "kind": "style",
+              "selector": "#bad",
+              "property": "border-top-color",
+              "value": "rgb(220, 0, 0)"
+            },
+            {
+              "id": "valid-parent",
+              "kind": "style",
+              "selector": "#good",
+              "property": "border-top-color",
+              "value": "rgb(128, 128, 128)"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-theme-override",
+    "skill": "modern-css",
+    "category": "theming",
+    "group": "modern-css/css-theme-override",
+    "split": "holdout",
+    "prompt": "The panel is white in light mode and rgb(20 20 20) in dark mode. A data-theme=\"light\" attribute on html must override a dark OS preference. Respect both system preference and the explicit override. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-theme-override/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-theme-override/good-1.txt",
+      "reference_outputs/modern-css/css-theme-override/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-theme-override/bad-1.txt",
+        "fails": [
+          "dark/background"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-theme-override/bad-2.txt",
+        "fails": [
+          "override/background"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-theme-override/page.html",
+      "states": [
+        {
+          "id": "light",
+          "media": {
+            "colorScheme": "light"
+          },
+          "checks": [
+            {
+              "id": "background",
+              "kind": "style",
+              "selector": ".panel",
+              "property": "background-color",
+              "value": "rgb(255, 255, 255)"
+            }
+          ]
+        },
+        {
+          "id": "dark",
+          "media": {
+            "colorScheme": "dark"
+          },
+          "checks": [
+            {
+              "id": "background",
+              "kind": "style",
+              "selector": ".panel",
+              "property": "background-color",
+              "value": "rgb(20, 20, 20)"
+            }
+          ]
+        },
+        {
+          "id": "override",
+          "media": {
+            "colorScheme": "dark"
+          },
+          "attributes": [
+            {
+              "selector": "html",
+              "name": "data-theme",
+              "value": "light"
+            }
+          ],
+          "checks": [
+            {
+              "id": "background",
+              "kind": "style",
+              "selector": ".panel",
+              "property": "background-color",
+              "value": "rgb(255, 255, 255)"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-logical-spacing",
+    "skill": "modern-css",
+    "category": "writing-modes",
+    "group": "modern-css/css-logical-spacing",
+    "split": "development",
+    "prompt": "Give the badge 24px spacing on the inline-start side and zero on the opposite side, in both LTR and RTL documents. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-logical-spacing/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-logical-spacing/good-1.txt",
+      "reference_outputs/modern-css/css-logical-spacing/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-logical-spacing/bad-1.txt",
+        "fails": [
+          "rtl/start",
+          "rtl/end"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-logical-spacing/bad-2.txt",
+        "fails": [
+          "ltr/end",
+          "rtl/end"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-logical-spacing/page.html",
+      "states": [
+        {
+          "id": "ltr",
+          "dir": "ltr",
+          "checks": [
+            {
+              "id": "start",
+              "kind": "style",
+              "selector": ".badge",
+              "property": "margin-left",
+              "value": "24px"
+            },
+            {
+              "id": "end",
+              "kind": "style",
+              "selector": ".badge",
+              "property": "margin-right",
+              "value": "0px"
+            }
+          ]
+        },
+        {
+          "id": "rtl",
+          "dir": "rtl",
+          "checks": [
+            {
+              "id": "start",
+              "kind": "style",
+              "selector": ".badge",
+              "property": "margin-right",
+              "value": "24px"
+            },
+            {
+              "id": "end",
+              "kind": "style",
+              "selector": ".badge",
+              "property": "margin-left",
+              "value": "0px"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-reduced-motion",
+    "skill": "modern-css",
+    "category": "accessibility",
+    "group": "modern-css/css-reduced-motion",
+    "split": "development",
+    "prompt": "Animate the spinner with a 1-second cycle normally. For reduced-motion users remove the animation, keeping the textual Processing status visible. Scope the change to these components. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-reduced-motion/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-reduced-motion/good-1.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-reduced-motion/bad-1.txt",
+        "fails": [
+          "reduced/no-motion"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-reduced-motion/bad-2.txt",
+        "fails": [
+          "reduced/status-visible"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-reduced-motion/page.html",
+      "states": [
+        {
+          "id": "normal",
+          "media": {
+            "reducedMotion": "no-preference"
+          },
+          "checks": [
+            {
+              "id": "duration",
+              "kind": "style",
+              "selector": ".spinner",
+              "property": "animation-duration",
+              "value": "1s"
+            }
+          ]
+        },
+        {
+          "id": "reduced",
+          "media": {
+            "reducedMotion": "reduce"
+          },
+          "checks": [
+            {
+              "id": "no-motion",
+              "kind": "style",
+              "selector": ".spinner",
+              "property": "animation-name",
+              "value": "none"
+            },
+            {
+              "id": "status-visible",
+              "kind": "visible",
+              "selector": ".status",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-shrinkable-content",
+    "skill": "modern-css",
+    "category": "overflow",
+    "group": "modern-css/css-shrinkable-content",
+    "split": "development",
+    "prompt": "Keep the 64px avatar and a 16px gap inside the 300px card. The text column must shrink to the remaining 220px, showing a single-line ellipsis without horizontal page overflow. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-shrinkable-content/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-shrinkable-content/good-1.txt",
+      "reference_outputs/modern-css/css-shrinkable-content/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-shrinkable-content/bad-1.txt",
+        "fails": [
+          "normal/text-width"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-shrinkable-content/bad-2.txt",
+        "fails": [
+          "normal/text-width",
+          "normal/ellipsis"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-shrinkable-content/page.html",
+      "states": [
+        {
+          "id": "normal",
+          "viewport": {
+            "width": 400,
+            "height": 600
+          },
+          "checks": [
+            {
+              "id": "text-width",
+              "kind": "rect",
+              "selector": ".copy",
+              "property": "width",
+              "value": 220
+            },
+            {
+              "id": "ellipsis",
+              "kind": "style",
+              "selector": ".title",
+              "property": "text-overflow",
+              "value": "ellipsis"
+            },
+            {
+              "id": "overflow",
+              "kind": "overflow",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-keyboard-focus",
+    "skill": "modern-css",
+    "category": "accessibility",
+    "group": "modern-css/css-keyboard-focus",
+    "split": "holdout",
+    "prompt": "Show a keyboard-focused button outline 3px solid rgb(0 85 204), with a 2px offset. Keep the button visible and operable. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-keyboard-focus/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-keyboard-focus/good-1.txt",
+      "reference_outputs/modern-css/css-keyboard-focus/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-keyboard-focus/bad-1.txt",
+        "fails": [
+          "keyboard/width",
+          "keyboard/style"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-keyboard-focus/bad-2.txt",
+        "fails": [
+          "keyboard/width"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-keyboard-focus/page.html",
+      "states": [
+        {
+          "id": "keyboard",
+          "tab": true,
+          "checks": [
+            {
+              "id": "width",
+              "kind": "style",
+              "selector": ".action",
+              "property": "outline-width",
+              "value": "3px"
+            },
+            {
+              "id": "style",
+              "kind": "style",
+              "selector": ".action",
+              "property": "outline-style",
+              "value": "solid"
+            },
+            {
+              "id": "color",
+              "kind": "style",
+              "selector": ".action",
+              "property": "outline-color",
+              "value": "rgb(0, 85, 204)"
+            },
+            {
+              "id": "offset",
+              "kind": "style",
+              "selector": ".action",
+              "property": "outline-offset",
+              "value": "2px"
+            },
+            {
+              "id": "visible",
+              "kind": "visible",
+              "selector": ".action",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "css-shared-tracks",
+    "skill": "modern-css",
+    "category": "subgrid",
+    "group": "modern-css/css-shared-tracks",
+    "split": "development",
+    "prompt": "Align row and header cells to the invoice grid tracks. Alignment must survive the parent switching from 80px/1fr/120px to 100px/1fr/140px columns. Preserve the HTML wrappers. Return only a CSS stylesheet. Target the pinned Chromium browser; do not change the HTML.",
+    "inputs": [
+      "fixtures/modern-css/css-shared-tracks/input.json"
+    ],
+    "grader": "css-runtime",
+    "references": [
+      "reference_outputs/modern-css/css-shared-tracks/good-1.txt",
+      "reference_outputs/modern-css/css-shared-tracks/good-2.txt"
+    ],
+    "counterexamples": [
+      {
+        "path": "reference_outputs/modern-css/css-shared-tracks/bad-1.txt",
+        "fails": [
+          "normal/name-alignment"
+        ]
+      },
+      {
+        "path": "reference_outputs/modern-css/css-shared-tracks/bad-2.txt",
+        "fails": [
+          "expanded/name-alignment"
+        ]
+      }
+    ],
+    "runtime": {
+      "html": "fixtures/modern-css/css-shared-tracks/page.html",
+      "states": [
+        {
+          "id": "normal",
+          "checks": [
+            {
+              "id": "name-alignment",
+              "kind": "same-column",
+              "selector": "#h-name",
+              "other": "#r-name",
+              "value": true
+            },
+            {
+              "id": "price-alignment",
+              "kind": "same-column",
+              "selector": "#h-price",
+              "other": "#r-price",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "expanded",
+          "attributes": [
+            {
+              "selector": ".invoice",
+              "name": "class",
+              "value": "invoice wide"
+            }
+          ],
+          "checks": [
+            {
+              "id": "name-alignment",
+              "kind": "same-column",
+              "selector": "#h-name",
+              "other": "#r-name",
+              "value": true
+            },
+            {
+              "id": "price-alignment",
+              "kind": "same-column",
+              "selector": "#h-price",
+              "other": "#r-price",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

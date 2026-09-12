@@ -1,0 +1,19 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "fallbackText": "Release update",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Release 42 failed in production",
+      "wrap": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "View logs",
+      "url": "https://example.com/logs/42"
+    }
+  ]
+}
