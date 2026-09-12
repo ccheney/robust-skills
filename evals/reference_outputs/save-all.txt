@@ -1,0 +1,2 @@
+export async function saveAll(items, save) { return Promise.all(items.map(item => save(item))); }
+

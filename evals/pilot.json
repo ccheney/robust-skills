@@ -1,0 +1,44 @@
+[
+  {
+    "id": "save-all",
+    "skill": "modern-javascript",
+    "input": "fixtures/save-all.js",
+    "grader": "javascript",
+    "prompt": "Fix saveAll so it starts saves concurrently, waits for all saves, returns results in input order, propagates rejection, and handles empty input. Use Node 24. Preserve the exported signature saveAll(items, save). Return only one JavaScript code block containing the module, with no tests or imports."
+  },
+  {
+    "id": "rank",
+    "skill": "modern-javascript",
+    "input": "fixtures/rank.js",
+    "grader": "javascript",
+    "prompt": "Fix rank so it returns scores ordered by points descending without mutating the input. Preserve object identities and the original order of tied scores. Use Node 24 and preserve the exported signature rank(scores). Return only one JavaScript code block containing the module, with no tests or imports."
+  },
+  {
+    "id": "graph",
+    "skill": "teams-adaptive-cards",
+    "input": "fixtures/graph.json",
+    "grader": "teams",
+    "prompt": "Repair this Microsoft Teams Graph chatMessage attachment wrapper. Preserve its attachment ID, card content, and body text. Return only the corrected JSON. Do not send it."
+  },
+  {
+    "id": "webhook",
+    "skill": "teams-adaptive-cards",
+    "input": "fixtures/webhook.json",
+    "grader": "teams",
+    "prompt": "Convert this raw Teams card into a Workflows webhook notification payload. Preserve the card text and make View release open https://example.com/releases/42. This is a notification-only webhook without a bot. Return only the corrected JSON. Do not send it."
+  },
+  {
+    "id": "checkout-placement",
+    "skill": "feature-slicing",
+    "input": "fixtures/checkout-tree.txt",
+    "grader": "fsd",
+    "prompt": "Place a checkout-only form and its validation in the existing FSD project. They should use the existing shared button. Return only JSON with form_path, validation_path, and imports (an array of objects with from and to file/module paths). Include form-to-validation and form-to-button imports. Paths are relative to the repository root. Preserve existing architecture and tooling."
+  },
+  {
+    "id": "cross-slice",
+    "skill": "feature-slicing",
+    "input": "fixtures/imports.json",
+    "grader": "fsd",
+    "prompt": "Repair this FSD same-layer import by composing the two existing feature APIs from the available page. Do not merge, relocate, or delete the features. Return only JSON with imports (objects with from and to repository-relative paths) describing the replacement graph. Use the feature public APIs, not their internals."
+  }
+]

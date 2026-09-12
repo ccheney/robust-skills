@@ -1,0 +1,2 @@
+export function rank(scores) { return scores.toSorted((a, b) => b.points - a.points); }
+

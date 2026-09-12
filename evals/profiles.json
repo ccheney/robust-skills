@@ -1,0 +1,19 @@
+{
+  "smoke": {
+    "routing": [
+      "modern-javascript-indirect",
+      "modern-javascript-negative",
+      "slack-mrkdwn-indirect",
+      "teams-adaptive-cards-negative"
+    ],
+    "tasks": [
+      "save-all",
+      "graph",
+      "checkout-placement"
+    ]
+  },
+  "full": {
+    "routing": "all",
+    "tasks": "all"
+  }
+}

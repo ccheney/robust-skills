@@ -1,0 +1,21 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "fallbackText": "Deployment complete",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Deployment complete",
+      "wrap": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "View release",
+      "data": {
+        "url": "https://example.com/releases/42"
+      }
+    }
+  ]
+}
