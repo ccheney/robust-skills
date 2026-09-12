@@ -1,0 +1,46 @@
+[
+  {
+    "skill": "bazel",
+    "prompt": "Use $bazel to propose the smallest BUILD fix. The repo uses Bazel 8 and existing WORKSPACE dependencies; do not upgrade it. app/main.cc includes lib/greeting.h. //lib:greeting is a public cc_library owning that header. app/BUILD.bazel is:\nload(\"@rules_cc//cc:cc_binary.bzl\", \"cc_binary\")\ncc_binary(name = \"hello\", srcs = [\"main.cc\"])\nReturn the corrected file and relevant verification command. There is no runnable Bazel checkout in this exercise."
+  },
+  {
+    "skill": "clean-ddd-hexagonal",
+    "prompt": "Use $clean-ddd-hexagonal to review this design in prose. We already use domain/application/infrastructure/presentation folders. A required business invariant says a funds transfer must atomically debit Account A and credit Account B in the same database transaction. Accounts are currently separate aggregates. Keep the presentation folder. Explain whether to coordinate the transaction or replace it with asynchronous events, and what domain fact would change your recommendation. Do not implement unrelated architecture."
+  },
+  {
+    "skill": "feature-slicing",
+    "prompt": "Use $feature-slicing to place a checkout-only form in our existing FSD frontend. Current tree: src/app/providers, src/pages/checkout/ui, src/pages/catalog/ui, src/shared/ui/button. Only checkout uses the form and its validation. Give file paths and allowed imports. Preserve existing tooling; this is a placement question."
+  },
+  {
+    "skill": "modern-css",
+    "prompt": "Use $modern-css to change only the hover color to the existing $accent token in this Sass component. Keep Sass and our global motion policy. Return the corrected snippet; no browser project is provided.\n$accent: #0055cc;\n.button {\n  color: white;\n  &:hover { color: red; }\n}"
+  },
+  {
+    "skill": "modern-javascript",
+    "prompt": "Use $modern-javascript to fix this Node 20 JavaScript function so it resolves only when all saves finish, preserving concurrent start and input order in the results. Do not upgrade the runtime. save is async and returns a value.\nasync function saveAll(items) {\n  const results = [];\n  items.forEach(async item => { results.push(await save(item)); });\n  return results;\n}\nReturn an executable function and exercise it locally with a stub save."
+  },
+  {
+    "skill": "postgres-drizzle",
+    "prompt": "Use $postgres-drizzle to write a PostgreSQL 17 migration adding orders.customer_id as a nullable UUID foreign key to existing customers.id (UUID primary key). Orders already exists with id UUID primary key. Do not connect to or change any database. Produce SQL only; migration registration is handled by our existing SQL migration system. Preserve existing orders and do not choose cascading deletion."
+  },
+  {
+    "skill": "mermaid-diagrams",
+    "prompt": "Use $mermaid-diagrams to fix this Markdown flowchart. Preserve the two stages and their edge; our renderer accepts basic flowchart syntax. Return a .mmd artifact. If you cannot run a renderer with installed tools, say so without installing a toolchain.\nflowchart LR\n    subgraph Build\n        Build[Compile]\n    end\n    Build --> Done[Done]\n"
+  },
+  {
+    "skill": "slack-block-kit",
+    "prompt": "Use $slack-block-kit to repair this message-surface payload. Keep the warning and the complete text fallback; output JSON only, do not post.\n{\"text\":\"Dependency conflict detected before deploy.\",\"blocks\":[{\"type\":\"alert\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Dependency conflict detected* before deploy.\"},\"level\":\"warning\"}]}\n"
+  },
+  {
+    "skill": "slack-mrkdwn",
+    "prompt": "Use $slack-mrkdwn to format a Slack Work Object string field. It must say Blocked in bold and link to https://example.com/runbook with label runbook. The field is explicitly standard Markdown and should have type string, value, and format. Return the JSON object; do not post."
+  },
+  {
+    "skill": "teams-adaptive-cards",
+    "prompt": "Use $teams-adaptive-cards to fix this Microsoft Teams Graph chatMessage wrapper. Preserve the attachment ID and card content. Write the corrected JSON to a local file and run the bundled linter against target graph. Do not send it.\n{\"body\":{\"contentType\":\"html\",\"content\":\"Card below\"},\"attachments\":[{\"id\":\"74d20c7f-34aa-4a7f-b74e-2b30004247c5\",\"contentType\":\"application/vnd.microsoft.card.adaptive\",\"content\":{\"type\":\"AdaptiveCard\",\"version\":\"1.2\",\"fallbackText\":\"Deployment complete\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"Deployment complete\",\"wrap\":true}]}}]}\n"
+  },
+  {
+    "skill": "teams-message-formatting",
+    "prompt": "Use $teams-message-formatting to correct the bold text in this existing Teams Graph body. Preserve HTML and do not introduce a card or send anything. Return the corrected JSON.\n{\"body\":{\"contentType\":\"html\",\"content\":\"<p>**Build passed**. See the runbook.</p>\"}}\n"
+  }
+]

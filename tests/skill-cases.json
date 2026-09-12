@@ -1,0 +1,475 @@
+[
+  {
+    "id": "bazel-direct",
+    "owner": "bazel",
+    "kind": "direct",
+    "prompt": "Fix the missing dependency in this Bazel BUILD.bazel target.",
+    "expected_skills": [
+      "bazel"
+    ]
+  },
+  {
+    "id": "bazel-indirect",
+    "owner": "bazel",
+    "kind": "indirect",
+    "prompt": "Our Bazel test passes locally but cannot find its data file under remote execution. Diagnose the graph.",
+    "expected_skills": [
+      "bazel"
+    ]
+  },
+  {
+    "id": "bazel-negative",
+    "owner": "bazel",
+    "kind": "negative",
+    "prompt": "Fix a GitHub Actions timeout in this npm-only repository; it does not use Bazel.",
+    "expected_skills": []
+  },
+  {
+    "id": "bazel-incomplete",
+    "owner": "bazel",
+    "kind": "incomplete",
+    "prompt": "Our Bazel build fails in CI. Help diagnose it.",
+    "expected_skills": [
+      "bazel"
+    ]
+  },
+  {
+    "id": "bazel-boundary",
+    "owner": "bazel",
+    "kind": "boundary",
+    "prompt": "We use Bazel 8. Fix the visibility of //lib/auth:auth without upgrading Bazel.",
+    "expected_skills": [
+      "bazel"
+    ]
+  },
+  {
+    "id": "clean-ddd-hexagonal-direct",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "direct",
+    "prompt": "Review our DDD aggregate boundaries for order confirmation and inventory reservation.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ]
+  },
+  {
+    "id": "clean-ddd-hexagonal-indirect",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "indirect",
+    "prompt": "Our domain model imports the HTTP client and ORM. Separate those dependencies behind ports and adapters.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ]
+  },
+  {
+    "id": "clean-ddd-hexagonal-negative",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "negative",
+    "prompt": "Add a health endpoint to this simple CRUD API; keep the current controller/service structure.",
+    "expected_skills": []
+  },
+  {
+    "id": "clean-ddd-hexagonal-incomplete",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "incomplete",
+    "prompt": "Model the consistency boundary for order approval; the business rules have not been supplied.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ]
+  },
+  {
+    "id": "clean-ddd-hexagonal-boundary",
+    "owner": "clean-ddd-hexagonal",
+    "kind": "boundary",
+    "prompt": "Use Clean Architecture, but keep the existing presentation folder and the required atomic update across two aggregates.",
+    "expected_skills": [
+      "clean-ddd-hexagonal"
+    ]
+  },
+  {
+    "id": "feature-slicing-direct",
+    "owner": "feature-slicing",
+    "kind": "direct",
+    "prompt": "Fix this FSD cross-slice import between features/cart and features/checkout.",
+    "expected_skills": [
+      "feature-slicing"
+    ]
+  },
+  {
+    "id": "feature-slicing-indirect",
+    "owner": "feature-slicing",
+    "kind": "indirect",
+    "prompt": "This frontend already uses Feature-Sliced Design. Where should the checkout-only form live?",
+    "expected_skills": [
+      "feature-slicing"
+    ]
+  },
+  {
+    "id": "feature-slicing-negative",
+    "owner": "feature-slicing",
+    "kind": "negative",
+    "prompt": "Add a React button in our existing components folder. Do not introduce Feature-Sliced Design.",
+    "expected_skills": []
+  },
+  {
+    "id": "feature-slicing-incomplete",
+    "owner": "feature-slicing",
+    "kind": "incomplete",
+    "prompt": "Help migrate our frontend to FSD; the framework and current file tree are not available yet.",
+    "expected_skills": [
+      "feature-slicing"
+    ]
+  },
+  {
+    "id": "feature-slicing-boundary",
+    "owner": "feature-slicing",
+    "kind": "boundary",
+    "prompt": "In our Next.js FSD app, expose a client-safe public API without moving framework route directories.",
+    "expected_skills": [
+      "feature-slicing"
+    ]
+  },
+  {
+    "id": "modern-css-direct",
+    "owner": "modern-css",
+    "kind": "direct",
+    "prompt": "Implement this responsive layout with CSS Grid and container queries.",
+    "expected_skills": [
+      "modern-css"
+    ]
+  },
+  {
+    "id": "modern-css-indirect",
+    "owner": "modern-css",
+    "kind": "indirect",
+    "prompt": "The modal stylesheet loses its theme overrides after we introduced cascade layers. Find the precedence issue.",
+    "expected_skills": [
+      "modern-css"
+    ]
+  },
+  {
+    "id": "modern-css-negative",
+    "owner": "modern-css",
+    "kind": "negative",
+    "prompt": "Update a React query cache key. No styles or layout change.",
+    "expected_skills": []
+  },
+  {
+    "id": "modern-css-incomplete",
+    "owner": "modern-css",
+    "kind": "incomplete",
+    "prompt": "Replace our tooltip positioning with CSS anchor positioning; I have not specified supported browsers.",
+    "expected_skills": [
+      "modern-css"
+    ]
+  },
+  {
+    "id": "modern-css-boundary",
+    "owner": "modern-css",
+    "kind": "boundary",
+    "prompt": "Fix a hover color in our Sass project. Keep Sass and do not add global resets.",
+    "expected_skills": [
+      "modern-css"
+    ]
+  },
+  {
+    "id": "modern-javascript-direct",
+    "owner": "modern-javascript",
+    "kind": "direct",
+    "prompt": "Modernize this JavaScript array transformation while preserving its observable behavior.",
+    "expected_skills": [
+      "modern-javascript"
+    ]
+  },
+  {
+    "id": "modern-javascript-indirect",
+    "owner": "modern-javascript",
+    "kind": "indirect",
+    "prompt": "This JavaScript forEach starts async saves but returns before they finish. Fix the completion behavior.",
+    "expected_skills": [
+      "modern-javascript"
+    ]
+  },
+  {
+    "id": "modern-javascript-negative",
+    "owner": "modern-javascript",
+    "kind": "negative",
+    "prompt": "Design a TypeScript conditional type that extracts route parameters; there is no runtime code change.",
+    "expected_skills": []
+  },
+  {
+    "id": "modern-javascript-incomplete",
+    "owner": "modern-javascript",
+    "kind": "incomplete",
+    "prompt": "Can we use Iterator.concat in this JavaScript project? Runtime targets are not available.",
+    "expected_skills": [
+      "modern-javascript"
+    ]
+  },
+  {
+    "id": "modern-javascript-boundary",
+    "owner": "modern-javascript",
+    "kind": "boundary",
+    "prompt": "Keep the intentional concurrent Promise.all behavior while refactoring this JavaScript; do not upgrade the runtime.",
+    "expected_skills": [
+      "modern-javascript"
+    ]
+  },
+  {
+    "id": "postgres-drizzle-direct",
+    "owner": "postgres-drizzle",
+    "kind": "direct",
+    "prompt": "Add a PostgreSQL foreign key and Drizzle relation for orders belonging to customers.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ]
+  },
+  {
+    "id": "postgres-drizzle-indirect",
+    "owner": "postgres-drizzle",
+    "kind": "indirect",
+    "prompt": "Our Postgres endpoint loads each user's posts in a loop. Rewrite the Drizzle query to avoid N+1.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ]
+  },
+  {
+    "id": "postgres-drizzle-negative",
+    "owner": "postgres-drizzle",
+    "kind": "negative",
+    "prompt": "Optimize this MongoDB aggregation pipeline; the service does not use PostgreSQL or Drizzle.",
+    "expected_skills": []
+  },
+  {
+    "id": "postgres-drizzle-incomplete",
+    "owner": "postgres-drizzle",
+    "kind": "incomplete",
+    "prompt": "Write a Drizzle relational query, but the installed version and schema are missing.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ]
+  },
+  {
+    "id": "postgres-drizzle-boundary",
+    "owner": "postgres-drizzle",
+    "kind": "boundary",
+    "prompt": "Review this Postgres migration SQL only. Do not connect to or change a database.",
+    "expected_skills": [
+      "postgres-drizzle"
+    ]
+  },
+  {
+    "id": "mermaid-diagrams-direct",
+    "owner": "mermaid-diagrams",
+    "kind": "direct",
+    "prompt": "Create a Mermaid sequence diagram showing a client, API, and database request.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ]
+  },
+  {
+    "id": "mermaid-diagrams-indirect",
+    "owner": "mermaid-diagrams",
+    "kind": "indirect",
+    "prompt": "Our Markdown docs contain a flowchart that fails because node IDs collide with a subgraph. Repair the Mermaid syntax.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ]
+  },
+  {
+    "id": "mermaid-diagrams-negative",
+    "owner": "mermaid-diagrams",
+    "kind": "negative",
+    "prompt": "Make a publication-ready scatter plot from these measurements using matplotlib.",
+    "expected_skills": []
+  },
+  {
+    "id": "mermaid-diagrams-incomplete",
+    "owner": "mermaid-diagrams",
+    "kind": "incomplete",
+    "prompt": "Draw a Mermaid ER diagram for our database, but I have not provided its tables or relationships.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ]
+  },
+  {
+    "id": "mermaid-diagrams-boundary",
+    "owner": "mermaid-diagrams",
+    "kind": "boundary",
+    "prompt": "Repair this Mermaid flowchart for an older renderer; preserve the supplied nodes and do not switch to architecture-beta.",
+    "expected_skills": [
+      "mermaid-diagrams"
+    ]
+  },
+  {
+    "id": "slack-block-kit-direct",
+    "owner": "slack-block-kit",
+    "kind": "direct",
+    "prompt": "Build a Slack Block Kit modal with a text input and a submit button.",
+    "expected_skills": [
+      "slack-block-kit"
+    ]
+  },
+  {
+    "id": "slack-block-kit-indirect",
+    "owner": "slack-block-kit",
+    "kind": "indirect",
+    "prompt": "Our Slack message JSON is rejected because it uses an alert block. Repair the layout for a message surface.",
+    "expected_skills": [
+      "slack-block-kit"
+    ]
+  },
+  {
+    "id": "slack-block-kit-negative",
+    "owner": "slack-block-kit",
+    "kind": "negative",
+    "prompt": "Search our Slack history for the latest release announcement; do not compose a payload.",
+    "expected_skills": []
+  },
+  {
+    "id": "slack-block-kit-incomplete",
+    "owner": "slack-block-kit",
+    "kind": "incomplete",
+    "prompt": "Build a Slack Block Kit form; I have not chosen whether it will be a modal or a message.",
+    "expected_skills": [
+      "slack-block-kit"
+    ]
+  },
+  {
+    "id": "slack-block-kit-boundary",
+    "owner": "slack-block-kit",
+    "kind": "boundary",
+    "prompt": "Generate a Slack Block Kit message JSON with a complete text fallback. Do not post it.",
+    "expected_skills": [
+      "slack-block-kit"
+    ]
+  },
+  {
+    "id": "slack-mrkdwn-direct",
+    "owner": "slack-mrkdwn",
+    "kind": "direct",
+    "prompt": "Format this Slack mrkdwn text with a bold heading and a labeled link.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ]
+  },
+  {
+    "id": "slack-mrkdwn-indirect",
+    "owner": "slack-mrkdwn",
+    "kind": "indirect",
+    "prompt": "The link [runbook](https://example.com) renders incorrectly in our Slack message text field. Correct the text syntax.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ]
+  },
+  {
+    "id": "slack-mrkdwn-negative",
+    "owner": "slack-mrkdwn",
+    "kind": "negative",
+    "prompt": "Read my Slack unread messages without drafting or formatting a reply.",
+    "expected_skills": []
+  },
+  {
+    "id": "slack-mrkdwn-incomplete",
+    "owner": "slack-mrkdwn",
+    "kind": "incomplete",
+    "prompt": "Create ready-to-send Slack text mentioning Ada, but I do not know her Slack user ID.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ]
+  },
+  {
+    "id": "slack-mrkdwn-boundary",
+    "owner": "slack-mrkdwn",
+    "kind": "boundary",
+    "prompt": "Format a Work Object string field with format markdown for Slack. Preserve standard Markdown bold and links.",
+    "expected_skills": [
+      "slack-mrkdwn"
+    ]
+  },
+  {
+    "id": "teams-adaptive-cards-direct",
+    "owner": "teams-adaptive-cards",
+    "kind": "direct",
+    "prompt": "Create a Microsoft Teams Adaptive Card for a Workflows webhook notification.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ]
+  },
+  {
+    "id": "teams-adaptive-cards-indirect",
+    "owner": "teams-adaptive-cards",
+    "kind": "indirect",
+    "prompt": "Our Teams card attachment sent through Graph has object content and no HTML placeholder. Fix the wrapper.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ]
+  },
+  {
+    "id": "teams-adaptive-cards-negative",
+    "owner": "teams-adaptive-cards",
+    "kind": "negative",
+    "prompt": "Build an Adaptive Card for a Windows notification host, not Microsoft Teams.",
+    "expected_skills": []
+  },
+  {
+    "id": "teams-adaptive-cards-incomplete",
+    "owner": "teams-adaptive-cards",
+    "kind": "incomplete",
+    "prompt": "Create an approval card for Microsoft Teams, but the delivery transport and action backend are unspecified.",
+    "expected_skills": [
+      "teams-adaptive-cards"
+    ]
+  },
+  {
+    "id": "teams-adaptive-cards-boundary",
+    "owner": "teams-adaptive-cards",
+    "kind": "boundary",
+    "prompt": "Fix the text in this legacy MessageCard delivered through a working Teams Workflow. Do not migrate the payload.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ]
+  },
+  {
+    "id": "teams-message-formatting-direct",
+    "owner": "teams-message-formatting",
+    "kind": "direct",
+    "prompt": "Format this Microsoft Teams bot message using textFormat xml.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ]
+  },
+  {
+    "id": "teams-message-formatting-indirect",
+    "owner": "teams-message-formatting",
+    "kind": "indirect",
+    "prompt": "Our Teams Graph mention appears as plain text. Fix its body markup and mentions metadata.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ]
+  },
+  {
+    "id": "teams-message-formatting-negative",
+    "owner": "teams-message-formatting",
+    "kind": "negative",
+    "prompt": "Find yesterday's messages in our Teams channel; do not format or send a response there.",
+    "expected_skills": []
+  },
+  {
+    "id": "teams-message-formatting-incomplete",
+    "owner": "teams-message-formatting",
+    "kind": "incomplete",
+    "prompt": "Format this Teams notification, but I have not said whether it is bot text, card text, or a Graph body.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ]
+  },
+  {
+    "id": "teams-message-formatting-boundary",
+    "owner": "teams-message-formatting",
+    "kind": "boundary",
+    "prompt": "Fix bold text in an existing Teams Graph HTML body without replacing it with an Adaptive Card.",
+    "expected_skills": [
+      "teams-message-formatting"
+    ]
+  }
+]
