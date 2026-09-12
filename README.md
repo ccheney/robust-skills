@@ -2,7 +2,16 @@
 
 # robust-skills
 
-Architectural taste for agentic engineering and agents. Bazel monorepo builds, backend patterns (DDD, Hexagonal, Clean Architecture), frontend structure (Feature-Sliced Design), modern CSS, database design (Postgres/Drizzle), system visualization (Mermaid), modern JavaScript (ES6-ES2026), Slack Block Kit, Slack mrkdwn formatting, Microsoft Teams Adaptive Cards, and Teams message formatting. Every skill is grounded against current official documentation, with verified examples and accurate version/support claims.
+Task-specific engineering skills for Bazel, backend and frontend architecture,
+JavaScript, CSS, PostgreSQL/Drizzle, Mermaid, Slack, and Microsoft Teams. Each
+skill has a concise entrypoint and links to technical references only when the
+task needs them. Version-specific examples are research snapshots; match them
+to the project's installed tools and target platforms.
+
+Version 4 changes automatic selection and workflow guidance. See the
+[release notes](docs/releases/v4.0.0.md) for migration details and the
+[authoring audit](docs/skill-authoring-audit.md) for the OpenAI guidance and
+validation results. Skill names and installation selectors are unchanged.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills
@@ -10,7 +19,7 @@ npx skills add https://github.com/ccheney/robust-skills
 
 ### bazel
 
-Manage, structure, modernize, and troubleshoot Bazel monorepos against Bazel 9.2. Covers the package/target/action graph, direct dependency and visibility discipline, Bazel 9's Bzlmod-only external dependency model, explicit external language rules, `query`/`cquery`/`aquery`/`mod`, `.bazelrc`, platforms and toolchains, hermetic actions, sandboxing, local and remote caching, remote execution, CI, performance profiling, Starlark extensions, and incremental adoption. Includes decision trees and diagnostics for the failure modes that commonly pass locally but fail under caching, sandboxing, or remote execution.
+Configure and troubleshoot Bazel builds. Use when editing BUILD or MODULE.bazel files, writing Starlark, diagnosing target, cache, or CI failures, or adopting or upgrading Bazel.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill bazel
@@ -18,7 +27,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill bazel
 
 ### clean-ddd-hexagonal
 
-Apply an opinionated synthesis of Clean Architecture + DDD + Hexagonal patterns to backend services. Use when designing APIs, microservices, domain models, aggregates, repositories, bounded contexts, or scalable backend structure. Leads with decision trees for the questions LLMs get wrong — where code belongs, entity vs value object, aggregate boundaries — plus a complexity ladder that says when NOT to use these patterns. Language-agnostic (Go, Rust, Python, TypeScript, Java, C#).
+Design or review backend domain and dependency boundaries using DDD, Clean Architecture, and ports/adapters. Use for aggregate modeling, bounded contexts, use-case isolation, or architecture refactoring; not routine CRUD changes.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill clean-ddd-hexagonal
@@ -26,7 +35,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill clean-ddd-hexago
 
 ### feature-slicing
 
-Apply Feature-Sliced Design (FSD v2.1) architecture to frontend projects. Use when creating new features/components/pages, restructuring React/Next.js/Vue/Remix projects, organizing frontend code, setting up project structure, fixing import violations, or migrating legacy codebases. Covers the strict layer hierarchy, the one import rule, public-API patterns, the pages-first philosophy that prevents over-slicing, official Next.js App Router integration, and Steiger linter setup.
+Organize frontend code with Feature-Sliced Design (FSD). Use when adopting FSD, placing code in an existing FSD project, or fixing slice imports and public APIs; not for every new component or page.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill feature-slicing
@@ -34,7 +43,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill feature-slicing
 
 ### modern-javascript
 
-Modern JavaScript (ES6-ES2026) patterns and best practices. Use when writing new JavaScript, refactoring legacy code, modernizing codebases, or implementing functional patterns. Pins every feature to its true ECMAScript edition and runtime baseline — including the commonly confused ones (`Array.fromAsync` is ES2026, `using` and Temporal are Stage 4 for ES2027, Records & Tuples was withdrawn). Covers `.at()`, `.toSorted()`, `Object.groupBy()`, iterator helpers, Set methods, optional chaining, nullish coalescing, async/await, and more, with syntax-checked examples verified on Node 24.
+Write, modernize, or review JavaScript language features and async code. Use for ECMAScript semantics, runtime compatibility, or polyfill/transform decisions; not unrelated framework or TypeScript type design.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill modern-javascript
@@ -42,7 +51,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill modern-javascrip
 
 ### modern-css
 
-Modern CSS features and best practices for building interfaces with pure native CSS — no preprocessors or frameworks. Use when writing CSS for any web project, choosing layout approaches, building responsive components, implementing dark mode or theming, creating animations, styling form elements, or modernizing legacy stylesheets. Covers Grid, Subgrid, Container Queries, `:has()`, `@layer`, `@scope`, nesting, `@property`, `@function`, `oklch`, `color-mix()`, `light-dark()`, scroll-driven animations, view transitions, anchor positioning, popover, and more — each annotated with accurate mid-2026 Baseline/browser-support status and safe-degradation patterns.
+Implement or debug CSS layouts, responsive styles, themes, and motion. Use when choosing native CSS features or replacing legacy styling with browser-compatible CSS; not for unrelated frontend logic.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill modern-css
@@ -50,7 +59,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill modern-css
 
 ### postgres-drizzle
 
-PostgreSQL and Drizzle ORM best practices. Use when writing database schemas, queries, relations, migrations, or any database-related code. Covers the stable drizzle-orm 0.x API while explicitly flagging v1.0 (Relational Queries v2 / `defineRelations`) differences so generated code matches the version a project actually uses, plus PG17/18 features, row-level security, connection pooling, and drizzle-kit workflows. Proactively apply when creating APIs, backends, or data models.
+Write or review PostgreSQL schemas, queries, migrations, and Drizzle ORM code. Use for Postgres/Drizzle relations, indexing, pooling, or query performance; not for unrelated databases or generic backend work.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill postgres-drizzle
@@ -58,7 +67,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill postgres-drizzle
 
 ### mermaid-diagrams
 
-Generate Mermaid diagrams in markdown, verified against Mermaid v11.16 — every example in the skill renders cleanly with mermaid-cli. Use when visualizing code, systems, processes, data structures, database schemas, workflows, or API flows. Supports flowcharts, sequence diagrams, ER diagrams, state machines, Gantt charts, mindmaps, C4, class diagrams, git graphs, and 12 more types, with a decision tree for picking the right one and a gotchas list covering the parse errors LLMs most often produce.
+Create or fix Mermaid diagrams in Markdown. Use for requested flowcharts, sequence diagrams, ER diagrams, state machines, or system diagrams when Mermaid is the output format; not every visualization or explanation.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill mermaid-diagrams
@@ -66,7 +75,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill mermaid-diagrams
 
 ### slack-mrkdwn
 
-Slack mrkdwn text formatting syntax for messages, text objects, and attachments. Use when formatting Slack message text, writing mrkdwn strings, constructing text objects, escaping user content, adding mentions or date formatting, or debugging text rendering issues. Covers the critical mrkdwn vs standard Markdown distinction — including Slack's newer standard-Markdown surfaces (`markdown` blocks and the `markdown_text` streaming argument) — plus mentions, date tokens, escaping, parse/verbatim behavior, and legacy attachments.
+Format or debug Slack message text, mentions, links, dates, and escaping. Use when choosing Slack mrkdwn versus Markdown, rich_text, or plain_text for a receiving field; not Block Kit layout or Slack history retrieval.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
@@ -74,7 +83,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill slack-mrkdwn
 
 ### slack-block-kit
 
-Slack Block Kit UI framework for building rich message layouts, modals, App Home views, and AI agent responses. Use when constructing blocks arrays, creating modals or App Home views, adding interactive elements, implementing link unfurling with Work Objects, streaming agent output via chat.startStream/appendStream/stopStream, or designing rich message layouts. Covers all 21 block types — including the 2026 additions (alert, card, carousel, container, table, data table, data visualization, plan, task card) — plus 20 interactive elements, composition objects, surfaces, and Work Objects, with verified limits and validated JSON examples.
+Build or debug Slack Block Kit payloads for messages, modals, App Home, streaming responses, and Work Object unfurls. Use for block layout, elements, or interaction schemas; not plain Slack text formatting alone.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
@@ -82,7 +91,7 @@ npx skills add https://github.com/ccheney/robust-skills --skill slack-block-kit
 
 ### teams-message-formatting
 
-Microsoft Teams text formatting syntax across bot activity text, Adaptive Card Markdown, Microsoft Graph chatMessage HTML, Workflows webhook messages, legacy MessageCards, mentions, emoji, links, code blocks, and escaping. Teams has four mutually incompatible text systems, and this skill routes you to the right markup for the surface, including desktop-vs-mobile support gaps and mention wire formats. Updated for the May 2026 O365 connector retirement. Use when formatting Teams message text, constructing Teams mentions, writing Graph chatMessage bodies, or debugging Teams rendering issues.
+Format or debug Microsoft Teams bot text, Adaptive Card text, and Graph chatMessage bodies. Use for markup, mentions, links, escaping, or client rendering issues; not card layout/actions or ordinary Teams conversation retrieval.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill teams-message-formatting
@@ -90,8 +99,28 @@ npx skills add https://github.com/ccheney/robust-skills --skill teams-message-fo
 
 ### teams-adaptive-cards
 
-Microsoft Teams Adaptive Cards for rich message layouts, notifications, approvals, forms, message extensions, bot responses, Workflows webhooks, and Microsoft Graph chatMessage attachments. Use when constructing, validating, wrapping, or migrating Teams card payloads. Covers version policy (default 1.2, ceiling 1.5 — Teams has no 1.6), Universal Actions with user-specific views, charts, people picker, `targetWidth` responsive layouts, and the post-May-2026 connector retirement migration path. Includes transport-specific wrappers and a bundled linter that catches wrapper mismatches and unsupported features before you ship a card.
+Build, validate, or repair Microsoft Teams Adaptive Card JSON and bot, webhook, or Graph wrappers. Use for card layouts, actions, forms, or MessageCard migration; not Teams text-only formatting or non-Teams card hosts.
 
 ```bash
 npx skills add https://github.com/ccheney/robust-skills --skill teams-adaptive-cards
 ```
+
+## Contributing and validation
+
+Use a description that identifies the actual task, and keep conditional detail
+in a linked reference. Preserve explicit user choices and keep verification
+proportional to the change. The [authoring audit](docs/skill-authoring-audit.md)
+explains the scope of the v4 review.
+
+For repository checks, install Python 3.10+ and PyYAML, then run:
+
+```bash
+python3 -m pip install 'PyYAML>=6,<7'
+python3 scripts/validate_skills.py
+```
+
+The validator checks metadata, local resource links, and evaluation coverage.
+It does not measure model activation or technical correctness. Use the
+[representative prompts](tests/skill-cases.json) and
+[workflow cases](tests/workflow-cases.json) to review behavior when changing a
+skill. Keep expected routing separate from the evaluator's input.
