@@ -11,6 +11,7 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 
 from evals.catalog import Catalog, snapshot
+from evals.credentials import from_gcloud
 from evals.graders import grade
 from evals.providers import Gemini, EvalUnavailable
 from evals.runner import build_plan, run_trial, summarize, main
@@ -218,6 +219,119 @@ class ProviderTests(unittest.TestCase):
         with self.assertRaises(EvalUnavailable):
             client.chat([], [])
 
+    def test_transient_503_retries_same_request_then_succeeds(self):
+        client = Gemini(max_requests=2, interval=0)
+        with (
+            patch.object(
+                client.opener,
+                "open",
+                side_effect=[
+                    HTTPError("url", 503, "overloaded", {}, None),
+                    io.BytesIO(json.dumps(completion()).encode()),
+                ],
+            ) as opened,
+            patch("evals.providers.time.sleep"),
+        ):
+            self.assertEqual(client.chat([], [])["model"], "test-model")
+            self.assertEqual(client.requests, 2)
+            self.assertIs(
+                opened.call_args_list[0].args[0], opened.call_args_list[1].args[0]
+            )
+            self.assertEqual([e["status"] for e in client.events], [503, 200])
+
+    def test_transient_retries_cannot_exceed_run_budget(self):
+        client = Gemini(max_requests=1, interval=0)
+        with patch.object(
+            client.opener,
+            "open",
+            side_effect=HTTPError("url", 503, "overloaded", {}, None),
+        ) as opened:
+            with self.assertRaisesRegex(EvalUnavailable, "budget exhausted"):
+                client.chat([], [])
+            self.assertEqual(opened.call_count, 1)
+
+    def test_retry_exhaustion_does_not_disable_later_trials(self):
+        client = Gemini(interval=0)
+        responses = [HTTPError("url", 503, "overloaded", {}, None) for _ in range(3)]
+        responses.append(io.BytesIO(json.dumps(completion()).encode()))
+        with (
+            patch.object(client.opener, "open", side_effect=responses),
+            patch("evals.providers.time.sleep"),
+        ):
+            with self.assertRaisesRegex(EvalUnavailable, "exhausted 2 retries"):
+                client.chat([], [])
+            self.assertEqual(client.chat([], [])["model"], "test-model")
+            self.assertEqual(client.requests, 4)
+
+    def test_auth_errors_are_not_retried_or_logged_with_secrets(self):
+        client = Gemini(interval=0)
+        with patch.object(
+            client.opener,
+            "open",
+            side_effect=HTTPError("url", 403, "fake-not-a-key", {}, None),
+        ) as opened:
+            with self.assertRaises(EvalUnavailable) as caught:
+                client.chat([], [])
+            self.assertNotIn("fake-not-a-key", str(caught.exception))
+            self.assertEqual(opened.call_count, 1)
+
+
+class CredentialTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.path = Path(self.directory.name) / "local.json"
+        self.path.write_text(
+            json.dumps(
+                {
+                    "gcloud_project": "test-project",
+                    "gcloud_account": "person@example.com",
+                    "gcloud_key": "test-key",
+                }
+            )
+        )
+
+    def tearDown(self):
+        self.directory.cleanup()
+
+    def test_gcloud_billing_check_precedes_secret_lookup(self):
+        from subprocess import CompletedProcess
+
+        responses = [
+            CompletedProcess([], 0, '{"billingEnabled":false}', ""),
+            CompletedProcess([], 0, "fake-key\n", ""),
+        ]
+        with patch("evals.credentials.subprocess.run", side_effect=responses) as run:
+            credentials = from_gcloud(self.path)
+            self.assertEqual(credentials["key"], "fake-key")
+            self.assertEqual(credentials["source"]["billing_enabled"], False)
+            self.assertIn("--account=person@example.com", run.call_args_list[0].args[0])
+            self.assertIn("billing", run.call_args_list[0].args[0])
+            self.assertIn("get-key-string", run.call_args_list[1].args[0])
+            self.assertNotIn("fake-key", json.dumps(credentials["source"]))
+
+    def test_billed_project_does_not_retrieve_key(self):
+        from subprocess import CompletedProcess
+
+        with patch(
+            "evals.credentials.subprocess.run",
+            return_value=CompletedProcess([], 0, '{"billingEnabled":true}', ""),
+        ) as run:
+            with self.assertRaisesRegex(EvalUnavailable, "disabled billing"):
+                from_gcloud(self.path)
+            self.assertEqual(run.call_count, 1)
+
+    def test_missing_config_uses_environment_path(self):
+        with patch("evals.credentials.subprocess.run") as run:
+            self.assertIsNone(from_gcloud(self.path.parent / "missing.json"))
+            run.assert_not_called()
+
+    def test_invalid_config_fails_without_calling_gcloud(self):
+        self.path.write_text("{}")
+        with patch("evals.credentials.subprocess.run") as run:
+            with self.assertRaises(EvalUnavailable):
+                from_gcloud(self.path)
+            run.assert_not_called()
+
 
 class InventoryTests(unittest.TestCase):
     def test_inventory_and_balanced_variants(self):
@@ -237,10 +351,12 @@ class InventoryTests(unittest.TestCase):
     def test_dry_run_makes_no_provider(self):
         with (
             patch("evals.runner.Gemini") as provider,
+            patch("evals.runner.from_gcloud") as credentials,
             patch("sys.stdout", new_callable=io.StringIO),
         ):
             self.assertEqual(main(["--dry-run"]), 0)
             provider.assert_not_called()
+            credentials.assert_not_called()
 
     def test_missing_credentials_emit_blocked_report(self):
         with (
@@ -248,7 +364,7 @@ class InventoryTests(unittest.TestCase):
             patch.dict(os.environ, {}, clear=True),
             patch("sys.stdout", new_callable=io.StringIO),
         ):
-            self.assertEqual(main(["--output", directory]), 2)
+            self.assertEqual(main(["--output", directory, "--no-local-config"]), 2)
             report = json.loads((Path(directory) / "results.json").read_text())
             self.assertEqual(report["requests"], 0)
             self.assertTrue(all(t["status"] == "blocked" for t in report["trials"]))

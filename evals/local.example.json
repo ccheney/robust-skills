@@ -1,0 +1,5 @@
+{
+  "gcloud_project": "your-project-with-billing-disabled",
+  "gcloud_account": "you@example.com",
+  "gcloud_key": "your-gemini-key-id"
+}

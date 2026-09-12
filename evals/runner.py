@@ -12,11 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from evals.catalog import Catalog, TOOLS, snapshot
+from evals.credentials import from_gcloud
 from evals.graders import grade
 from evals.providers import DEFAULT_MODEL, Gemini, EvalUnavailable
 from evals.validation import validate
 
-HARNESS_VERSION = 1
+HARNESS_VERSION = 2
 
 
 def run_trial(client, texts, prompt, max_turns=4):
@@ -226,6 +227,14 @@ def main(argv=None):
     parser.add_argument("--timeout", type=float, default=90)
     parser.add_argument("--output", type=Path, default=Path("evals/results/latest"))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--local-config", type=Path, default=Path(__file__).parent / "local.json"
+    )
+    parser.add_argument(
+        "--no-local-config",
+        action="store_true",
+        help="Use environment credentials only",
+    )
     args = parser.parse_args(argv)
     variants = args.variants.split(",")
     if (
@@ -311,8 +320,16 @@ def main(argv=None):
     }
     unavailable = None
     try:
+        credentials = None if args.no_local_config else from_gcloud(args.local_config)
         client = Gemini(
-            max_requests=args.max_requests, interval=args.interval, timeout=args.timeout
+            max_requests=args.max_requests,
+            interval=args.interval,
+            timeout=args.timeout,
+            key=credentials["key"] if credentials else None,
+            verified_free_tier=bool(credentials),
+        )
+        report["credential_source"] = (
+            credentials["source"] if credentials else {"method": "environment"}
         )
     except EvalUnavailable as exc:
         unavailable = str(exc)
@@ -339,6 +356,7 @@ def main(argv=None):
                 client, snapshots[trial["variant"]], prompt, args.max_turns
             )
             report["requests"] = client.requests
+            report["provider_events"] = client.events
         if outcome["status"] == "completed":
             if trial["kind"] == "routing":
                 outcome.update(

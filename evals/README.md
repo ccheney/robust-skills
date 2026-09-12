@@ -36,26 +36,39 @@ The default is `gemini-3.8-flash`. Google's current
 output tokens on the free tier. Use a Google AI Studio project **without Cloud
 Billing enabled**. Create its API key in [AI Studio](https://aistudio.google.com/apikey).
 
-A free API still requires authentication. Configure:
+A free API still requires authentication. The local runner can retrieve a
+Gemini-restricted key through an authenticated `gcloud` account. It checks
+`billingEnabled: false` before fetching the key, and keeps the key in memory.
+The active Google CLI account/project configuration is not changed.
 
-- Repository secret `GEMINI_API_KEY`: that free-tier project's API key.
-- Repository variable `GEMINI_FREE_TIER`: `true`, identifying the designated
-  free-tier project.
+Create an ignored `evals/local.json` using `local.example.json` as the template:
 
-The variable is a configuration assertion, not an API-level billing check. The
-runner cannot verify whether billing has been enabled on the key's project.
-Do not reuse a paid-project key for these free runs. The runner uses a fixed
-model/endpoint, caps request count and output size, spaces requests, and halts
-on quota/auth/network errors without retry or a paid fallback. Google controls
-[per-project quotas](https://ai.google.dev/gemini-api/docs/rate-limits), so a
-complete suite is not guaranteed to fit a day's free allowance.
+```json
+{
+  "gcloud_project": "your-project-with-billing-disabled",
+  "gcloud_account": "you@example.com",
+  "gcloud_key": "your-gemini-key-id"
+}
+```
 
-Standard GitHub-hosted runner time is free for public repositories; artifact
-storage has separate allowances. Copilot in CI uses Copilot credits even with
-`GITHUB_TOKEN`, and GitHub Models was retired July 30, 2026. This suite does not
-use either service. See [Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions),
-[Copilot billing in Actions](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/copilot-cli-in-github-actions),
-and [GitHub Models retirement](https://docs.github.com/en/github-models).
+Sign in with `gcloud auth login you@example.com --no-activate`. If you manage
+Google CLI through asdf, an optional `gcloud_version` field selects an installed
+version for these commands. This config contains identifiers, not the key value.
+It is never sent to the model or included in the skill catalog.
+
+Without a local config, environment credentials remain supported:
+`GEMINI_API_KEY` plus `GEMINI_FREE_TIER=true`. That environment flag is an
+assertion, not a billing lookup; only use it for an unbilled project. Pass
+`--no-local-config` to select this mode explicitly.
+
+The runner uses a fixed model/endpoint and never falls back to a paid model.
+Transient HTTP 408/500/502/503/504 and network failures get at most two retries,
+with exponential backoff and jitter. Every attempt counts toward the run's
+request cap. A transient failure that exhausts retries leaves that trial
+unscored; independent later trials can continue. Authentication, quota (429),
+and other nontransient HTTP errors halt provider requests for the run.
+Google controls [per-project quotas](https://ai.google.dev/gemini-api/docs/rate-limits),
+so a complete suite is not guaranteed to fit a day's free allowance.
 
 ## Run locally
 
@@ -73,8 +86,8 @@ python3 -m evals.runner --dry-run
 ```
 
 The commands above need no model key and make no LLM requests. The Node image
-pull and dependency install download public packages. Set `GEMINI_API_KEY` and
-`GEMINI_FREE_TIER=true` in your local environment before a live run:
+pull and dependency install download public packages. After configuring your
+local Google account, run:
 
 ```bash
 python3 -m evals.runner --profile smoke --max-requests 24
@@ -89,24 +102,19 @@ Trials are shuffled with a recorded seed to reduce ordering bias; this seed
 controls scheduling, not the provider's generation randomness. Large suites
 need larger quotas or multiple days. There is no background scheduling.
 
-## CI behavior
+## Local execution only
 
-Every relevant PR/push runs deterministic validation and the grader tests.
-Live LLM evals run through `workflow_dispatch`, after validation, only when the
-free-tier variable is configured. A missing key produces a blocked report with
-zero requests. GitHub requires the workflow to exist on the default branch
-before its manual dispatch becomes available; then you can select a branch.
-
-Live scores are initially report-only. The job summary and seven-day artifacts
-show failed and unscored trials. Infrastructure/quota limits are not counted as
-successes, and the workflow's green status is not evidence of a passing LLM
-benchmark. Promote stable regression cases to gates after reviewing real runs.
+There is no GitHub Actions evaluation workflow. Run validation and live model
+comparisons locally. Results stay in the ignored `evals/results/` directory;
+no reports are uploaded automatically. The former CI workflow and its GitHub
+secret/variable were removed when evaluations moved to local execution.
 
 ## Reports and interpretation
 
 `results.json` stores per-trial artifacts, tool traces, selected skills, grader
 results, elapsed time, available token counts, returned model identifiers, Git
-refs, snapshot/case hashes, dirty-tree status, and run limits. `summary.md` gives
+refs, snapshot/case hashes, dirty-tree status, credential provenance (without
+the key), provider attempts/retries, and run limits. `summary.md` gives
 per-variant counts. Routing precision/recall and task pass rates use only scored
 trials, alongside explicit unscored counts; a fully blocked run has a null rate.
 Exit codes: 0 = all trials pass; 1 = scored failures; 2 = blocked, inconclusive,
@@ -132,4 +140,5 @@ and [agent evaluation guidance](https://www.anthropic.com/engineering/demystifyi
 compare skill/no-skill outcomes, isolate trials, prefer executable graders, and
 record failures and resource use. The transport uses Google's documented
 [Chat Completions compatibility endpoint](https://ai.google.dev/gemini-api/docs/openai).
+Retry behavior follows Google's [troubleshooting guidance](https://ai.google.dev/gemini-api/docs/troubleshooting).
 Provider and billing details were checked September 11, 2026.
