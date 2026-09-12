@@ -14,13 +14,13 @@ from pathlib import Path
 from evals.catalog import Catalog, TOOLS, snapshot
 from evals.credentials import from_gcloud
 from evals.graders import grade
-from evals.providers import DEFAULT_MODEL, Gemini, EvalUnavailable
+from evals.providers import DEFAULT_MODEL, FREE_MODELS, Gemini, EvalUnavailable
 from evals.validation import validate
 
-HARNESS_VERSION = 2
+HARNESS_VERSION = 3
 
 
-def run_trial(client, texts, prompt, max_turns=4):
+def run_trial(client, texts, prompt, max_turns=8):
     catalog = Catalog(texts)
     instruction = (
         "Complete the user request. The user's explicit instructions take precedence over skill guidelines. "
@@ -217,12 +217,19 @@ def save_report(path, report):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", choices=["smoke", "full"], default="smoke")
+    parser.add_argument("--model", choices=FREE_MODELS, default=DEFAULT_MODEL)
     parser.add_argument("--variants", default="candidate,none")
     parser.add_argument("--baseline-ref")
     parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument(
+        "--case",
+        dest="case_ids",
+        action="append",
+        help="Run only this case ID (repeatable; must be in the selected profile)",
+    )
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--max-requests", type=int, default=24)
-    parser.add_argument("--max-turns", type=int, default=4)
+    parser.add_argument("--max-requests", type=int, default=36)
+    parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--interval", type=float, default=15)
     parser.add_argument("--timeout", type=float, default=90)
     parser.add_argument("--output", type=Path, default=Path("evals/results/latest"))
@@ -259,6 +266,13 @@ def main(argv=None):
         trials = build_plan(
             root, args.profile, variants, args.repeats, args.seed, args.baseline_ref
         )
+        if args.case_ids:
+            missing = set(args.case_ids) - {t["case"]["id"] for t in trials}
+            if missing:
+                raise ValueError(
+                    f"Cases not in the selected profile: {sorted(missing)}"
+                )
+            trials = [t for t in trials if t["case"]["id"] in args.case_ids]
         sha, texts = snapshot(root)
         snapshots = {"candidate": texts, "none": {}}
         refs = {"candidate": sha, "none": None}
@@ -284,7 +298,7 @@ def main(argv=None):
         print(
             json.dumps(
                 {
-                    "model": DEFAULT_MODEL,
+                    "model": args.model,
                     "profile": args.profile,
                     "trials": plan,
                     "max_requests": args.max_requests,
@@ -295,7 +309,7 @@ def main(argv=None):
         return 0
     report = {
         "harness_version": HARNESS_VERSION,
-        "model": DEFAULT_MODEL,
+        "model": args.model,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "git_refs": refs,
         "dirty": dirty,
@@ -327,6 +341,7 @@ def main(argv=None):
             timeout=args.timeout,
             key=credentials["key"] if credentials else None,
             verified_free_tier=bool(credentials),
+            model=args.model,
         )
         report["credential_source"] = (
             credentials["source"] if credentials else {"method": "environment"}
@@ -335,6 +350,7 @@ def main(argv=None):
         unavailable = str(exc)
     for trial in trials:
         case = trial["case"]
+        print(f"Running {trial['variant']} {case['id']} #{trial['repeat']}", flush=True)
         prompt = case["prompt"]
         if trial["kind"] == "task":
             prompt += (

@@ -31,7 +31,8 @@ Its selection numbers must not be presented as those hosts' activation rates.
 
 ## Model and cost
 
-The default is `gemini-3.8-flash`. Google's current
+The default is `gemini-3.5-flash`; select `--model gemini-3.8-flash` for a
+separate comparison run. The model stays fixed throughout each run. Google's current
 [pricing page](https://ai.google.dev/gemini-api/docs/pricing) lists free input and
 output tokens on the free tier. Use a Google AI Studio project **without Cloud
 Billing enabled**. Create its API key in [AI Studio](https://aistudio.google.com/apikey).
@@ -61,7 +62,8 @@ Without a local config, environment credentials remain supported:
 assertion, not a billing lookup; only use it for an unbilled project. Pass
 `--no-local-config` to select this mode explicitly.
 
-The runner uses a fixed model/endpoint and never falls back to a paid model.
+The runner uses the selected free-tier model and a fixed endpoint; it never
+switches models during a run or falls back to a paid model.
 Transient HTTP 408/500/502/503/504 and network failures get at most two retries,
 with exponential backoff and jitter. Every attempt counts toward the run's
 request cap. A transient failure that exhausts retries leaves that trial
@@ -90,14 +92,21 @@ pull and dependency install download public packages. After configuring your
 local Google account, run:
 
 ```bash
-python3 -m evals.runner --profile smoke --max-requests 24
+python3 -m evals.runner --profile smoke --max-requests 36
 python3 -m evals.runner --profile full --repeats 3 \
   --variants candidate,none,baseline --baseline-ref v4.0.0 \
   --max-requests 100 --output evals/results/comparison
 ```
 
+Rerun a specific case without repeating unrelated tasks:
+
+```bash
+python3 -m evals.runner --case checkout-placement --variants candidate \
+  --output evals/results/checkout-rerun
+```
+
 The request cap applies to the entire run, including reference-reading turns.
-The default is four model turns per trial and 15 seconds between requests.
+The default is eight model turns per trial and 15 seconds between requests.
 Trials are shuffled with a recorded seed to reduce ordering bias; this seed
 controls scheduling, not the provider's generation randomness. Large suites
 need larger quotas or multiple days. There is no background scheduling.

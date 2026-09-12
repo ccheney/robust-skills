@@ -8,7 +8,8 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "gemini-3.5-flash"
+FREE_MODELS = ("gemini-3.5-flash", "gemini-3.8-flash")
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 TRANSIENT_HTTP = {408, 500, 502, 503, 504}
 MAX_RETRIES = 2
@@ -27,13 +28,18 @@ class Gemini:
     def __init__(
         self,
         *,
-        max_requests=24,
+        max_requests=36,
         interval=15,
         timeout=90,
         max_tokens=4096,
         key=None,
         verified_free_tier=False,
+        model=DEFAULT_MODEL,
     ):
+        if model not in FREE_MODELS:
+            raise EvalUnavailable(
+                "Choose a model with a verified free-tier configuration"
+            )
         self.key = key or os.environ.get("GEMINI_API_KEY", "")
         if not self.key:
             raise EvalUnavailable(
@@ -50,7 +56,7 @@ class Gemini:
         self.requests = 0
         self.last_request = None
         self.halted = None
-        self.model = DEFAULT_MODEL
+        self.model = model
         self.events = []
         self.opener = build_opener(NoRedirects)
 

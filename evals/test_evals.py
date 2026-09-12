@@ -193,6 +193,11 @@ class ProviderTests(unittest.TestCase):
                 with self.assertRaises(EvalUnavailable):
                     Gemini()
 
+    def test_model_selection_is_explicit_and_restricted_to_free_models(self):
+        self.assertEqual(Gemini(model="gemini-3.8-flash").model, "gemini-3.8-flash")
+        with self.assertRaises(EvalUnavailable):
+            Gemini(model="unverified-paid-model")
+
     def test_request_budget_and_fixed_endpoint(self):
         client = Gemini(max_requests=1, interval=0)
         client.opener.open = lambda req, timeout: io.BytesIO(
@@ -368,6 +373,36 @@ class InventoryTests(unittest.TestCase):
             report = json.loads((Path(directory) / "results.json").read_text())
             self.assertEqual(report["requests"], 0)
             self.assertTrue(all(t["status"] == "blocked" for t in report["trials"]))
+
+    def test_targeted_plan_filters_cases_without_live_calls(self):
+        with (
+            patch("evals.runner.Gemini") as provider,
+            patch("sys.stdout", new_callable=io.StringIO) as output,
+        ):
+            self.assertEqual(
+                main(
+                    [
+                        "--dry-run",
+                        "--case",
+                        "checkout-placement",
+                        "--variants",
+                        "candidate",
+                    ]
+                ),
+                0,
+            )
+            plan = json.loads(output.getvalue())
+            self.assertEqual(len(plan["trials"]), 1)
+            self.assertEqual(plan["trials"][0]["id"], "checkout-placement")
+            provider.assert_not_called()
+
+    def test_unknown_case_is_a_configuration_error(self):
+        with (
+            patch("sys.stderr", new_callable=io.StringIO),
+            self.assertRaises(SystemExit) as caught,
+        ):
+            main(["--dry-run", "--case", "does-not-exist"])
+        self.assertEqual(caught.exception.code, 2)
 
 
 class GraderTests(unittest.TestCase):
