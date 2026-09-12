@@ -121,6 +121,6 @@ python3 scripts/validate_skills.py
 
 The validator checks metadata, local resource links, and evaluation coverage.
 It does not measure model activation or technical correctness. Use the
-[representative prompts](tests/skill-cases.json) and
-[workflow cases](tests/workflow-cases.json) to review behavior when changing a
+[representative prompts](evals/routing.json) and
+[workflow cases](evals/workflows.json) to review behavior when changing a
 skill. Keep expected routing separate from the evaluator's input.
