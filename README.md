@@ -113,6 +113,8 @@ Gemini 3.8 Flash free-tier runner. Run evaluations
 locally with your Google CLI account or an environment key. See the evaluation
 guide for setup and limits. No evaluation workflow runs in GitHub Actions.
 
+> We have a local skill evaluation suite covering routing and generated artifacts, with executable graders and baseline comparisons. We’re validating its coverage and measuring skill effectiveness.
+
 Use a description that identifies the actual task, and keep conditional detail
 in a linked reference. Preserve explicit user choices and keep verification
 proportional to the change. The [authoring audit](docs/skill-authoring-audit.md)
