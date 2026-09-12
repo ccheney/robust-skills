@@ -107,6 +107,11 @@ npx skills add https://github.com/ccheney/robust-skills --skill teams-adaptive-c
 
 ## Contributing and validation
 
+The root [evals directory](evals/README.md) contains reusable cases, fixtures,
+deterministic graders, and a bounded Gemini free-tier runner. CI validates the
+suite automatically; live model comparisons are manually triggered after a
+free-tier API key is configured. See the evaluation guide for setup and limits.
+
 Use a description that identifies the actual task, and keep conditional detail
 in a linked reference. Preserve explicit user choices and keep verification
 proportional to the change. The [authoring audit](docs/skill-authoring-audit.md)
