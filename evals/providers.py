@@ -8,7 +8,7 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
-DEFAULT_MODEL = "gemini-3.5-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"
 FREE_MODELS = ("gemini-3.5-flash", "gemini-3.8-flash")
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 TRANSIENT_HTTP = {408, 500, 502, 503, 504}

@@ -31,8 +31,8 @@ Its selection numbers must not be presented as those hosts' activation rates.
 
 ## Model and cost
 
-The default is `gemini-3.5-flash`; select `--model gemini-3.8-flash` for a
-separate comparison run. The model stays fixed throughout each run. Google's current
+The default is `gemini-3.8-flash`; select `--model gemini-3.5-flash` only for an
+explicit older-model comparison run. The model stays fixed throughout each run. Google's current
 [pricing page](https://ai.google.dev/gemini-api/docs/pricing) lists free input and
 output tokens on the free tier. Use a Google AI Studio project **without Cloud
 Billing enabled**. Create its API key in [AI Studio](https://aistudio.google.com/apikey).
